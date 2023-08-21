@@ -1,1 +1,9 @@
 rootProject.name = 'chatvault'
+
+include "application"
+include "infra:persistence"
+include "infra:app-service"
+include "infra:web"
+include "domain"
+include "usecase"
+include "service"
