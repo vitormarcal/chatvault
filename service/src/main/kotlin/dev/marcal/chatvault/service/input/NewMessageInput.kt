@@ -8,7 +8,11 @@ data class NewMessageInput(
     val createdAt: LocalDateTime,
     val content: String,
     val attachment: NewAttachmentInput? = null
+)
 
+data class NewMessagePayloadInput(
+    val chatId: Long,
+    val messages: List<NewMessageInput>
 )
 
 data class NewAttachmentInput(
