@@ -11,6 +11,7 @@ import dev.marcal.chatvault.service.input.NewAttachmentInput
 import dev.marcal.chatvault.service.input.NewChatInput
 import dev.marcal.chatvault.service.input.NewMessageInput
 import dev.marcal.chatvault.service.input.NewMessagePayloadInput
+import dev.marcal.chatvault.service.output.ChatBucketInfoOutput
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -26,34 +27,37 @@ class ChatLegacyImporterUseCase(
 
     override fun execute() {
         getAllChats()
-            .doOnNext { createChatIfNotExists(it) }
-            .flatMap { chat -> findMessagesAndCreatePayloadInput(chat) }
+            .map { chatDTO ->
+                chatDTO to createChatIfNotExists(chatDTO)
+            }
+            .flatMap { (chat, bucketInfo) -> findMessagesAndCreatePayloadInput(chat, bucketInfo) }
             .subscribe { input -> newMessage.execute(input) }
 
     }
 
-    private fun createChatIfNotExists(it: ChatDTO) {
+    private fun createChatIfNotExists(it: ChatDTO) =
         newChat.executeIfNotExists(NewChatInput(name = it.name, externalId = it.id.toString()))
-    }
 
     private fun getAllChats() = wppLegacyService.getAllChats()
         .doOnNext {
             logger.info("Found ${it.count} chats")
         }.flatMapIterable { chatResponse -> chatResponse.data }
 
-    private fun findMessagesAndCreatePayloadInput(chat: ChatDTO) =
+    private fun findMessagesAndCreatePayloadInput(chat: ChatDTO, bucketInfo: ChatBucketInfoOutput) =
         wppLegacyService.getMessagesByChatId(chatId = chat.id, offset = 0, 100)
             .doOnNext { logger.info("Found ${it.count} messages") }
-            .map { response -> toMessagePayloadInput(chat, response) }
+            .map { response -> toMessagePayloadInput(chat, bucketInfo, response) }
 
     private fun toMessagePayloadInput(
         chat: ChatDTO,
+        bucketInfo: ChatBucketInfoOutput,
         response: WppChatResponse<MessageDTO>
     ) = NewMessagePayloadInput(
-        chatId = chat.id,
+        chatId = bucketInfo.chatId,
         messages = response.data.map { message ->
             NewMessageInput(
-                chatId = chat.id,
+                chatId = bucketInfo.chatId,
+                externalId = message.id.toString(),
                 authorName = message.author ?: "",
                 createdAt = LocalDateTime.now(),
                 content = message.content,

@@ -16,7 +16,8 @@ data class Chat(
 data class Message(
     val author: Author,
     val createdAt: LocalDateTime,
-    val content: Content
+    val content: Content,
+    val externalId: String?
 )
 
 data class Author(

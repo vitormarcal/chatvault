@@ -39,10 +39,11 @@ class NewMessageUseCase(
                 type = if (input.authorName.isEmpty()) AuthorType.SYSTEM else AuthorType.USER
             ),
             createdAt = input.createdAt,
+            externalId = input.externalId,
             content = Content(text = input.content, attachment = input.attachment?.let {
                 Attachment(
                     name = it.name,
-                    bucket = chatBucketInfo.bucket.withPath(input.createdAt.toLocalDate().toString())
+                    bucket = chatBucketInfo.bucket.withPath("/")
                 )
             })
         )

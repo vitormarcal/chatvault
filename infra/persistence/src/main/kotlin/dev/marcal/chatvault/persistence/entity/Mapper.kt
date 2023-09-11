@@ -1,8 +1,6 @@
 package dev.marcal.chatvault.persistence.entity
 
-import dev.marcal.chatvault.model.Chat
-import dev.marcal.chatvault.model.ChatPayload
-import dev.marcal.chatvault.model.MessagePayload
+import dev.marcal.chatvault.model.*
 
 
 fun MessagePayload.toMessagesEntity(): List<MessageEntity> {
@@ -13,6 +11,7 @@ fun MessagePayload.toMessagesEntity(): List<MessageEntity> {
             content = it.content.text,
             attachmentPath = it.content.attachment?.bucket?.path,
             chatId = this.chatId,
+            externalId = it.externalId,
             createdAt = it.createdAt
         )
     }
@@ -25,3 +24,5 @@ fun ChatPayload.toChatEntity(): ChatEntity {
         bucket = this.bucket.path
     )
 }
+
+fun ChatEntity.toChatBucketInfo() = ChatBucketInfo(chatId = this.id!!, Bucket(this.bucket))

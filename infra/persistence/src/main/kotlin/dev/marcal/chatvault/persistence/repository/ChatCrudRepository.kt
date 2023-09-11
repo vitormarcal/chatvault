@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 interface ChatCrudRepository: JpaRepository<ChatEntity, Long> {
 
     fun existsByExternalId(externalId: String): Boolean
+
+    fun findByExternalId(externalId: String): ChatEntity
 }

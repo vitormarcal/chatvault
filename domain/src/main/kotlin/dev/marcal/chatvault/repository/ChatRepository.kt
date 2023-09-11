@@ -10,6 +10,7 @@ interface ChatRepository {
     fun saveNewMessages(payload: MessagePayload)
     fun findChatBucketInfoByChatId(chatId: Long): ChatBucketInfo?
 
-    fun create(payload: ChatPayload)
+    fun create(payload: ChatPayload): ChatBucketInfo
     fun existsByExternalId(externalId: String): Boolean
+    fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo
 }

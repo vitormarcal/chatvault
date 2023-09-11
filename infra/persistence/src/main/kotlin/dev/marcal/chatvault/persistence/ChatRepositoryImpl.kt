@@ -1,6 +1,8 @@
 package dev.marcal.chatvault.persistence
 
 import dev.marcal.chatvault.model.*
+import dev.marcal.chatvault.persistence.entity.ChatEntity
+import dev.marcal.chatvault.persistence.entity.toChatBucketInfo
 import dev.marcal.chatvault.persistence.entity.toChatEntity
 import dev.marcal.chatvault.persistence.entity.toMessagesEntity
 import dev.marcal.chatvault.persistence.repository.ChatCrudRepository
@@ -22,16 +24,18 @@ class ChatRepositoryImpl(
         messageCrudRepository.saveAll(messagesToSave)
     }
 
-    override fun create(payload: ChatPayload) {
-        chatCrudRepository.save(payload.toChatEntity())
+    override fun create(payload: ChatPayload): ChatBucketInfo {
+        return chatCrudRepository.save(payload.toChatEntity()).toChatBucketInfo()
     }
     override fun findChatBucketInfoByChatId(chatId: Long): ChatBucketInfo? {
-        return chatCrudRepository.findById(chatId).getOrNull()?.let {
-            ChatBucketInfo(chatId = it.id!!, Bucket(it.bucket))
-        }
+        return chatCrudRepository.findById(chatId).getOrNull()?.toChatBucketInfo()
     }
 
     override fun existsByExternalId(externalId: String): Boolean {
         return chatCrudRepository.existsByExternalId(externalId)
+    }
+
+    override fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo {
+        return chatCrudRepository.findByExternalId(externalId).toChatBucketInfo()
     }
 }

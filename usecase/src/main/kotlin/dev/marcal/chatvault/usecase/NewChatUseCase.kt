@@ -1,11 +1,12 @@
 package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.model.Bucket
-import dev.marcal.chatvault.model.Chat
 import dev.marcal.chatvault.model.ChatPayload
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.NewChat
 import dev.marcal.chatvault.service.input.NewChatInput
+import dev.marcal.chatvault.service.output.ChatBucketInfoOutput
+import dev.marcal.chatvault.usecase.mapper.toOutput
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -13,15 +14,15 @@ import java.util.UUID
 class NewChatUseCase(
     private val chatRepository: ChatRepository
 ): NewChat {
-    override fun executeIfNotExists(input: NewChatInput) {
+    override fun executeIfNotExists(input: NewChatInput): ChatBucketInfoOutput {
 
         if (chatWithExternalIdExists(input.externalId)) {
-            return
+            return chatRepository.findChatBucketInfoByExternalId(input.externalId!!).toOutput()
         }
 
         val chatToSave = buildChat(input)
 
-        chatRepository.create(chatToSave)
+        return chatRepository.create(chatToSave).toOutput()
 
     }
 
