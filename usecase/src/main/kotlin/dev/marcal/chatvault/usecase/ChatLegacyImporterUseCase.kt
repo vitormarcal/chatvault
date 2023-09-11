@@ -46,10 +46,9 @@ class ChatLegacyImporterUseCase(
     private fun findMessagesAndCreatePayloadInput(chat: ChatDTO, bucketInfo: ChatBucketInfoOutput) =
         wppLegacyService.getMessagesByChatId(chatId = chat.id, offset = 0, 100)
             .doOnNext { logger.info("Found ${it.count} messages") }
-            .map { response -> toMessagePayloadInput(chat, bucketInfo, response) }
+            .map { response -> toMessagePayloadInput(bucketInfo, response) }
 
     private fun toMessagePayloadInput(
-        chat: ChatDTO,
         bucketInfo: ChatBucketInfoOutput,
         response: WppChatResponse<MessageDTO>
     ) = NewMessagePayloadInput(
