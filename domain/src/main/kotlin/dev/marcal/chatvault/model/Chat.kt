@@ -7,6 +7,8 @@ import java.time.LocalDateTime
 
 data class Chat(
     val id: Long,
+    val externalId: String? = null,
+    val name: String,
     val messages: List<Message> = emptyList(),
     val bucket: Bucket
 )

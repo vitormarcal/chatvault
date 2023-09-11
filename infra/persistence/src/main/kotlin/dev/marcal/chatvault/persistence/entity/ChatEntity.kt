@@ -4,24 +4,27 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "chat")
-data class Chat(
+@Table(name = "chat", uniqueConstraints = [
+    UniqueConstraint(name = "chat_external_id_key", columnNames = ["externalId"] )
+])
+data class ChatEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
     val name: String,
+    val externalId: String? = null,
     val bucket: String
 )
 
 @Entity
 @Table(name = "message")
-data class Message(
+data class MessageEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
     val author: String,
     val authorType: String,
     val createdAt: LocalDateTime,
-    val content: String,
+    @Column(columnDefinition = "TEXT") val content: String,
     val attachmentPath: String?,
     val chatId: Long,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatId", insertable = false, updatable = false)
-    val chat: Chat? = null
+    val chat: ChatEntity? = null
 )

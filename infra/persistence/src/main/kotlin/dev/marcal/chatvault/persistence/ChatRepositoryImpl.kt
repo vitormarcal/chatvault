@@ -1,9 +1,8 @@
 package dev.marcal.chatvault.persistence
 
-import dev.marcal.chatvault.model.Bucket
-import dev.marcal.chatvault.model.Chat
-import dev.marcal.chatvault.model.ChatBucketInfo
-import dev.marcal.chatvault.persistence.entity.Message
+import dev.marcal.chatvault.model.*
+import dev.marcal.chatvault.persistence.entity.toChatEntity
+import dev.marcal.chatvault.persistence.entity.toMessagesEntity
 import dev.marcal.chatvault.persistence.repository.ChatCrudRepository
 import dev.marcal.chatvault.persistence.repository.MessageCrudRepository
 import dev.marcal.chatvault.repository.ChatRepository
@@ -18,23 +17,21 @@ class ChatRepositoryImpl(
 ) : ChatRepository {
 
     @Transactional
-    override fun saveNewMessages(chat: Chat) {
-        val messagesToSave = chat.messages.map {
-            Message(
-                author = it.author.name,
-                authorType = it.author.type.name,
-                content = it.content.text,
-                attachmentPath = it.content.attachment?.bucket?.path,
-                chatId = chat.id,
-                createdAt = it.createdAt
-            )
-        }
+    override fun saveNewMessages(payload: MessagePayload) {
+        val messagesToSave = payload.toMessagesEntity()
         messageCrudRepository.saveAll(messagesToSave)
     }
 
+    override fun create(payload: ChatPayload) {
+        chatCrudRepository.save(payload.toChatEntity())
+    }
     override fun findChatBucketInfoByChatId(chatId: Long): ChatBucketInfo? {
         return chatCrudRepository.findById(chatId).getOrNull()?.let {
             ChatBucketInfo(chatId = it.id!!, Bucket(it.bucket))
         }
+    }
+
+    override fun existsByExternalId(externalId: String): Boolean {
+        return chatCrudRepository.existsByExternalId(externalId)
     }
 }

@@ -23,13 +23,12 @@ class NewMessageUseCase(
         val chatBucketInfo =
             chatRepository.findChatBucketInfoByChatId(input.chatId) ?: throw RuntimeException("chat not found")
 
-        val theChat = Chat(
-            id = chatBucketInfo.chatId,
-            bucket = chatBucketInfo.bucket,
+        val theMessagePayload = MessagePayload(
+            chatId = chatBucketInfo.chatId,
             messages = input.messages.map { buildNewMessage(it, chatBucketInfo) }
         )
 
-        chatRepository.saveNewMessages(chat = theChat)
+        chatRepository.saveNewMessages(payload = theMessagePayload)
     }
 
     private fun buildNewMessage(input: NewMessageInput, chatBucketInfo: ChatBucketInfo): Message {
