@@ -22,7 +22,7 @@ class ChatController(
 
     @GetMapping("legacy/import")
     fun importLegacy() {
-        chatLegacyImporter.execute()
+        chatLegacyImporter.importMessages()
     }
 
 }
