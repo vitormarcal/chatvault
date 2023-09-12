@@ -1,6 +1,6 @@
 package dev.marcal.chatvault.web
 
-import dev.marcal.chatvault.service.ChatLegacyImporter
+import dev.marcal.chatvault.service.legacy.ChatLegacyImporter
 import dev.marcal.chatvault.service.NewMessage
 import dev.marcal.chatvault.service.input.NewMessageInput
 import org.springframework.web.bind.annotation.GetMapping
