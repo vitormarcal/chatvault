@@ -19,6 +19,5 @@ data class MessageDTO(
     val attachmentName: String?,
     val date: String,
     val createdAt: String,
-    val updateAt: String?,
-
-    )
+    val updateAt: String?
+)

@@ -8,4 +8,5 @@ import reactor.core.publisher.Mono
 interface WppLegacyService {
     fun getAllChats(): Mono<WppChatResponse<ChatDTO>>
     fun getMessagesByChatId(chatId: Long, offset: Int, limit: Int): Mono<WppChatResponse<MessageDTO>>
+    fun getAttachmentsByMessageId(messageId: String): Mono<ByteArray>
 }

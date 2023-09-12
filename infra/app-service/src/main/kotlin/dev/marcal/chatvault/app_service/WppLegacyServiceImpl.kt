@@ -11,8 +11,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import reactor.util.retry.Retry
-import java.time.Duration
 
 @Service
 @PropertySource("classpath:appservice.properties")
@@ -20,7 +18,8 @@ class WppLegacyServiceImpl(
     private val webClient: WebClient,
     private val wppLegacyAuthenticatorService: WppLegacyAuthenticatorService,
     @Value("\${app.legacy.all-chats}") private val allChatsUrl: String,
-    @Value("\${app.legacy.messages-by-chat-id}") private val messagesByChatIdUrl: String
+    @Value("\${app.legacy.messages-by-chat-id}") private val messagesByChatIdUrl: String,
+    @Value("\${app.legacy.attachments-by-message-id}") private val attachmentsByMessageIdUrl: String
 ): WppLegacyService {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -51,6 +50,23 @@ class WppLegacyServiceImpl(
                 .retry(3)
                 .doOnError {
                     logger.error("Fail to get messages chatId=$chatId, offset=$offset, limit=$limit", it)
+                }
+        }
+    }
+
+    override fun getAttachmentsByMessageId(messageId: String): Mono<ByteArray> {
+        return wppLegacyAuthenticatorService.getToken().flatMap { token ->
+            webClient
+                .get()
+                .uri(
+                    messagesByChatIdUrl.replace("{messageId}", messageId.toString())
+                )
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                .retrieve()
+                .bodyToMono(ByteArray::class.java)
+                .retry(3)
+                .doOnError {
+                    logger.error("Fail to get attachments info messageId=$messageId", it)
                 }
         }
     }
