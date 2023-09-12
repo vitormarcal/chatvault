@@ -48,7 +48,9 @@ data class EventSourceEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
     val chatId: Long,
     val externalId: String? = null,
-    val imported: Boolean = false,
+    val messageImported: Boolean = false,
+    val attachmentImported: Boolean? = null,
+    val hasAttachment: Boolean = false,
     @Column(columnDefinition = "jsonb")   @ColumnTransformer(write = "?::jsonb") val payload: String,
     val createdAt: LocalDateTime
 )

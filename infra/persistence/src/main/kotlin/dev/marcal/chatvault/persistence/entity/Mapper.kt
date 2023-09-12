@@ -20,10 +20,14 @@ fun MessagePayload.toMessagesEntity(): List<MessageEntity> {
 
 fun MessagePayload.toEventSourceEntity(objectMapper: ObjectMapper): List<EventSourceEntity> {
     return this.messages.map {
+        val hasAttachment = it.content.attachment != null
         EventSourceEntity(
             chatId = this.chatId,
             externalId = it.externalId,
             createdAt = it.createdAt,
+            messageImported = false,
+            attachmentImported = if (hasAttachment) true else null,
+            hasAttachment = hasAttachment,
             payload = objectMapper.writeValueAsString(it)
         )
     }
