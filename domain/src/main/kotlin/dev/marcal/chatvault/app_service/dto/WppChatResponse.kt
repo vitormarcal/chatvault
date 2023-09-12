@@ -9,7 +9,7 @@ data class ChatDTO(
     val id: Long,
     val name: String,
     val attachmentDir: String,
-    val messagesCount: Long,
+    val messagesCount: Int,
 )
 
 data class MessageDTO(
