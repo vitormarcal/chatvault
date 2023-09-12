@@ -1,9 +1,6 @@
 package dev.marcal.chatvault.repository
 
-import dev.marcal.chatvault.model.Chat
-import dev.marcal.chatvault.model.ChatBucketInfo
-import dev.marcal.chatvault.model.ChatPayload
-import dev.marcal.chatvault.model.MessagePayload
+import dev.marcal.chatvault.model.*
 
 interface ChatRepository {
 
@@ -13,4 +10,7 @@ interface ChatRepository {
     fun create(payload: ChatPayload): ChatBucketInfo
     fun existsByExternalId(externalId: String): Boolean
     fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo
+    fun findLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message>
+    fun findAllEventSourceChatId(): List<Long>
+    fun saveLegacyMessage(messagePayload: MessagePayload)
 }

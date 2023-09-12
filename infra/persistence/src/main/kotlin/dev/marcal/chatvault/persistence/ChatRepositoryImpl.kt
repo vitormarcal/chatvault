@@ -7,6 +7,8 @@ import dev.marcal.chatvault.persistence.repository.ChatCrudRepository
 import dev.marcal.chatvault.persistence.repository.EventSourceCrudRepository
 import dev.marcal.chatvault.persistence.repository.MessageCrudRepository
 import dev.marcal.chatvault.repository.ChatRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.jvm.optionals.getOrNull
@@ -34,9 +36,40 @@ class ChatRepositoryImpl(
         eventSourceCrudRepository.saveAll(messagesToSave)
     }
 
+    override fun findLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message> {
+        return eventSourceCrudRepository.findLegacyNotImportedByChatId(
+            chatId,
+            PageRequest.of(page - 1, size, Sort.by(Sort.Order.asc("externalId")))
+        )
+            .let { pageRequest ->
+                Page(
+                    data = pageRequest.map { it.toMessage(objectMapper) }.toList(),
+                    page = page,
+                    totalPages = pageRequest.totalPages,
+                    items = size,
+                    totalItems = pageRequest.totalElements
+                )
+            }
+
+    }
+
+    override fun findAllEventSourceChatId(): List<Long> {
+        return eventSourceCrudRepository.findAllChatId()
+    }
+
+    @Transactional
+    override fun saveLegacyMessage(messagePayload: MessagePayload) {
+        saveNewMessages(messagePayload, eventSource = false)
+        messagePayload.messages
+            .map { requireNotNull(it.externalId) }
+            .forEach { eventSourceCrudRepository.setImportedTrue(it) }
+
+    }
+
     override fun create(payload: ChatPayload): ChatBucketInfo {
         return chatCrudRepository.save(payload.toChatEntity()).toChatBucketInfo()
     }
+
     override fun findChatBucketInfoByChatId(chatId: Long): ChatBucketInfo? {
         return chatCrudRepository.findById(chatId).getOrNull()?.toChatBucketInfo()
     }

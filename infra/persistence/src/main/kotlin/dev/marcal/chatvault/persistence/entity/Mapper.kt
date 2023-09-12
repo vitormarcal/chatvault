@@ -29,6 +29,10 @@ fun MessagePayload.toEventSourceEntity(objectMapper: ObjectMapper): List<EventSo
     }
 }
 
+fun EventSourceEntity.toMessage(objectMapper: ObjectMapper): Message {
+    return objectMapper.readValue(this.payload, Message::class.java)
+}
+
 fun ChatPayload.toChatEntity(): ChatEntity {
     return ChatEntity(
         name = this.name,
