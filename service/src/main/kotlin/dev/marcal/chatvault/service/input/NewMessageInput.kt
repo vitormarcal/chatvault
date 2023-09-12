@@ -13,6 +13,7 @@ data class NewMessageInput(
 
 data class NewMessagePayloadInput(
     val chatId: Long,
+    val eventSource: Boolean,
     val messages: List<NewMessageInput>
 )
 

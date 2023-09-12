@@ -7,7 +7,7 @@ import dev.marcal.chatvault.model.MessagePayload
 
 interface ChatRepository {
 
-    fun saveNewMessages(payload: MessagePayload)
+    fun saveNewMessages(payload: MessagePayload, eventSource: Boolean = false)
     fun findChatBucketInfoByChatId(chatId: Long): ChatBucketInfo?
 
     fun create(payload: ChatPayload): ChatBucketInfo

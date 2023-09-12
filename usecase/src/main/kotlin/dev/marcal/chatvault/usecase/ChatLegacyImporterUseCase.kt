@@ -60,6 +60,7 @@ class ChatLegacyImporterUseCase(
         response: WppChatResponse<MessageDTO>
     ) = NewMessagePayloadInput(
         chatId = bucketInfo.chatId,
+        eventSource = true,
         messages = response.data.map { message ->
             NewMessageInput(
                 chatId = bucketInfo.chatId,

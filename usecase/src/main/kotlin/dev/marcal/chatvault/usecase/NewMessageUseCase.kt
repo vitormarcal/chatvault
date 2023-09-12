@@ -14,7 +14,8 @@ class NewMessageUseCase(
     override fun execute(input: NewMessageInput) {
         val payloadInput = NewMessagePayloadInput(
             chatId = input.chatId,
-            messages = listOf(input)
+            messages = listOf(input),
+            eventSource = false,
         )
         execute(payloadInput)
     }
@@ -28,7 +29,7 @@ class NewMessageUseCase(
             messages = input.messages.map { buildNewMessage(it, chatBucketInfo) }
         )
 
-        chatRepository.saveNewMessages(payload = theMessagePayload)
+        chatRepository.saveNewMessages(payload = theMessagePayload, eventSource = input.eventSource)
     }
 
     private fun buildNewMessage(input: NewMessageInput, chatBucketInfo: ChatBucketInfo): Message {

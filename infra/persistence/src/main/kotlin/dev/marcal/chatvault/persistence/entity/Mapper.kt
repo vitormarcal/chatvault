@@ -1,5 +1,6 @@
 package dev.marcal.chatvault.persistence.entity
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import dev.marcal.chatvault.model.*
 
 
@@ -13,6 +14,17 @@ fun MessagePayload.toMessagesEntity(): List<MessageEntity> {
             chatId = this.chatId,
             externalId = it.externalId,
             createdAt = it.createdAt
+        )
+    }
+}
+
+fun MessagePayload.toEventSourceEntity(objectMapper: ObjectMapper): List<EventSourceEntity> {
+    return this.messages.map {
+        EventSourceEntity(
+            chatId = this.chatId,
+            externalId = it.externalId,
+            createdAt = it.createdAt,
+            payload = objectMapper.writeValueAsString(it)
         )
     }
 }

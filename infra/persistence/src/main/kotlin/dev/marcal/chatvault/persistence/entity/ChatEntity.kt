@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.persistence.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.ColumnTransformer
 import java.time.LocalDateTime
 
 @Entity
@@ -34,4 +35,20 @@ data class MessageEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatId", insertable = false, updatable = false)
     val chat: ChatEntity? = null
+)
+
+
+@Entity
+@Table(
+    name = "event_source", uniqueConstraints = [
+        UniqueConstraint(name = "event_source_external_id_key", columnNames = ["externalId"])
+    ]
+)
+data class EventSourceEntity(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
+    val chatId: Long,
+    val externalId: String? = null,
+    val imported: Boolean? = null,
+    @Column(columnDefinition = "jsonb")   @ColumnTransformer(write = "?::jsonb") val payload: String,
+    val createdAt: LocalDateTime
 )
