@@ -26,6 +26,7 @@ class WppLegacyAuthenticatorService(
             .bodyValue(mapOf("email" to email, "password" to psw))
             .retrieve()
             .bodyToMono(AuthToken::class.java)
+            .cache(java.time.Duration.ofMinutes(10))
             .map { it.token }
     }
 }

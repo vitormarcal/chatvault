@@ -4,7 +4,6 @@ import dev.marcal.chatvault.app_service.WppLegacyService
 import dev.marcal.chatvault.app_service.dto.ChatDTO
 import dev.marcal.chatvault.app_service.dto.MessageDTO
 import dev.marcal.chatvault.app_service.dto.WppChatResponse
-import dev.marcal.chatvault.model.MessagePayload
 import dev.marcal.chatvault.service.ChatLegacyImporter
 import dev.marcal.chatvault.service.NewChat
 import dev.marcal.chatvault.service.NewMessage
@@ -49,7 +48,7 @@ class ChatLegacyImporterUseCase(
     private fun getAllChats() = wppLegacyService.getAllChats()
         .doOnNext {
             logger.info("Found ${it.count} chats")
-        }.flatMapIterable { chatResponse -> chatResponse.data }
+        }.flatMapIterable { chatResponse -> chatResponse.data.sortedBy { it.id } }
 
     private fun findMessagesAndCreatePayloadInput(chat: ChatDTO, bucketInfo: ChatBucketInfoOutput, offset: Int, limit: Int) =
         wppLegacyService.getMessagesByChatId(chatId = chat.id, offset = offset, limit)
