@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import reactor.util.retry.Retry
+import java.time.Duration
 
 @Service
 @PropertySource("classpath:appservice.properties")
@@ -46,6 +48,10 @@ class WppLegacyServiceImpl(
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
                 .retrieve()
                 .bodyToMono(object : ParameterizedTypeReference<WppChatResponse<MessageDTO>>() {})
+                .retry(3)
+                .doOnError {
+                    logger.error("Fail to get messages chatId=$chatId, offset=$offset, limit=$limit", it)
+                }
         }
     }
 
