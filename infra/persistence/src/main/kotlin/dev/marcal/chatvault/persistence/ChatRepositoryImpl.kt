@@ -37,7 +37,24 @@ class ChatRepositoryImpl(
     }
 
     override fun findLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message> {
-        return eventSourceCrudRepository.findLegacyNotImportedByChatId(
+        return eventSourceCrudRepository.findLegacyMessageNotImportedByChatId(
+            chatId,
+            PageRequest.of(page - 1, size, Sort.by(Sort.Order.asc("externalId")))
+        )
+            .let { pageRequest ->
+                Page(
+                    data = pageRequest.map { it.toMessage(objectMapper) }.toList(),
+                    page = page,
+                    totalPages = pageRequest.totalPages,
+                    items = size,
+                    totalItems = pageRequest.totalElements
+                )
+            }
+
+    }
+
+    override fun findAttachmentLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message> {
+        return eventSourceCrudRepository.findLegacyAttachmentNotImportedByChatId(
             chatId,
             PageRequest.of(page - 1, size, Sort.by(Sort.Order.asc("externalId")))
         )
@@ -64,6 +81,10 @@ class ChatRepositoryImpl(
             .map { requireNotNull(it.externalId) }
             .forEach { eventSourceCrudRepository.setImportedTrue(it) }
 
+    }
+
+    override fun setLegacyAttachmentImported(messageExternalId: String) {
+        eventSourceCrudRepository.setAttachmentImportedTrue(messageExternalId)
     }
 
     override fun create(payload: ChatPayload): ChatBucketInfo {

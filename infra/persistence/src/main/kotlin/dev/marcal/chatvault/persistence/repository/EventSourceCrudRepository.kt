@@ -16,11 +16,22 @@ interface EventSourceCrudRepository: JpaRepository<EventSourceEntity, Long> {
             SELECT e FROM EventSourceEntity e
             WHERE 0=0
                 AND e.chatId = :chatId
-                AND e.imported <> true
+                AND e.messageImported <> true
                 AND e.externalId is not null
         """
     )
-    fun findLegacyNotImportedByChatId(@Param("chatId") chatId: Long, pageable: Pageable): Page<EventSourceEntity>
+    fun findLegacyMessageNotImportedByChatId(@Param("chatId") chatId: Long, pageable: Pageable): Page<EventSourceEntity>
+
+    @Query(
+        """
+            SELECT e FROM EventSourceEntity e
+            WHERE 0=0
+                AND e.chatId = :chatId
+                AND e.attachmentImported = false
+                AND e.externalId is not null
+        """
+    )
+    fun findLegacyAttachmentNotImportedByChatId(@Param("chatId") chatId: Long, pageable: Pageable): Page<EventSourceEntity>
 
     @Query(
         """
@@ -34,9 +45,20 @@ interface EventSourceCrudRepository: JpaRepository<EventSourceEntity, Long> {
     @Query(
         """
             UPDATE EventSourceEntity e
-            SET e.imported = true
+            SET e.messageImported = true
             WHERE e.externalId = :externalId
         """
     )
     fun setImportedTrue(@Param("externalId") externalId: String)
+
+    @Modifying
+    @Transactional
+    @Query(
+        """
+            UPDATE EventSourceEntity e
+            SET e.attachmentImported = true
+            WHERE e.externalId = :externalId
+        """
+    )
+    fun setAttachmentImportedTrue(@Param("externalId") externalId: String)
 }

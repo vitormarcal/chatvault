@@ -26,7 +26,7 @@ fun MessagePayload.toEventSourceEntity(objectMapper: ObjectMapper): List<EventSo
             externalId = it.externalId,
             createdAt = it.createdAt,
             messageImported = false,
-            attachmentImported = if (hasAttachment) true else null,
+            attachmentImported = if (hasAttachment) false else null,
             hasAttachment = hasAttachment,
             payload = objectMapper.writeValueAsString(it)
         )

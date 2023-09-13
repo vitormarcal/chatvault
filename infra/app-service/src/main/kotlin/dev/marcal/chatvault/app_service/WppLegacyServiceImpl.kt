@@ -55,20 +55,17 @@ class WppLegacyServiceImpl(
     }
 
     override fun getAttachmentsByMessageId(messageId: String): Mono<ByteArray> {
-        return wppLegacyAuthenticatorService.getToken().flatMap { token ->
-            webClient
-                .get()
-                .uri(
-                    messagesByChatIdUrl.replace("{messageId}", messageId.toString())
-                )
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
-                .retrieve()
-                .bodyToMono(ByteArray::class.java)
-                .retry(3)
-                .doOnError {
-                    logger.error("Fail to get attachments info messageId=$messageId", it)
-                }
-        }
+        return webClient
+            .get()
+            .uri(
+                attachmentsByMessageIdUrl.replace("{messageId}", messageId.toString())
+            )
+            .retrieve()
+            .bodyToMono(ByteArray::class.java)
+            .retry(3)
+            .doOnError {
+                logger.error("Fail to get attachments info messageId=$messageId", it)
+            }
     }
 
 }

@@ -38,7 +38,9 @@ data class Content(
 data class Attachment(
     val name: String,
     val bucket: Bucket,
-)
+) {
+    fun path() = bucket.path + name
+}
 
 data class Bucket(
     val path: String

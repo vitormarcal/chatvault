@@ -11,6 +11,9 @@ interface ChatRepository {
     fun existsByExternalId(externalId: String): Boolean
     fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo
     fun findLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message>
+    fun findAttachmentLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message>
     fun findAllEventSourceChatId(): List<Long>
     fun saveLegacyMessage(messagePayload: MessagePayload)
+
+    fun setLegacyAttachmentImported(messageExternalId: String)
 }
