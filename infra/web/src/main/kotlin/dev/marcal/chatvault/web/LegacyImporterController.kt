@@ -1,12 +1,9 @@
 package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.service.legacy.ChatLegacyImporter
-import dev.marcal.chatvault.service.NewMessage
-import dev.marcal.chatvault.service.input.NewMessageInput
 import dev.marcal.chatvault.service.legacy.AttachmentLegacyImporter
 import dev.marcal.chatvault.service.legacy.EventSourceLegacyImporter
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -22,12 +19,12 @@ class LegacyImporterController(
 
     @GetMapping("import/event-source")
     fun importLegacy() {
-        chatLegacyImporter.importMessages()
+        chatLegacyImporter.importToEventSource()
     }
 
     @GetMapping("legacy/import/event-source/messages")
     fun importLegacyEventSourceMessages() {
-        eventSourceLegacyImporter.import()
+        eventSourceLegacyImporter.importMessagesFromEventSource()
     }
 
     @GetMapping("legacy/import/event-source/attachments")

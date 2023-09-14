@@ -13,7 +13,7 @@ class EventSourceLegacyImporterUseCase(
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun import() {
+    override fun importMessagesFromEventSource() {
 
 
         chatRepository.findAllEventSourceChatId()

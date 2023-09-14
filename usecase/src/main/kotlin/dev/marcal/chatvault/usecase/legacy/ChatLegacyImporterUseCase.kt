@@ -26,7 +26,7 @@ class ChatLegacyImporterUseCase(
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun importMessages() {
+    override fun importToEventSource() {
         getAllChats()
             .map { chatDTO ->
                 chatDTO to createChatIfNotExists(chatDTO)
