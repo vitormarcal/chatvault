@@ -1,5 +1,7 @@
 package dev.marcal.chatvault.usecase.legacy
 
+import dev.marcal.chatvault.app_service.bucket_service.BucketService
+import dev.marcal.chatvault.app_service.bucket_service.BucketServiceException
 import dev.marcal.chatvault.app_service.wpp_legacy_service.WppLegacyService
 import dev.marcal.chatvault.model.Message
 import dev.marcal.chatvault.model.Page
@@ -10,15 +12,13 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 
 @Service
 class AttachmentLegacyImporterUseCase(
     private val chatRepository: ChatRepository,
-    private val wppLegacyService: WppLegacyService
+    private val wppLegacyService: WppLegacyService,
+    private val bucketService: BucketService
 ) : AttachmentLegacyImporter {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -59,16 +59,12 @@ class AttachmentLegacyImporterUseCase(
     }
 
     private fun writeFile(bytes: ByteArray, message: Message): Mono<Message> {
-        File("/opt/chatvault/" + message.content.attachment!!.bucket.path).takeIf { !it.exists() }?.also { it.mkdirs() }
-        val filePath = "/opt/chatvault/" + message.content.attachment!!.path()
         return Mono.create { sink: MonoSink<Message> ->
             try {
-                FileOutputStream(File(filePath)).use { fos ->
-                    fos.write(bytes)
-                    fos.flush()
-                    sink.success(message)
-                }
-            } catch (e: IOException) {
+                val bucketFile = requireNotNull(message.content.attachment).toBucketFile(bytes)
+                bucketService.save(bucketFile)
+                sink.success(message)
+            } catch (e: BucketServiceException) {
                 sink.error(e)
             }
         }

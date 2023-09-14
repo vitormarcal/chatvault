@@ -1,7 +1,5 @@
 package dev.marcal.chatvault.model
 
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.time.LocalDateTime
 
 
@@ -39,7 +37,9 @@ data class Attachment(
     val name: String,
     val bucket: Bucket,
 ) {
-    fun path() = bucket.path + name
+    fun toBucketFile(bytes: ByteArray): BucketFile {
+        return BucketFile(bytes = bytes, fileName = this.name, address = bucket)
+    }
 }
 
 data class Bucket(
