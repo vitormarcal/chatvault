@@ -11,20 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/chat")
-class ChatController(
-    private val newMessage: NewMessage,
+@RequestMapping("/legacy")
+class LegacyImporterController(
     private val chatLegacyImporter: ChatLegacyImporter,
     private val eventSourceLegacyImporter: EventSourceLegacyImporter,
     private val attachmentLegacyImporter: AttachmentLegacyImporter
 ) {
 
-    @PostMapping("messages")
-    fun newMessage(input: NewMessageInput) {
-        newMessage.execute(input)
-    }
 
-    @GetMapping("legacy/import")
+
+    @GetMapping("import/event-source")
     fun importLegacy() {
         chatLegacyImporter.importMessages()
     }

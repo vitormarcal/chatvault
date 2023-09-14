@@ -6,6 +6,7 @@ import dev.marcal.chatvault.service.NewMessage
 import dev.marcal.chatvault.service.input.NewMessageInput
 import dev.marcal.chatvault.service.input.NewMessagePayloadInput
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class NewMessageUseCase(
@@ -39,7 +40,7 @@ class NewMessageUseCase(
                 name = input.authorName,
                 type = if (input.authorName.isEmpty()) AuthorType.SYSTEM else AuthorType.USER
             ),
-            createdAt = input.createdAt,
+            createdAt = input.createdAt ?: LocalDateTime.now(),
             externalId = input.externalId,
             content = Content(text = input.content, attachment = input.attachment?.let {
                 Attachment(

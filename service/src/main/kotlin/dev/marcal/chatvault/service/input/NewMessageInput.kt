@@ -6,7 +6,7 @@ data class NewMessageInput(
     val authorName: String,
     val chatId: Long,
     val externalId: String? = null,
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime? = null,
     val content: String,
     val attachment: NewAttachmentInput? = null
 )
