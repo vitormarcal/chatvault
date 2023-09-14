@@ -1,6 +1,6 @@
 package dev.marcal.chatvault.usecase.legacy
 
-import dev.marcal.chatvault.app_service.WppLegacyService
+import dev.marcal.chatvault.app_service.wpp_legacy_service.WppLegacyService
 import dev.marcal.chatvault.app_service.dto.ChatDTO
 import dev.marcal.chatvault.app_service.dto.MessageDTO
 import dev.marcal.chatvault.app_service.dto.WppChatResponse

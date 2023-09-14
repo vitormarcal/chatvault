@@ -1,4 +1,4 @@
-package dev.marcal.chatvault.app_service
+package dev.marcal.chatvault.app_service.wpp_legacy_service
 
 import dev.marcal.chatvault.app_service.dto.AuthToken
 import org.springframework.beans.factory.annotation.Value
