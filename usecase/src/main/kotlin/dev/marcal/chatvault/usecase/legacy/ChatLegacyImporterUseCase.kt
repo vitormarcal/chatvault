@@ -66,7 +66,7 @@ class ChatLegacyImporterUseCase(
                 chatId = bucketInfo.chatId,
                 externalId = message.id.toString(),
                 authorName = message.author ?: "",
-                createdAt = LocalDateTime.now(),
+                createdAt = message.date,
                 content = message.content,
                 attachment = message.attachmentName?.let { NewAttachmentInput(name = it, content = "") }
             )
