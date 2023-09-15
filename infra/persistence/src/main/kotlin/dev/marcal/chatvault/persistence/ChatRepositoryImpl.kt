@@ -2,6 +2,7 @@ package dev.marcal.chatvault.persistence
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev.marcal.chatvault.model.*
+import dev.marcal.chatvault.persistence.dto.toChatLastMessage
 import dev.marcal.chatvault.persistence.entity.*
 import dev.marcal.chatvault.persistence.repository.ChatCrudRepository
 import dev.marcal.chatvault.persistence.repository.EventSourceCrudRepository
@@ -85,6 +86,10 @@ class ChatRepositoryImpl(
 
     override fun setLegacyAttachmentImported(messageExternalId: String) {
         eventSourceCrudRepository.setAttachmentImportedTrue(messageExternalId)
+    }
+
+    override fun findAllChatsWithLastMessage(): Sequence<ChatLastMessage> {
+        return chatCrudRepository.findAllChatsWithLastMessage().asSequence().map { it.toChatLastMessage() }
     }
 
     override fun create(payload: ChatPayload): ChatBucketInfo {

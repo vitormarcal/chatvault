@@ -16,4 +16,6 @@ interface ChatRepository {
     fun saveLegacyMessage(messagePayload: MessagePayload)
 
     fun setLegacyAttachmentImported(messageExternalId: String)
+
+    fun findAllChatsWithLastMessage(): Sequence<ChatLastMessage>
 }
