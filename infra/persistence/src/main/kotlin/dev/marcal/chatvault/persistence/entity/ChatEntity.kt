@@ -30,6 +30,7 @@ data class MessageEntity(
     val createdAt: LocalDateTime,
     @Column(columnDefinition = "TEXT") val content: String,
     val attachmentPath: String?,
+    val attachmentName: String?,
     val chatId: Long,
     val externalId: String? = null,
     @ManyToOne(fetch = FetchType.LAZY)

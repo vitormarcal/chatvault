@@ -11,6 +11,7 @@ fun MessagePayload.toMessagesEntity(): List<MessageEntity> {
             authorType = it.author.type.name,
             content = it.content.text,
             attachmentPath = it.content.attachment?.bucket?.path,
+            attachmentName = it.content.attachment?.name,
             chatId = this.chatId,
             externalId = it.externalId,
             createdAt = it.createdAt
