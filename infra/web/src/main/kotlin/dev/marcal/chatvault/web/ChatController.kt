@@ -2,7 +2,7 @@ package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
-import dev.marcal.chatvault.service.ListChat
+import dev.marcal.chatvault.service.ChatLister
 import dev.marcal.chatvault.service.MessageFinderByChatId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/chats")
 class ChatController(
-    private val listChat: ListChat,
+    private val chatLister: ChatLister,
     private val messageFinderByChatId: MessageFinderByChatId
 ) {
 
     @GetMapping
     fun listChats(): List<ChatLastMessageOutput> {
-        return listChat.execute()
+        return chatLister.execute()
     }
 
     @GetMapping("{chatId}")

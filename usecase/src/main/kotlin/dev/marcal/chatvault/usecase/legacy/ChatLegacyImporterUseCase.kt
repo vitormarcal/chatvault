@@ -5,8 +5,8 @@ import dev.marcal.chatvault.app_service.dto.ChatDTO
 import dev.marcal.chatvault.app_service.dto.MessageDTO
 import dev.marcal.chatvault.app_service.dto.WppChatResponse
 import dev.marcal.chatvault.service.legacy.ChatLegacyImporter
-import dev.marcal.chatvault.service.NewChat
-import dev.marcal.chatvault.service.NewMessage
+import dev.marcal.chatvault.service.ChatCreator
+import dev.marcal.chatvault.service.MessageCreator
 import dev.marcal.chatvault.in_out_boundary.input.NewAttachmentInput
 import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
@@ -19,8 +19,8 @@ import reactor.core.publisher.Flux
 @Service
 class ChatLegacyImporterUseCase(
     private val wppLegacyService: WppLegacyService,
-    private val newMessage: NewMessage,
-    private val newChat: NewChat
+    private val messageCreator: MessageCreator,
+    private val chatCreator: ChatCreator
 ) : ChatLegacyImporter {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -32,7 +32,7 @@ class ChatLegacyImporterUseCase(
             }
             .flatMap { (chat, bucketInfo) -> processMessagesInBatches(chat, bucketInfo) }
             .doOnNext { input ->
-                newMessage.execute(input)
+                messageCreator.execute(input)
             }
             .subscribe {
                 logger.info("Imported: chatId=${it.chatId}, messages=${it.messages.size}")
@@ -42,7 +42,7 @@ class ChatLegacyImporterUseCase(
     }
 
     private fun createChatIfNotExists(it: ChatDTO) =
-        newChat.executeIfNotExists(NewChatInput(name = it.name, externalId = it.id.toString()))
+        chatCreator.executeIfNotExists(NewChatInput(name = it.name, externalId = it.id.toString()))
 
     private fun getAllChats() = wppLegacyService.getAllChats()
         .doOnNext {
