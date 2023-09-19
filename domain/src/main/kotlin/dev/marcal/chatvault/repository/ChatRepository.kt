@@ -1,6 +1,8 @@
 package dev.marcal.chatvault.repository
 
+import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.model.*
+import org.springframework.data.domain.Pageable
 
 interface ChatRepository {
 
@@ -18,4 +20,6 @@ interface ChatRepository {
     fun setLegacyAttachmentImported(messageExternalId: String)
 
     fun findAllChatsWithLastMessage(): Sequence<ChatLastMessage>
+
+    fun findMessagesBy(chatId: Long, pageable: Pageable): org.springframework.data.domain.Page<MessageOutput>
 }

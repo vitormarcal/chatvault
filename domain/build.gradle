@@ -1,0 +1,3 @@
+dependencies {
+    implementation project(":in-out-boundary")
+}
