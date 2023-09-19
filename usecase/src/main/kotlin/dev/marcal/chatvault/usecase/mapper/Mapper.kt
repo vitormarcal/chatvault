@@ -2,8 +2,8 @@ package dev.marcal.chatvault.usecase.mapper
 
 import dev.marcal.chatvault.model.ChatBucketInfo
 import dev.marcal.chatvault.model.ChatLastMessage
-import dev.marcal.chatvault.service.output.ChatBucketInfoOutput
-import dev.marcal.chatvault.service.output.ChatLastMessageOutput
+import dev.marcal.chatvault.in_out_boundary.output.ChatBucketInfoOutput
+import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 
 fun ChatBucketInfo.toOutput(): ChatBucketInfoOutput {
     return ChatBucketInfoOutput(

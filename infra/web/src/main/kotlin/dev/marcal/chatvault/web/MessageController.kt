@@ -1,7 +1,7 @@
 package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.service.NewMessage
-import dev.marcal.chatvault.service.input.NewMessageInput
+import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

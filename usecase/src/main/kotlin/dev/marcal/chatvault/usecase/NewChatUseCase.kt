@@ -4,8 +4,8 @@ import dev.marcal.chatvault.model.Bucket
 import dev.marcal.chatvault.model.ChatPayload
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.NewChat
-import dev.marcal.chatvault.service.input.NewChatInput
-import dev.marcal.chatvault.service.output.ChatBucketInfoOutput
+import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
+import dev.marcal.chatvault.in_out_boundary.output.ChatBucketInfoOutput
 import dev.marcal.chatvault.usecase.mapper.toOutput
 import org.springframework.stereotype.Service
 import java.util.UUID

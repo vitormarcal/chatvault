@@ -7,15 +7,14 @@ import dev.marcal.chatvault.app_service.dto.WppChatResponse
 import dev.marcal.chatvault.service.legacy.ChatLegacyImporter
 import dev.marcal.chatvault.service.NewChat
 import dev.marcal.chatvault.service.NewMessage
-import dev.marcal.chatvault.service.input.NewAttachmentInput
-import dev.marcal.chatvault.service.input.NewChatInput
-import dev.marcal.chatvault.service.input.NewMessageInput
-import dev.marcal.chatvault.service.input.NewMessagePayloadInput
-import dev.marcal.chatvault.service.output.ChatBucketInfoOutput
+import dev.marcal.chatvault.in_out_boundary.input.NewAttachmentInput
+import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
+import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
+import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
+import dev.marcal.chatvault.in_out_boundary.output.ChatBucketInfoOutput
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
-import java.time.LocalDateTime
 
 @Service
 class ChatLegacyImporterUseCase(

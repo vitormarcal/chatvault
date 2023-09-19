@@ -1,4 +1,4 @@
-package dev.marcal.chatvault.service.input
+package dev.marcal.chatvault.in_out_boundary.input
 
 import java.time.LocalDateTime
 

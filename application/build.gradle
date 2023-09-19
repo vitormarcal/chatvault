@@ -4,6 +4,7 @@ mainClassName = "dev.marcal.chatvault"
 
 dependencies {
     implementation project(":infra:persistence")
+    implementation project(":in-out-boundary")
     implementation project(":infra:app-service")
     implementation project(":infra:web")
     implementation project(":domain")

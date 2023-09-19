@@ -2,7 +2,7 @@ package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.ListChat
-import dev.marcal.chatvault.service.output.ChatLastMessageOutput
+import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.usecase.mapper.toOutput
 import org.springframework.stereotype.Service
 

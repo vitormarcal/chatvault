@@ -1,7 +1,7 @@
 package dev.marcal.chatvault.service
 
-import dev.marcal.chatvault.service.input.NewMessageInput
-import dev.marcal.chatvault.service.input.NewMessagePayloadInput
+import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
+import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
 
 interface NewMessage {
     fun execute(input: NewMessageInput)
