@@ -4,35 +4,64 @@ import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.model.MessageParser
 import dev.marcal.chatvault.service.ChatMessageParser
 import dev.marcal.chatvault.usecase.mapper.toOutput
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.time.LocalDateTime
 
 @Service
 class ChatMessageParserUseCase(
 ) : ChatMessageParser {
+    override fun <R> parseAndTransform(
+        inputStream: InputStream,
+        transformIn: (MessageOutput) -> R
+    ): List<R> {
+        return runBlocking { parse(inputStream).map { transformIn(it) }.toList() }
+    }
 
-    override fun execute(inputStream: InputStream): Sequence<MessageOutput> {
+    override fun parseToList(
+        inputStream: InputStream
+    ): List<MessageOutput> {
+        return parseAndTransform(inputStream) { it }
+    }
 
-        val inputStreamReader = InputStreamReader(inputStream)
-        val reader = BufferedReader(inputStreamReader)
+    override fun parse(inputStream: InputStream): Flow<MessageOutput> {
+        return sequenceOfTextMessage(inputStream)
+            .map { messageText -> MessageParser.parse(messageText) { it.toOutput() } }
+    }
 
-        val messagesSequence = generateSequence {
-            val line = reader.readLine()
-            if (line != null) {
-                MessageParser(line).parse { it.toOutput() }
-            } else {
-                reader.close()
-                inputStreamReader.close()
-                inputStream.close()
-                null
+    private fun sequenceOfTextMessage(inputStream: InputStream): Flow<String> {
+        val message = callbackFlow {
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            var currentDate: LocalDateTime? = null
+            var currentLines = StringBuilder()
+
+            reader.forEachLine { line ->
+
+                MessageParser.extractDate(line)?.let { lineDate ->
+                    if (currentDate != null && currentLines.isNotEmpty()) {
+                        val trySendBlocking = trySendBlocking(currentLines.toString())
+                        print(trySendBlocking)
+                    }
+                    currentDate = lineDate
+                    currentLines = StringBuilder(line)
+                } ?: currentLines.appendLine().append(line)
             }
 
+            if (currentDate != null && currentLines.isNotEmpty()) {
+                val trySendBlocking = trySendBlocking(currentLines.toString())
+                print(trySendBlocking)
+            }
+            close()
+
         }
-
-        return messagesSequence
-
-
+        return message
     }
 }

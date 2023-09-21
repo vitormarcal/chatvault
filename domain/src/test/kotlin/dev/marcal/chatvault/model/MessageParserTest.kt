@@ -1,6 +1,6 @@
 package dev.marcal.chatvault.model
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
@@ -12,9 +12,9 @@ class MessageParserTest {
         val line =
             "03/08/2023 18:16 - As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
 
-        val message = MessageParser(line).parse { it }
+        val message = MessageParser.parse(line) { it }
         val expected = Message(
-            createdAt = LocalDateTime.of(2023,8,3,18,16),
+            createdAt = LocalDateTime.of(2023, 8, 3, 18, 16),
             author = Author(
                 name = "",
                 type = AuthorType.SYSTEM
@@ -22,7 +22,8 @@ class MessageParserTest {
             externalId = null,
             content = Content(
                 attachment = null,
-                text = "As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais.")
+                text = "As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
+            )
         )
 
 
@@ -35,9 +36,9 @@ class MessageParserTest {
         val line =
             "13/08/2023 18:24 - Beltrano: Opa, vlw Fulano !\uD83D\uDE43"
 
-        val message = MessageParser(line).parse { it }
+        val message = MessageParser.parse(line) { it }
         val expected = Message(
-            createdAt = LocalDateTime.of(2023,8,13,18,24),
+            createdAt = LocalDateTime.of(2023, 8, 13, 18, 24),
             author = Author(
                 name = "Beltrano",
                 type = AuthorType.USER
@@ -45,9 +46,36 @@ class MessageParserTest {
             externalId = null,
             content = Content(
                 attachment = null,
-                text = "Opa, vlw Fulano !\uD83D\uDE43")
+                text = "Opa, vlw Fulano !\uD83D\uDE43"
+            )
         )
 
+
+        assertEquals(expected, message)
+
+    }
+
+    @Test
+    fun `should return a multiline message`() {
+        val line = """
+            19/09/2023 22:58 - Fulano: Olha aquela coisa!
+            Vou pendurar na sala kkkk
+            Hahahahah
+        """.trimIndent()
+
+        val message = MessageParser.parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 9, 19, 22, 58),
+            author = Author(
+                name = "Fulano",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = null,
+                text = "Olha aquela coisa!\nVou pendurar na sala kkkk\nHahahahah"
+            )
+        )
 
         assertEquals(expected, message)
 
@@ -59,7 +87,7 @@ class MessageParserTest {
             ""
 
         org.junit.jupiter.api.assertThrows<IllegalStateException> {
-            MessageParser(line).parse { message ->  message }
+            val message = MessageParser.parse(line) { it }
         }
 
     }
