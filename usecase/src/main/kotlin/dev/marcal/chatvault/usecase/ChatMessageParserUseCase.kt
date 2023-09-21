@@ -4,6 +4,7 @@ import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.model.MessageParser
 import dev.marcal.chatvault.service.ChatMessageParser
 import dev.marcal.chatvault.usecase.mapper.toOutput
+import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -47,8 +48,7 @@ class ChatMessageParserUseCase(
 
                 MessageParser.extractDate(line)?.let { lineDate ->
                     if (currentDate != null && currentLines.isNotEmpty()) {
-                        val trySendBlocking = trySendBlocking(currentLines.toString())
-                        print(trySendBlocking)
+                        trySendBlocking(currentLines)
                     }
                     currentDate = lineDate
                     currentLines = StringBuilder(line)
@@ -56,12 +56,15 @@ class ChatMessageParserUseCase(
             }
 
             if (currentDate != null && currentLines.isNotEmpty()) {
-                val trySendBlocking = trySendBlocking(currentLines.toString())
-                print(trySendBlocking)
+                trySendBlocking(currentLines)
             }
             close()
 
         }
         return message
+    }
+
+    private fun ProducerScope<String>.trySendBlocking(currentLines: StringBuilder) {
+        trySendBlocking(currentLines.toString()).takeIf { it.isFailure }?.getOrThrow()
     }
 }
