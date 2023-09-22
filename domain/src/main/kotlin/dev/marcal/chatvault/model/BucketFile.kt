@@ -10,6 +10,16 @@ class BucketFile(
 
 
     fun file(root: String = "/"): File {
-        return File(root + address.path + fileName)
+        val file = File(root + address.path + fileName)
+
+        if (!file.toPath().normalize().startsWith(File(root).toPath())) {
+            throw IllegalStateException("bad file path!out of root directory")
+        }
+
+        if (!file.toPath().normalize().startsWith(File(root + address.path).toPath())) {
+            throw IllegalStateException("bad file path!out of bucket chat directory")
+        }
+
+        return file
     }
 }

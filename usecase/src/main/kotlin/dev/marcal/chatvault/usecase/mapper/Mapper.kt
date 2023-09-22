@@ -1,10 +1,12 @@
 package dev.marcal.chatvault.usecase.mapper
 
-import dev.marcal.chatvault.model.ChatBucketInfo
-import dev.marcal.chatvault.model.ChatLastMessage
+import dev.marcal.chatvault.in_out_boundary.input.NewAttachmentInput
+import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
 import dev.marcal.chatvault.in_out_boundary.output.ChatBucketInfoOutput
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
+import dev.marcal.chatvault.model.ChatBucketInfo
+import dev.marcal.chatvault.model.ChatLastMessage
 import dev.marcal.chatvault.model.Message
 
 fun ChatBucketInfo.toOutput(): ChatBucketInfoOutput {
@@ -33,5 +35,15 @@ fun Message.toOutput(): MessageOutput {
         attachmentName = this.content.attachment?.name,
         authorType = this.author.type.name,
         author = this.author.name
+    )
+}
+
+fun MessageOutput.toNewMessageInput(chatId: Long): NewMessageInput {
+    return NewMessageInput(
+        authorName = this.author ?: "",
+        chatId = chatId,
+        createdAt = this.createdAt,
+        content = this.content,
+        attachment = this.attachmentName?.let { NewAttachmentInput(name = it, content = "") }
     )
 }
