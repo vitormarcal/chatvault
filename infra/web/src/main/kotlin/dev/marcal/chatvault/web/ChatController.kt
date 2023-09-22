@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.SortDefault
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -52,13 +51,17 @@ class ChatController(
             return ResponseEntity.badRequest().body("The file is empty")
         }
 
-        val mediaType = file.contentType?.let { MediaType.valueOf(it) } ?: return ResponseEntity.badRequest().body("media type is required.")
-
+        val fileType = when(file.contentType) {
+            null -> return ResponseEntity.badRequest().body("media type is required.")
+            "text/plain" -> "text"
+            "application/zip" -> "zip"
+            else -> return ResponseEntity.badRequest().body("media type not supported ${file.contentType}.")
+        }
 
         chatFileImporter.execute(
             chatId = chatId,
             inputStream = file.inputStream,
-            fileType = mediaType.subtype
+            fileType = fileType
         )
 
         return ResponseEntity.ok("The file was imported")

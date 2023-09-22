@@ -15,6 +15,20 @@ class ChatFileImporterUseCase(
     private val messageCreator: MessageCreator
 ) : ChatFileImporter {
     override fun execute(chatId: Long, inputStream: InputStream, fileType: String) {
+        when(fileType) {
+            "zip" -> {
+                TODO("$fileType parser not implemented yet")
+            }
+            "text" -> {
+                createMessages(inputStream = inputStream, chatId = chatId)
+            }
+            else -> throw RuntimeException("file type $fileType not supported")
+        }
+
+
+    }
+
+    private fun createMessages(inputStream: InputStream, chatId: Long) {
         val messages = chatMessageParser.parseAndTransform(inputStream) { messageOutput ->
             NewMessageInput(
                 authorName = messageOutput.author ?: "",
