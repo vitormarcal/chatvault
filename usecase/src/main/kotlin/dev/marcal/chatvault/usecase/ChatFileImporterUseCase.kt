@@ -14,7 +14,7 @@ class ChatFileImporterUseCase(
     private val chatMessageParser: ChatMessageParser,
     private val messageCreator: MessageCreator
 ) : ChatFileImporter {
-    override fun execute(chatId: Long, inputStream: InputStream) {
+    override fun execute(chatId: Long, inputStream: InputStream, fileType: String) {
         val messages = chatMessageParser.parseAndTransform(inputStream) { messageOutput ->
             NewMessageInput(
                 authorName = messageOutput.author ?: "",

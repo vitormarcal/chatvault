@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.SortDefault
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -51,9 +52,13 @@ class ChatController(
             return ResponseEntity.badRequest().body("The file is empty")
         }
 
+        val mediaType = file.contentType?.let { MediaType.valueOf(it) } ?: return ResponseEntity.badRequest().body("media type is required.")
+
+
         chatFileImporter.execute(
             chatId = chatId,
-            inputStream = file.inputStream
+            inputStream = file.inputStream,
+            fileType = mediaType.subtype
         )
 
         return ResponseEntity.ok("The file was imported")
