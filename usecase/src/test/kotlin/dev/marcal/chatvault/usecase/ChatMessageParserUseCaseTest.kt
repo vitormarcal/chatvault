@@ -61,4 +61,28 @@ class ChatMessageParserUseCaseTest {
         assertEquals(expected, list)
     }
 
+    @Test
+    fun `when receive input stream should build message with attachmentName`() {
+
+        val expected = listOf(
+            MessageOutput(
+                id = null,
+                author = "Fulano",
+                authorType = "USER",
+                attachmentName = "IMG-20230922-WA0006.jpg",
+                createdAt = LocalDateTime.of(2023, 9, 22, 13, 33),
+                content = "IMG-20230922-WA0006.jpg (arquivo anexado)\nEsse é  um teste"
+            )
+        )
+
+        val inputStream = """
+            22/09/2023 13:33 - Fulano: ‎IMG-20230922-WA0006.jpg (arquivo anexado)
+            Esse é  um teste
+        """.trimIndent().byteInputStream()
+
+        val list = chatMessageParser.parseToList(inputStream)
+
+        assertEquals(expected, list)
+    }
+
 }

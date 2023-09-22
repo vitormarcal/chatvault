@@ -92,5 +92,54 @@ class MessageParserTest {
 
     }
 
+    @Test
+    fun `should mount message with attachmentName`() {
+        val line =
+            """
+                22/09/2023 13:33 - Beltrano: ‎IMG-20230922-WA0006.jpg (arquivo anexado)
+            """.trimIndent()
+        val message = MessageParser.parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 9, 22, 13, 33),
+            author = Author(
+                name = "Beltrano",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = Attachment(name = "IMG-20230922-WA0006.jpg", bucket = Bucket(path = "/")),
+                text = "IMG-20230922-WA0006.jpg (arquivo anexado)"
+            )
+        )
+
+
+        assertEquals(expected, message)
+
+    }
+
+    @Test
+    fun `should mount message multi line with attachmentName`() {
+        val line =
+            """
+                22/09/2023 13:33 - Beltrano: ‎IMG-20230922-WA0006.jpg (arquivo anexado)
+                Esse é  um teste
+            """.trimIndent()
+        val message = MessageParser.parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 9, 22, 13, 33),
+            author = Author(
+                name = "Beltrano",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = Attachment(name = "IMG-20230922-WA0006.jpg", bucket = Bucket(path = "/")),
+                text = "IMG-20230922-WA0006.jpg (arquivo anexado)\nEsse é  um teste"
+            )
+        )
+
+        assertEquals(expected, message)
+    }
+
 
 }
