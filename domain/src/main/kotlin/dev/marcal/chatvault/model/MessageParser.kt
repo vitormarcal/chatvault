@@ -10,7 +10,7 @@ object MessageParser {
     private val dateWithoutNameRegex = "^(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}) - (.*)$".toRegex()
     private val dateWithNameRegex = "^(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}) - ([^:]+): (.+)$".toRegex()
     private val onlyDate = "\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}".toRegex()
-    private val attachmentNameRegex = "^(.*?)\\s+\\((arquivo anexado)\\)$".toRegex()
+    private val attachmentNameRegex = "^(.*?)\\s+\\((.*?)\\)$".toRegex()
 
     fun <R> parse(text: String, transform: (Message) -> R): R {
         return transform(parse(text))

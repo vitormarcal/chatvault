@@ -118,6 +118,31 @@ class MessageParserTest {
     }
 
     @Test
+    fun `should mount message without attachmentName`() {
+        val line =
+            """
+                22/09/2023 13:33 - Beltrano: ‎IMG-20230922-WA0006.jpg (arquivo anexado) conforme anexo anterior
+            """.trimIndent()
+        val message = MessageParser.parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 9, 22, 13, 33),
+            author = Author(
+                name = "Beltrano",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = null,
+                text = "IMG-20230922-WA0006.jpg (arquivo anexado) conforme anexo anterior"
+            )
+        )
+
+
+        assertEquals(expected, message)
+
+    }
+
+    @Test
     fun `should mount message multi line with attachmentName`() {
         val line =
             """
