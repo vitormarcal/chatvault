@@ -53,7 +53,7 @@ class ChatController(
             null -> return ResponseEntity.badRequest().body("media type is required.")
             "text/plain" -> "text"
             "application/zip" -> "zip"
-            else -> return ResponseEntity.badRequest().body("media type not supported ${HtmlUtils.htmlEscape(escapedContentType)}.")
+            else -> return ResponseEntity.badRequest().body("media type not supported ${escapedContentType}.")
         }
 
         chatFileImporter.execute(
