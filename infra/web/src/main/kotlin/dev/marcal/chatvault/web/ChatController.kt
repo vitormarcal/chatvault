@@ -47,13 +47,13 @@ class ChatController(
             return ResponseEntity.badRequest().body("The file is empty")
         }
 
-        val contentType = file.contentType?.let { HtmlUtils.htmlEscape(it) }
+        val escapedContentType = file.contentType?.let { HtmlUtils.htmlEscape(it) }
 
-        val fileType = when (contentType) {
+        val fileType = when (escapedContentType) {
             null -> return ResponseEntity.badRequest().body("media type is required.")
             "text/plain" -> "text"
             "application/zip" -> "zip"
-            else -> return ResponseEntity.badRequest().body("media type not supported ${contentType}.")
+            else -> return ResponseEntity.badRequest().body("media type not supported ${HtmlUtils.htmlEscape(escapedContentType)}.")
         }
 
         chatFileImporter.execute(
