@@ -10,13 +10,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.SortDefault
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.util.HtmlUtils
 
 @RestController
 @RequestMapping("/chats")
@@ -51,11 +47,13 @@ class ChatController(
             return ResponseEntity.badRequest().body("The file is empty")
         }
 
-        val fileType = when(file.contentType) {
+        val contentType = file.contentType?.let { HtmlUtils.htmlEscape(it) }
+
+        val fileType = when (contentType) {
             null -> return ResponseEntity.badRequest().body("media type is required.")
             "text/plain" -> "text"
             "application/zip" -> "zip"
-            else -> return ResponseEntity.badRequest().body("media type not supported ${file.contentType}.")
+            else -> return ResponseEntity.badRequest().body("media type not supported ${contentType}.")
         }
 
         chatFileImporter.execute(
