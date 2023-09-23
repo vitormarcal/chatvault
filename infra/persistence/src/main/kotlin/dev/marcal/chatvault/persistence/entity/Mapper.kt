@@ -46,4 +46,21 @@ fun ChatPayload.toChatEntity(): ChatEntity {
     )
 }
 
+fun MessageEntity.toMessageDomain() = Message(
+    author = this.toAuthorDomain(),
+    createdAt = this.createdAt,
+    externalId = this.externalId,
+    content = this.toContentDomain()
+)
+
+fun MessageEntity.toAuthorDomain() = Author(name = this.author, type = AuthorType.valueOf(this.authorType))
+
+fun MessageEntity.toContentDomain() = Content(text = this.content, attachment = this.toAttachmentDomain())
+
+fun MessageEntity.toAttachmentDomain() = this.attachmentName?.let {
+    Attachment(name = it, bucket = this.toBucketDomain())
+}
+
+fun MessageEntity.toBucketDomain() = Bucket(path = requireNotNull(this.attachmentPath))
+
 fun ChatEntity.toChatBucketInfo() = ChatBucketInfo(chatId = this.id!!, Bucket(this.bucket))

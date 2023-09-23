@@ -37,7 +37,7 @@ data class Attachment(
     val name: String,
     val bucket: Bucket,
 ) {
-    fun toBucketFile(bytes: ByteArray): BucketFile {
+    fun toBucketFile(bytes: ByteArray = ByteArray(0)): BucketFile {
         return BucketFile(bytes = bytes, fileName = this.name, address = bucket)
     }
 }

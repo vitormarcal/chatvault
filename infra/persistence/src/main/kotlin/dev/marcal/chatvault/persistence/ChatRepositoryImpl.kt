@@ -98,6 +98,10 @@ class ChatRepositoryImpl(
         return messageCrudRepository.findAllByChatIdIs(chatId, pageable)
     }
 
+    override fun findMessageBy(chatId: Long, messageId: Long): Message? {
+        return messageCrudRepository.findMessageEntityByIdAndChatId(id = messageId, chatId = chatId)?.toMessageDomain()
+    }
+
     override fun create(payload: ChatPayload): ChatBucketInfo {
         return chatCrudRepository.save(payload.toChatEntity()).toChatBucketInfo()
     }
