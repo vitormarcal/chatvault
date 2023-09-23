@@ -22,4 +22,5 @@ interface ChatRepository {
     fun findAllChatsWithLastMessage(): Sequence<ChatLastMessage>
 
     fun findMessagesBy(chatId: Long, pageable: Pageable): org.springframework.data.domain.Page<MessageOutput>
+    fun findMessageBy(chatId: Long, messageId: Long): Message?
 }

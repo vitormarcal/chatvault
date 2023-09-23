@@ -1,10 +1,14 @@
 package dev.marcal.chatvault.app_service.bucket_service
 
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.AttachmentFinderException
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.AttachmentNotFoundException
 import dev.marcal.chatvault.model.BucketFile
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.PropertySource
+import org.springframework.core.io.Resource
+import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.FileNotFoundException
@@ -41,6 +45,17 @@ class BucketServiceImpl(
             throw BucketServiceException("I/O error when try to save ${bucketFile.fileName}", e)
         } catch (e: Exception) {
             throw BucketServiceException("not mapped error when try to save ${bucketFile.fileName}", e)
+        }
+    }
+
+    override fun loadFileAsResource(bucketFile: BucketFile): Resource {
+        try {
+            val file = bucketFile.file(bucketRootPath)
+            val resource = UrlResource(file.toURI())
+
+            return resource.takeIf { it.exists() } ?: throw AttachmentNotFoundException("file not found ${file.name}")
+        } catch (e: Exception) {
+            throw AttachmentFinderException("failed to load file ${bucketFile.fileName}", e)
         }
     }
 
