@@ -23,4 +23,5 @@ interface ChatRepository {
 
     fun findMessagesBy(chatId: Long, pageable: Pageable): org.springframework.data.domain.Page<MessageOutput>
     fun findMessageBy(chatId: Long, messageId: Long): Message?
+    fun findChatBucketInfoByChatName(chatName: String): ChatBucketInfo?
 }

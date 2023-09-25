@@ -6,6 +6,8 @@ import org.springframework.core.io.Resource
 interface BucketService {
     fun save(bucketFile: BucketFile)
     fun loadFileAsResource(bucketFile: BucketFile): Resource
+    fun zipPendingImports(): Sequence<Resource>
+    fun deleteZipImported(filename: String)
 }
 
 class BucketServiceException(message: String?, throwable: Throwable?): RuntimeException(message, throwable)

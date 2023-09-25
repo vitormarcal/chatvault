@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.model
 
 import java.io.File
+import java.nio.file.Paths
 
 class BucketFile(
     val bytes: ByteArray,
@@ -10,16 +11,16 @@ class BucketFile(
 
 
     fun file(root: String = "/"): File {
-        val file = File(root + address.path + fileName)
+        val path = Paths.get(root, address.path, fileName).normalize()
 
-        if (!file.toPath().normalize().startsWith(File(root).toPath())) {
+        if (!path.startsWith(File(root).toPath())) {
             throw IllegalStateException("bad file path!out of root directory")
         }
 
-        if (!file.toPath().normalize().startsWith(File(root + address.path).toPath())) {
+        if (!path.startsWith(Paths.get(root, address.path))) {
             throw IllegalStateException("bad file path!out of bucket chat directory")
         }
 
-        return file
+        return path.toFile()
     }
 }
