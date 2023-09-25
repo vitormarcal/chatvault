@@ -3,10 +3,7 @@ package dev.marcal.chatvault.web
 import dev.marcal.chatvault.in_out_boundary.input.AttachmentCriteriaInput
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
-import dev.marcal.chatvault.service.AttachmentFinder
-import dev.marcal.chatvault.service.ChatFileImporter
-import dev.marcal.chatvault.service.ChatLister
-import dev.marcal.chatvault.service.MessageFinderByChatId
+import dev.marcal.chatvault.service.*
 import org.springframework.core.io.Resource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -26,7 +23,8 @@ class ChatController(
     private val chatLister: ChatLister,
     private val messageFinderByChatId: MessageFinderByChatId,
     private val chatFileImporter: ChatFileImporter,
-    private val attachmentFinder: AttachmentFinder
+    private val attachmentFinder: AttachmentFinder,
+    private val bucketDiskImporter: BucketDiskImporter
 ) {
 
     @GetMapping
@@ -70,6 +68,11 @@ class ChatController(
 
         return ResponseEntity.ok("The file was imported")
 
+    }
+
+    @PostMapping("disk-import")
+    fun executeDiskImport() {
+        bucketDiskImporter.execute()
     }
 
 

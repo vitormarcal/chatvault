@@ -102,6 +102,10 @@ class ChatRepositoryImpl(
         return messageCrudRepository.findMessageEntityByIdAndChatId(id = messageId, chatId = chatId)?.toMessageDomain()
     }
 
+    override fun findChatBucketInfoByChatName(chatName: String): ChatBucketInfo? {
+        return chatCrudRepository.findByName(chatName)?.toChatBucketInfo()
+    }
+
     override fun create(payload: ChatPayload): ChatBucketInfo {
         return chatCrudRepository.save(payload.toChatEntity()).toChatBucketInfo()
     }

@@ -1,4 +1,4 @@
-package dev.marcal.chatvault.app_service.dto
+package dev.marcal.chatvault.app_service.wpp_legacy_service.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDateTime

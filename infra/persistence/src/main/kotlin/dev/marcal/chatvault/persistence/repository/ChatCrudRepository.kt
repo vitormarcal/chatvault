@@ -13,6 +13,8 @@ interface ChatCrudRepository: JpaRepository<ChatEntity, Long> {
 
     fun findByExternalId(externalId: String): ChatEntity
 
+    fun findByName(chatName: String): ChatEntity?
+
 
     @Query(
         """

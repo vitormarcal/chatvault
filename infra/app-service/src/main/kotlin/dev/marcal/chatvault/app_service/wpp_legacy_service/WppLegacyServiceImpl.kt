@@ -1,8 +1,8 @@
 package dev.marcal.chatvault.app_service.wpp_legacy_service
 
-import dev.marcal.chatvault.app_service.dto.ChatDTO
-import dev.marcal.chatvault.app_service.dto.MessageDTO
-import dev.marcal.chatvault.app_service.dto.WppChatResponse
+import dev.marcal.chatvault.app_service.wpp_legacy_service.dto.ChatDTO
+import dev.marcal.chatvault.app_service.wpp_legacy_service.dto.MessageDTO
+import dev.marcal.chatvault.app_service.wpp_legacy_service.dto.WppChatResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.PropertySource
