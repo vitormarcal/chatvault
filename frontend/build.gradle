@@ -7,7 +7,7 @@ node {
     version = '20.0.0'
     // If true, it will download node using above parameters.
     // If false, it will try to use globally installed node.
-    download = false
+    download = true
 }
 
 
@@ -17,6 +17,12 @@ task buildFrontend(type: NpmTask, dependsOn: 'npmInstall') {
     inputs.file file('package.json')
     outputs.dir file('dist')
     args = ['run', 'generate']
+}
+
+task npmRunDev(type: NpmTask) {
+    description = 'Execute command npm run dev'
+    inputs.file file('package.json')
+    args = ['run', 'dev']
 }
 
 // Configure a tarefa 'build' para executar 'buildFrontend' antes de ser construída
