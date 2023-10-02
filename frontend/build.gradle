@@ -10,9 +10,19 @@ node {
     download = true
 }
 
+task npmClean(type: NpmTask)  {
+    doFirst {
+        delete 'build'
+        delete 'dist'
+        delete '.output'
+        delete '.nuxt'
+    }
+    args = ['ci']
+}
+
 
 // Tarefa para executar o comando 'npm run build'
-task buildFrontend(type: NpmTask, dependsOn: 'npmInstall') {
+task buildFrontend(type: NpmTask, dependsOn: 'npmClean') {
     description = 'Executa o comando npm run build'
     inputs.file file('package.json')
     outputs.dir file('dist')
@@ -27,3 +37,4 @@ task npmRunDev(type: NpmTask) {
 
 // Configure a tarefa 'build' para executar 'buildFrontend' antes de ser construída
 build.dependsOn buildFrontend
+clean.dependsOn npmClean
