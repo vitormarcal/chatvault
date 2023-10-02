@@ -1,0 +1,22 @@
+apply plugin: 'application'
+
+
+sourceSets {
+    main {
+        resources {
+            srcDir '../../frontend/.output'
+        }
+    }
+}
+
+processResources.dependsOn ':frontend:buildFrontend'
+
+dependencies {
+    implementation project(":backend:infra:persistence")
+    implementation project(":backend:in-out-boundary")
+    implementation project(":backend:infra:app-service")
+    implementation project(":backend:infra:web")
+    implementation project(":backend:domain")
+    implementation project(":backend:usecase")
+    implementation project(":backend:service")
+}
