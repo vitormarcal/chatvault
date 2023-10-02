@@ -10,7 +10,7 @@ node {
     download = true
 }
 
-task npmClean(type: NpmTask)  {
+task npmCI(type: NpmTask)  {
     doFirst {
         delete 'build'
         delete 'dist'
@@ -22,7 +22,7 @@ task npmClean(type: NpmTask)  {
 
 
 // Tarefa para executar o comando 'npm run build'
-task buildFrontend(type: NpmTask, dependsOn: 'npmClean') {
+task buildFrontend(type: NpmTask, dependsOn: 'npmCI') {
     description = 'Executa o comando npm run build'
     inputs.file file('package.json')
     outputs.dir file('dist')
