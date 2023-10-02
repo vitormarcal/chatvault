@@ -1,4 +1,0 @@
-dependencies {
-    implementation project(":domain")
-    implementation project(":in-out-boundary")
-}

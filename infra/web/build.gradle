@@ -1,4 +1,0 @@
-dependencies {
-    implementation project(":service")
-    implementation project(":in-out-boundary")
-}
