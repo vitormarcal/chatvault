@@ -37,4 +37,4 @@ task npmRunDev(type: NpmTask) {
 
 // Configure a tarefa 'build' para executar 'buildFrontend' antes de ser construída
 build.dependsOn buildFrontend
-clean.dependsOn npmClean
+clean.dependsOn npmCI
