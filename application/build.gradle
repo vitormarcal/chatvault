@@ -1,7 +1,5 @@
 apply plugin: 'application'
 
-mainClassName = "dev.marcal.chatvault"
-
 dependencies {
     implementation project(":infra:persistence")
     implementation project(":in-out-boundary")
