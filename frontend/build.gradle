@@ -2,6 +2,10 @@ plugins {
     id "com.github.node-gradle.node" version "7.0.0"
 }
 
+jar {
+    enabled = false
+}
+
 node {
 
     version = '20.0.0'

@@ -19,5 +19,4 @@ dependencies {
     implementation project(":backend:domain")
     implementation project(":backend:usecase")
     implementation project(":backend:service")
-    implementation project(":frontend")
 }
