@@ -88,6 +88,7 @@ class MessageParserTest {
 
         org.junit.jupiter.api.assertThrows<IllegalStateException> {
             val message = MessageParser.parse(line) { it }
+            throw UnsupportedOperationException("test error returns $message")
         }
 
     }
