@@ -33,5 +33,6 @@ To run the frontend application through gradle, run
 ./gradlew npmRunDev
 `
 
-The frontend application will listen on port 3001 by default.
+The frontend application will listen on port 8080 by default, unless you ran the backend application before (the backend listens on 8080), in which case the frontend will pick up a random port.
+If you have run the backend, it will serve the static files and it is not necessary to run the frontend, but it is still possible to run the two on different ports and processes.
 To run the conventional way, with npm commands, follow the Readme in the frontend directory.

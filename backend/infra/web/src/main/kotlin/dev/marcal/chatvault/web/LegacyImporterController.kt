@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/legacy")
+@RequestMapping("/api/legacy")
 class LegacyImporterController(
     private val chatLegacyImporter: ChatLegacyImporter,
     private val eventSourceLegacyImporter: EventSourceLegacyImporter,

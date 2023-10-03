@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.util.HtmlUtils
 
 @RestController
-@RequestMapping("/chats")
+@RequestMapping("/api/chats")
 class ChatController(
     private val chatLister: ChatLister,
     private val messageFinderByChatId: MessageFinderByChatId,
