@@ -5,7 +5,7 @@
     <div class="navbar">navbar</div>
     <main class="container-fluid">
       <div class="row h-100">
-        <ChatList :chats="chats"
+        <chat-list :chats="chats"
         />
         <div id="message-area"></div>
       </div>
@@ -14,22 +14,14 @@
   </div>
 </template>
 
-<script>
-import ChatList from "../components/ChatList.vue";
+<script setup lang="ts">
+import ChatList from "~/components/ChatList.vue";
 
-export default {
-  name: 'IndexPage',
-  components: {ChatList},
-  data() {
-    return {
-      chats: []
-    }
-  },
-  async mounted() {
-    this.chats = await this.$getChatList()
-  },
-}
+const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
+const { data: chats} = await useFetch(listChatsAPIUrl)
+
 </script>
+
 
 <style>
 

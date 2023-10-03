@@ -1,25 +1,17 @@
 <template>
-    <div id="chat-list-area" class="col-12  col-md-4 flex-column overflow-auto h-100 p-0">
+    <div id="chat-list-area" class="col-12  col-md-3 flex-column overflow-auto h-100 p-0">
         <template v-for="item in chats">
-            <ChatItem :item="item"
-                      />
+          <chat-item :item="item"></chat-item>
         </template>
 
     </div>
 </template>
-<script>
+<script setup lang="ts">
 
-import ChatItem from "./ChatItem.vue";
-
-export default {
-  components: {ChatItem},
-    props: ['chats'],
-    methods: {
-
-    }
-}
+defineProps(['chats'])
 
 </script>
+
 
 <style>
 

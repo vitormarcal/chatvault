@@ -32,11 +32,8 @@ task buildFrontend(type: NpmTask, dependsOn: 'npmCI') {
     inputs.file file('nuxt.config.js')
     inputs.dir file('components')
     inputs.dir file('pages')
-    inputs.dir file('plugins')
-    inputs.dir file('services')
-    inputs.dir file('static')
-    inputs.dir file('store')
-    outputs.dir file('dist/public')
+    inputs.dir file('public')
+    outputs.dir file('.output')
     args = ['run', 'generate']
 }
 

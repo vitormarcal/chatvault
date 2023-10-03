@@ -3,14 +3,9 @@
          style="height:50px;" id="pic">
 </template>
 
-<script>
+<script setup lang="ts">
 
-export default {
-    props: ['chatId'],
-    computed: {
-
-    }
-}
+defineProps(['id'])
 
 </script>
 
