@@ -21,6 +21,7 @@ interface ChatCrudRepository: JpaRepository<ChatEntity, Long> {
         SELECT new dev.marcal.chatvault.persistence.dto.ChatMessagePairDTO(c, m)
         FROM ChatEntity c 
         JOIN MessageEntity m ON c.id = m.chatId  AND m.id = (SELECT MAX(m2.id) FROM MessageEntity m2 WHERE m2.chatId = c.id)
+        ORDER BY m.createdAt desc
          """
     )
     fun findAllChatsWithLastMessage(): List<ChatMessagePairDTO>

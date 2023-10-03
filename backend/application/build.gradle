@@ -4,7 +4,7 @@ apply plugin: 'application'
 sourceSets {
     main {
         resources {
-            srcDir '../../frontend/.output'
+            srcDir '../../frontend/dist'
         }
     }
 }
