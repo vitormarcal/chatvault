@@ -29,7 +29,7 @@ task npmCI(type: NpmTask)  {
 task buildFrontend(type: NpmTask, dependsOn: 'npmCI') {
     description = 'Executa o comando npm run build'
     inputs.file file('package.json')
-    inputs.file file('nuxt.config.js')
+    inputs.file file('nuxt.config.ts')
     inputs.dir file('components')
     inputs.dir file('pages')
     inputs.dir file('public')
