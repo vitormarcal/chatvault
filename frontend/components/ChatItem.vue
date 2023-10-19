@@ -1,5 +1,5 @@
 <template>
-    <div id="chat-item-area" class="chat-item d-flex flex-row p-2 w-100 border-bottom">
+    <div id="chat-item-area" class="chat-item d-flex flex-row p-2 w-100 border-bottom" @click="emitThisChatActive()">
         <profile-image :id="item.chatId"/>
         <div class="w-50">
             <div class="name">{{ item.chatName }}</div>
@@ -11,11 +11,20 @@
         <message-created-at :date="item.msgCreatedAt"/>
     </div>
 </template>
+
 <script setup lang="ts">
 
-defineProps(['item'])
+const props = defineProps(['item'])
+
+const emit = defineEmits(['update:chat-active'])
+
+function emitThisChatActive() {
+  emit('update:chat-active', props.item)
+}
 
 </script>
+
+
 <style>
 .chat-item {
     cursor: pointer;
