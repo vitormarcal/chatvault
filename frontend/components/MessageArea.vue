@@ -1,5 +1,6 @@
 <template>
-  <div class="message-area flex-column col-12 col-md-9 p-3 h-100 overflow-auto"
+  <div id="message-area" class="message-area flex-column col-12 col-md-9 p-3 h-100 overflow-auto"
+       ref="messagesAreaElement"
   >
 
     <div id="navbar" class="row d-flex flex-row align-items-center p-2 m-0" v-if="chatActive">
@@ -14,7 +15,7 @@
     </div>
 
 
-    <div class="message-list d-flex flex-column" ref="messagesAreaElement">
+    <div id="infinite-list" class="message-list d-flex flex-column">
       <template v-for="(message, index) in messages" :key="index">
         <message-item :message="message" :chatId="chat.chatId"/>
       </template>
@@ -48,15 +49,12 @@ const content = computed(() => {
 })
 
 function scrollBottom() {
-  console.log("init scrollBottom")
   if (messagesAreaElement.value) {
-    console.log("processing scrollBottom")
     messagesAreaElement.value.scrollTo({
       top: messagesAreaElement.value.scrollHeight,
       behavior: 'smooth'
     })
   }
-  console.log("finish scrollBottom")
 }
 
 watch(
@@ -68,8 +66,9 @@ watch(
 
 watch(content, async (newContent, oldContent) => {
   messages.value.push(...newContent)
+  await nextTick()
+  scrollBottom()
 })
-
 
 </script>
 

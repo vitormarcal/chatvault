@@ -41,8 +41,4 @@ main {
   background: cadetblue;
 }
 
-#message-area {
-  background: #0f6674;
-}
-
 </style>
