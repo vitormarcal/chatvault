@@ -16,7 +16,7 @@
 
     <div class="message-list d-flex flex-column">
       <template v-for="(message, index) in messages" :key="index">
-        <message-item :message="message"/>
+        <message-item :message="message" :chatId="chat.chatId"/>
       </template>
     </div>
 

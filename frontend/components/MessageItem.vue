@@ -3,7 +3,7 @@
     <div class="message-id">{{ message.id }}</div>
     <div class="author font-weight-bold">{{ message.author }}</div>
     <div class="message-content" v-html="safeContent"></div>
-    <attachment :message="message"></attachment>
+    <attachment v-if="hasAttachment" :message="message" :chatId="chatId"></attachment>
     <div class="message-createdAt">{{ message.createdAt }}</div>
   </div>
 </template>
@@ -11,13 +11,14 @@
 <script setup lang="ts">
 import Attachment from "~/components/Attachment.vue";
 
-const props = defineProps(["message"])
+const props = defineProps(["message", "chatId"])
 
 const safeContent = computed(() => props.message.content.replace(
     /https?:\/\/[^\s]+/g,
     '<a href="$&" target="_blank">$&</a>'
 ))
 
+const hasAttachment = computed(() => !!props.message.attachmentName)
 const isSystem = computed(() => props.message.authorType === 'SYSTEM')
 
 const classObject = computed(() => {

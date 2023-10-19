@@ -5,8 +5,8 @@ export default defineNuxtConfig({
         public: {
             api: {
                 listChats: 'http://localhost:8080/api/chats',
-                getAttachment: 'http://localhost:8080/api/attachment',
-                getMessagesByIdAndPage: 'http://localhost:8080/api/chats/:chatId?page=:page'
+                getMessagesByIdAndPage: 'http://localhost:8080/api/chats/:chatId?page=:page',
+                getAttachmentByChatIdAndMessageId: 'http://localhost:8080/api/chats/:chatId/messages/:messageId/attachment'
             }
         }
     },
