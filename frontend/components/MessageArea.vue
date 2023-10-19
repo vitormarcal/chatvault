@@ -1,5 +1,5 @@
 <template>
-  <div class="message-area d-sm-flex flex-column col-12 col-sm-7 col-md-8 p-0 h-100" ref="chatWindow"
+  <div class="message-area flex-column col-12 col-md-9 p-3 h-100" ref="chatWindow"
   >
 
     <div id="navbar" class="row d-flex flex-row align-items-center p-2 m-0" v-if="chatActive">
@@ -15,7 +15,7 @@
 
 
     <div class="message-list d-flex flex-column">
-      <template v-for="message in messages">
+      <template v-for="(message, index) in messages" :key="index">
         <message-item :message="message"/>
       </template>
     </div>
