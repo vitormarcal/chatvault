@@ -32,6 +32,10 @@ function updateChatActive(item: any) {
 
 <style>
 
+main {
+  width: 100vw;
+  height: 90vh;
+}
 
 .navbar {
   background: cadetblue;
