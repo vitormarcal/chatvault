@@ -16,6 +16,7 @@
 
 
     <div id="infinite-list" class="message-list d-flex flex-column">
+      <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages</button>
       <template v-for="(message, index) in messages" :key="index">
         <message-item :message="message" :chatId="chat.chatId"/>
       </template>
@@ -48,8 +49,16 @@ const content = computed(() => {
   return response?.value?.content ?? []
 })
 
+const hasNextPages = computed(() => {
+  if (response?.value) {
+    return !response.value.last
+  } else {
+    return false
+  }
+})
+
 function scrollBottom() {
-  if (messagesAreaElement.value) {
+  if (messagesAreaElement.value && nextPage.value === 0) {
     messagesAreaElement.value.scrollTo({
       top: messagesAreaElement.value.scrollHeight,
       behavior: 'smooth'
@@ -57,15 +66,20 @@ function scrollBottom() {
   }
 }
 
+function loadMoreMessages() {
+   nextPage.value+=1
+}
+
 watch(
     () => props.chat.chatId,
     (chatId) => {
       messages.value = []
+      nextPage.value = 0
     }
 )
 
 watch(content, async (newContent, oldContent) => {
-  messages.value.push(...newContent)
+  messages.value =  [...newContent, ...messages.value]
   await nextTick()
   scrollBottom()
 })
