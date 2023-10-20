@@ -3,20 +3,28 @@
        ref="messagesAreaElement"
   >
 
-    <div id="navbar" class="row d-flex flex-row align-items-center p-2 m-0" v-if="chatActive">
-      <a href="#" class="h2">arrow</a>
+    <div id="navbar" class="d-flex align-items-center p-2 m-0" v-if="chatActive">
+      <a href="#" class="h2">
+        <svg xmlns="http://www.w3.org/2000/svg"  width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+             viewBox="0 0 16 16">
+          <path fill-rule="evenodd"
+                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+        </svg>
+      </a>
       <a href="#">
         <profile-image :chat-id="chat.id"/>
       </a>
       <div class="d-flex flex-column">
-        <div class="text-white font-weight-bold" id="name">{{ chat.chatName }}</div>
-        <div class="text-white small" id="details">last seen 01/01/20233</div>
+        <div class="font-weight-bold" id="name">{{ chat.chatName }}</div>
+        <div class="small d-flex" id="details">last message sent:<message-created-at :date="chat.msgCreatedAt"/>
+        </div>
       </div>
     </div>
 
 
     <div id="infinite-list" class="message-list d-flex flex-column">
-      <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages</button>
+      <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
+      </button>
       <template v-for="(message, index) in messages" :key="index">
         <message-item :message="message" :chatId="chat.chatId"/>
       </template>
@@ -67,7 +75,7 @@ function scrollBottom() {
 }
 
 function loadMoreMessages() {
-   nextPage.value+=1
+  nextPage.value += 1
 }
 
 watch(
@@ -79,7 +87,7 @@ watch(
 )
 
 watch(content, async (newContent, oldContent) => {
-  messages.value =  [...newContent, ...messages.value]
+  messages.value = [...newContent, ...messages.value]
   await nextTick()
   scrollBottom()
 })
