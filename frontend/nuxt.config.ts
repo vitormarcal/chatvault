@@ -4,7 +4,9 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             api: {
-                listChats: 'http://localhost:8080/api/chats'
+                listChats: 'http://localhost:8080/api/chats',
+                getMessagesByIdAndPage: 'http://localhost:8080/api/chats/:chatId?page=:page',
+                getAttachmentByChatIdAndMessageId: 'http://localhost:8080/api/chats/:chatId/messages/:messageId/attachment'
             }
         }
     },

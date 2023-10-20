@@ -1,6 +1,6 @@
 <template>
   <div class="flex-grow-1 text-end">
-    <div class="small"  :class="classObject">{{ dateObject.date }}</div>
+    <div class="small" :class="classObject">{{ dateObject.date }}</div>
   </div>
 </template>
 

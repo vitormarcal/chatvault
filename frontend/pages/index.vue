@@ -6,8 +6,9 @@
     <main class="container-fluid">
       <div class="row h-100">
         <chat-list :chats="chats"
+                   @update:chat-active="updateChatActive"
         />
-        <div id="message-area"></div>
+        <message-area :chat="chat"/>
       </div>
     </main>
 
@@ -16,22 +17,28 @@
 
 <script setup lang="ts">
 import ChatList from "~/components/ChatList.vue";
+import MessageArea from "~/components/MessageArea.vue";
 
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
-const { data: chats} = await useFetch(listChatsAPIUrl)
+const {data: chats} = await useFetch(listChatsAPIUrl)
+const chat = ref({})
+
+function updateChatActive(item: any) {
+  chat.value = item
+}
 
 </script>
 
 
 <style>
 
+main {
+  width: 100vw;
+  height: 90vh;
+}
 
 .navbar {
   background: cadetblue;
-}
-
-#message-area {
-  background: #0f6674;
 }
 
 </style>
