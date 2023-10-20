@@ -20,7 +20,7 @@ import ChatList from "~/components/ChatList.vue";
 import MessageArea from "~/components/MessageArea.vue";
 
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
-const { data: chats} = await useFetch(listChatsAPIUrl)
+const {data: chats} = await useFetch(listChatsAPIUrl)
 const chat = ref({})
 
 function updateChatActive(item: any) {
