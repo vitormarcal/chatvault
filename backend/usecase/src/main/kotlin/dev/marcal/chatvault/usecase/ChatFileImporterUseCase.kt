@@ -1,9 +1,11 @@
 package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.app_service.bucket_service.BucketService
+import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.model.BucketFile
 import dev.marcal.chatvault.repository.ChatRepository
+import dev.marcal.chatvault.service.ChatCreator
 import dev.marcal.chatvault.service.ChatFileImporter
 import dev.marcal.chatvault.service.ChatMessageParser
 import dev.marcal.chatvault.service.MessageCreator
@@ -13,6 +15,7 @@ import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.lang.IllegalStateException
+import java.time.LocalDateTime
 import java.util.zip.ZipInputStream
 
 @Service
@@ -20,7 +23,8 @@ class ChatFileImporterUseCase(
     private val chatMessageParser: ChatMessageParser,
     private val messageCreator: MessageCreator,
     private val bucketService: BucketService,
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val chatCreator: ChatCreator
 ) : ChatFileImporter {
 
     private val possiblyWhatsappTalk = Regex(".*WhatsApp.*\\.txt$")
@@ -38,6 +42,17 @@ class ChatFileImporterUseCase(
         }
 
 
+    }
+
+    override fun execute(chatName: String?, inputStream: InputStream, fileType: String) {
+        val chatId = chatName?.let { chatRepository.findChatBucketInfoByChatName(it)?.chatId } ?: createTodoChat(chatName)
+        execute(chatId, inputStream, fileType)
+    }
+
+    private fun createTodoChat(chatName: String?): Long {
+        val tempChatName = chatName ?: "todo imported at ${LocalDateTime.now()}"
+        chatCreator.executeIfNotExists(NewChatInput(name = tempChatName))
+        return requireNotNull(chatRepository.findChatBucketInfoByChatName(tempChatName)?.chatId) { "temp chat creation fails: chatName: $tempChatName" }
     }
 
     private fun iterateOverZip(chatId: Long, inputStream: InputStream) {
