@@ -5,6 +5,7 @@ import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.model.Bucket
 import dev.marcal.chatvault.model.ChatBucketInfo
 import dev.marcal.chatvault.repository.ChatRepository
+import dev.marcal.chatvault.service.ChatCreator
 import dev.marcal.chatvault.service.MessageCreator
 import io.mockk.*
 import org.junit.jupiter.api.BeforeEach
@@ -16,11 +17,14 @@ class ChatFileImporterUseCaseTest {
     private val chatRepository: ChatRepository = mockk()
     private val bucketService: BucketService = mockk()
     private val messageCreator: MessageCreator = mockk()
+    private val chatCreator: ChatCreator = mockk()
     private val chatFileImporter = ChatFileImporterUseCase(
         chatMessageParser = chatMessageParser,
         chatRepository = chatRepository,
         bucketService = bucketService,
-        messageCreator = messageCreator
+        messageCreator = messageCreator,
+        chatCreator = chatCreator,
+
     )
 
     @BeforeEach
