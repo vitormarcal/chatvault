@@ -3,60 +3,95 @@ package dev.marcal.chatvault.email.listener
 import dev.marcal.chatvault.service.ChatFileImporter
 import jakarta.mail.Folder
 import jakarta.mail.Multipart
-import jakarta.mail.Part
 import jakarta.mail.internet.MimeMessage
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.integration.annotation.ServiceActivator
 import org.springframework.messaging.Message
 import org.springframework.stereotype.Component
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @Component
 @ConditionalOnProperty(prefix = "app.email", name = ["enabled"], havingValue = "true", matchIfMissing = true)
 class EmailMessageHandler(
     private val chatFileImporter: ChatFileImporter,
-    @Value("\${app.email.subject-starts-with}") private val subjectStartsWithList: List<String>
+    @Value("\${app.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
+    @Value("\${app.email.debug}") private val emailDebug: Boolean
 ) {
+
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @ServiceActivator(inputChannel = "imapChannel")
     fun handleMessage(message: Message<MimeMessage>) {
-        // Aqui você pode implementar a lógica para processar a mensagem recebida.
-        val mimeMessage = message.payload
-
-
-        if (mimeMessage.isMimeType("multipart/*")) {
-            val multipart = mimeMessage.content as Multipart
-
-            // Itere pelos elementos no Multipart.
-            for (i in 0 until multipart.count) {
-                val bodyPart = multipart.getBodyPart(i)
-
-                // Verifique se este é um anexo.
-                if (Part.ATTACHMENT.equals(bodyPart.disposition, ignoreCase = true)) {
-                    // Verifique se o nome do anexo é o que você procura (neste caso, um arquivo ZIP).
-                    if (bodyPart.fileName.endsWith(".zip", ignoreCase = true)) {
-                        // Obtenha o InputStream do anexo ZIP.
-                        val folder: Folder = mimeMessage.folder
-                        if (!folder.isOpen) {
-                            folder.open(Folder.HOLDS_MESSAGES) // Ou o modo apropriado para a sua situação
-                        }
-                        val attachmentInputStream: InputStream = bodyPart.inputStream
-                        // Certifique-se de fechar a pasta após terminar de acessar os anexos.
-
-
-                        chatFileImporter.execute(
-                            chatName = getChatNameOrNull(mimeMessage),
-                            attachmentInputStream,
-                            fileType = "zip"
-                        )
-                        folder.close(false)
-                    }
-                }
-            }
+        val mimeMessage = message.payload.also {
+            if (emailDebug) logger.info("Starting to process new email message ${it.subject}")
         }
 
+        useFolder(mimeMessage) {
+            if (mimeMessage.isMimeType("multipart/*")) {
+                val multipart = mimeMessage.content as Multipart
 
+                val (fileType, inputStream) = getInputStream(multipart)
+                chatFileImporter.execute(
+                    chatName = getChatNameOrNull(mimeMessage),
+                    inputStream,
+                    fileType = fileType
+                )
+            }
+        }
+    }
+
+    fun useFolder(mimeMessage: MimeMessage, doIt: (MimeMessage) -> Unit) {
+        val folder: Folder = mimeMessage.folder
+        try {
+            if (!folder.isOpen) { folder.open(Folder.READ_ONLY) }
+            doIt(mimeMessage)
+            folder.close(false)
+        } catch (e: Exception) {
+            logger.error("Fail to handle message ${mimeMessage.subject}", e)
+            throw e
+        } finally {
+            folder.close(false)
+        }
+
+    }
+
+    private fun getInputStream(multipart: Multipart): Pair<String, InputStream> {
+        val indexStart = 1 // because 0 is the body text (ignored)
+        return if (multipart.count == 2) {
+            // only one file (body email text and attachment), body text is ignored
+            val bodyPart = multipart.getBodyPart(indexStart)
+            val attachmentInputStream: InputStream = bodyPart.inputStream
+            if (bodyPart.fileName.endsWith(".zip", ignoreCase = true)) {
+                "zip" to attachmentInputStream
+            } else {
+                "txt" to attachmentInputStream
+            }
+        } else {
+            //many files
+            val outputStream = ByteArrayOutputStream()
+            val zipOutputStream = ZipOutputStream(outputStream)
+            for (i in indexStart until multipart.count) {
+                val bodyPart = multipart.getBodyPart(i)
+                val inputStream: InputStream = bodyPart.inputStream
+
+                zipOutputStream.putNextEntry(ZipEntry(bodyPart.fileName))
+                val buffer = ByteArray(1024)
+                var len: Int
+                while (inputStream.read(buffer).also { len = it } > 0) {
+                    zipOutputStream.write(buffer, 0, len)
+                }
+                zipOutputStream.closeEntry()
+                inputStream.close()
+            }
+            zipOutputStream.close()
+            "zip" to ByteArrayInputStream(outputStream.toByteArray())
+        }
     }
 
     private fun getChatNameOrNull(mimeMessage: MimeMessage): String? {
