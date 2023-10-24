@@ -22,6 +22,7 @@ class EmailHandlerConfig(
     @Value("\${app.email.username}") private val username: String,
     @Value("\${app.email.password}") private val password: String,
     @Value("\${app.email.fixed-delay-mlss}") private val fixedDelay: Long,
+    @Value("\${app.email.debug}") private val emailDebug: Boolean,
     @Value("\${app.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
 ) {
 
@@ -36,7 +37,7 @@ class EmailHandlerConfig(
                 .userFlag("chat-vault")
                 .autoCloseFolder(false)
                 .javaMailProperties { p: PropertiesBuilder ->
-                    p.put("mail.debug", "true")
+                    p.put("mail.debug", emailDebug)
                     p.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
                     p.put("mail.store.protocol", "imap")
                     p.put("mail.imap.socketFactory.fallback", "false")
