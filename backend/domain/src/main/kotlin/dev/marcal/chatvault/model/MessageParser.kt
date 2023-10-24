@@ -40,7 +40,7 @@ object MessageParser {
                 name = "",
                 type = AuthorType.SYSTEM
             ),
-            content = Content(text = content, attachment = attachment),
+            content = Content(text = removeTrailingNulls(content) , attachment = attachment),
             createdAt = date,
             externalId = null
         )
@@ -65,5 +65,8 @@ object MessageParser {
 
     private fun removePrefix(content: String): String {
         return content.removePrefix("\u200E")
+    }
+    private fun removeTrailingNulls(content: String): String {
+        return content.filterNot { it == '\u0000' }
     }
 }

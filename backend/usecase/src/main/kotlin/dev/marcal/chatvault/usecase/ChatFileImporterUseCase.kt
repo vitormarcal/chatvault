@@ -50,7 +50,7 @@ class ChatFileImporterUseCase(
     }
 
     private fun createTodoChat(chatName: String?): Long {
-        val tempChatName = chatName ?: "todo imported at ${LocalDateTime.now()}"
+        val tempChatName = chatName?.takeIf { it.isNotEmpty() } ?: "todo imported at ${LocalDateTime.now()}"
         chatCreator.executeIfNotExists(NewChatInput(name = tempChatName))
         return requireNotNull(chatRepository.findChatBucketInfoByChatName(tempChatName)?.chatId) { "temp chat creation fails: chatName: $tempChatName" }
     }

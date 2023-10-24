@@ -16,6 +16,7 @@ dependencies {
     implementation project(":backend:in-out-boundary")
     implementation project(":backend:infra:app-service")
     implementation project(":backend:infra:web")
+    implementation project(":backend:infra:email")
     implementation project(":backend:domain")
     implementation project(":backend:usecase")
     implementation project(":backend:service")
