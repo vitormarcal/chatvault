@@ -50,7 +50,6 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
         runtimeOnly 'org.postgresql:postgresql'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
         testImplementation("io.mockk:mockk:1.13.5")
     }
 

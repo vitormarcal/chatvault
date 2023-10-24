@@ -1,12 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     devtools: {enabled: true},
+    ssr: false,
     runtimeConfig: {
         public: {
             api: {
-                listChats: 'http://localhost:8080/api/chats',
-                getMessagesByIdAndPage: 'http://localhost:8080/api/chats/:chatId?page=:page',
-                getAttachmentByChatIdAndMessageId: 'http://localhost:8080/api/chats/:chatId/messages/:messageId/attachment'
+                listChats: '/api/chats',
+                getMessagesByIdAndPage: '/api/chats/:chatId?page=:page',
+                getAttachmentByChatIdAndMessageId: '/api/chats/:chatId/messages/:messageId/attachment'
             }
         }
     },
