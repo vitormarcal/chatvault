@@ -1,10 +1,14 @@
 <template>
-  <div id="message-area" class="message-area flex-column col-12 col-md-9 p-3 h-100 overflow-auto"
+  <div id="message-area"
+       class="message-area flex-column col-12 col-md-9 p-3 h-100 overflow-auto"
+       :class="dynamicClass"
        ref="messagesAreaElement"
   >
 
-    <div id="navbar" class="d-flex align-items-center p-2 m-0" v-if="chatActive">
-      <a href="#" class="h2">
+    <div id="navbar"
+         class="d-flex align-items-center p-2 m-0"
+         v-if="chatActive">
+      <a href="#" class="h2" @click="exitThisChat">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
              viewBox="0 0 16 16">
           <path fill-rule="evenodd"
@@ -38,7 +42,9 @@
 <script setup lang="ts">
 import MessageItem from "~/components/MessageItem.vue";
 
-const props = defineProps(['chat'])
+const props = defineProps(['chat', 'mobile'])
+const emit = defineEmits(['update:chat-exited'])
+
 const messages = ref([])
 const nextPage = ref(0)
 const messagesAreaElement = ref(null)
@@ -66,6 +72,12 @@ const hasNextPages = computed(() => {
   }
 })
 
+const dynamicClass = computed(() => {
+  return {
+    'd-none': props.mobile && props.chat.chatId == null
+  }
+})
+
 function scrollBottom() {
   if (messagesAreaElement.value && nextPage.value === 0) {
     messagesAreaElement.value.scrollTo({
@@ -77,6 +89,10 @@ function scrollBottom() {
 
 function loadMoreMessages() {
   nextPage.value += 1
+}
+
+function exitThisChat() {
+  emit('update:chat-exited')
 }
 
 watch(
