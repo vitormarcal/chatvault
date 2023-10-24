@@ -1,5 +1,5 @@
 services:
-  postgres:
+  database:
     image: 'postgres:latest'
     environment:
       - 'POSTGRES_DB=chatvault'
@@ -11,3 +11,15 @@ services:
     image: adminer
     ports:
       - 8081:8080
+  chatvault:
+    build: ./
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/chatvault
+      - SPRING_DATASOURCE_USERNAME=usr_chatvault
+      - SPRING_DATASOURCE_PASSWORD=secret
+    ports:
+      - 8080:8080
+    volumes:
+      - '/opt/chatvault:/opt/chatvault'
+    depends_on:
+      - database

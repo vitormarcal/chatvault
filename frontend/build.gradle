@@ -11,7 +11,7 @@ node {
     version = '20.0.0'
     // If true, it will download node using above parameters.
     // If false, it will try to use globally installed node.
-    download = true
+    download = false
 }
 
 task npmCI(type: NpmTask)  {
