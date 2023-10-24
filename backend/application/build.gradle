@@ -1,5 +1,8 @@
 apply plugin: 'application'
 
+application {
+    mainClass.set("dev.marcal.chatvault.Boot")
+}
 
 sourceSets {
     main {

@@ -6,7 +6,7 @@ services:
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_USER=usr_chatvault'
     ports:
-      - '5432'
+      - '5432:5432'
   adminer:
     image: adminer
     ports:
