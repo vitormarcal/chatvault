@@ -1,5 +1,6 @@
 package dev.marcal.chatvault.email.config
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -26,13 +27,15 @@ class EmailHandlerConfig(
     @Value("\${app.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
 ) {
 
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     @Bean
     fun imapMailFlow(): IntegrationFlow {
+        logger.info("creating imapMailFlow integration flow receive emails")
         return IntegrationFlow
             .from(Mail.imapInboundAdapter("imap://${username}:${password}@${host}:${port}/INBOX")
                 .selector { mimeMessage ->
-                    subjectStartsWithList.any { mimeMessage.subject.startsWith(it, ignoreCase = true)   }
+                    subjectStartsWithList.any { mimeMessage.subject.startsWith(it, ignoreCase = true) }
                 }
                 .userFlag("chat-vault")
                 .autoCloseFolder(false)
