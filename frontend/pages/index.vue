@@ -2,7 +2,7 @@
   <div class="index-page" ref="indexRef">
 
     <main class="container-fluid">
-      <div class="row h-100">
+      <div class="row h-100 m-3 m-md-4">
         <chat-list :chats="chats"
                    :active-chat="chat"
                    :mobile="isMobile"
