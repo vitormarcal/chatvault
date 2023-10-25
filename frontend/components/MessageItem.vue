@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import Attachment from "~/components/Attachment.vue";
 
-const props = defineProps(["message", "chatId"])
+const props = defineProps(["message", "chatId", "authorActive"])
 
 const safeContent = computed(() => props.message.content.replace(
     /https?:\/\/[^\s]+/g,
@@ -21,9 +21,13 @@ const safeContent = computed(() => props.message.content.replace(
 const hasAttachment = computed(() => !!props.message.attachmentName)
 const isSystem = computed(() => props.message.authorType === 'SYSTEM')
 
+const self = computed(() => props.message.author === props.authorActive)
+
 const classObject = computed(() => {
   return {
-    'system-message': isSystem.value,
+    'system-message w-50 align-self-center': isSystem.value,
+    'align-self-end': self.value,
+    'align-self-start': !self.value
   }
 })
 </script>
