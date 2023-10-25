@@ -30,8 +30,8 @@
 
       <div class="chat-option d-flex mt-3">
         <div class="form-group">
-          <label for="exampleFormControlSelect1">Active Author</label>
-          <select class="form-control" v-model="authorActive" id="exampleFormControlSelect1">
+          <label for="active-author">Active Author</label>
+          <select class="form-control" v-model="authorActive" id="active-author">
             <option v-for="option in authors" :value="option">{{ option }}</option>
           </select>
         </div>
