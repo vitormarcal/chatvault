@@ -4,14 +4,15 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "API_HOST=http://localhost:8080/api nuxt dev ",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "upgrade": "nuxt upgrade",
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
-    "nuxt": "^3.7.4",
+    "nuxt": "^3.8.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5"
   },

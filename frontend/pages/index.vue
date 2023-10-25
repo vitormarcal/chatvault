@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="indexRef">
 
 
     <div class="navbar">navbar</div>
@@ -28,9 +28,13 @@ const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
 const {data: chats} = await useFetch(listChatsAPIUrl)
 const chat = ref({})
 const isMobile = ref(true)
+const indexRef = ref(null)
 
 function checkWindowSize() {
-  isMobile.value = window.innerWidth <= 575;
+  if (indexRef.value) {
+    isMobile.value = indexRef.value.offsetWidth <= 575;
+  }
+
 }
 
 function updateChatActive(item: any) {
@@ -41,9 +45,24 @@ function updateChatExited() {
   chat.value = {}
 }
 
+watchEffect(() => {
+  if (indexRef.value) {
+    indexRef.value.addEventListener('resize', checkWindowSize);
+    checkWindowSize()
+  }
+})
+
+onBeforeMount(() => {
+  window.addEventListener("resize", checkWindowSize);
+})
+
 onMounted(() => {
   nextTick(() => {
-    window.addEventListener('resize', checkWindowSize);
+    if (indexRef.value) {
+      console.log("add event listener")
+      indexRef.value.addEventListener('resize', checkWindowSize);
+      checkWindowSize()
+    }
   })
 })
 

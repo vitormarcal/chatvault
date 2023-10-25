@@ -104,7 +104,7 @@ watch(
 )
 
 watch(content, async (newContent, oldContent) => {
-  messages.value = [...newContent, ...messages.value]
+  messages.value = [...newContent.reverse(), ...messages.value]
   await nextTick()
   scrollBottom()
 })
