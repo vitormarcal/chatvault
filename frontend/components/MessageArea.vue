@@ -35,6 +35,12 @@
             <option v-for="option in authors" :value="option">{{ option }}</option>
           </select>
         </div>
+
+        <div class="form-group">
+          <label for="import-chat-file">Import Chat</label>
+          <input type="file" accept=".zip,.txt" ref="chatImportRef" class="form-control-file" id="import-chat-file"
+                 @change="onFilePicked">
+        </div>
       </div>
 
 
@@ -63,16 +69,17 @@ const messages = ref([])
 const authorActive = ref({})
 const nextPage = ref(0)
 const messagesAreaElement = ref(null)
+const chatImportRef = ref(null)
 
 const chatActive = computed(() => props.chat.chatId > 0)
 
 const moreMessagesPath = computed(() =>
     useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", nextPage.value))
 
+const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", props.chat.chatId))
 
-const {data: response} = await useLazyFetch(() => moreMessagesPath.value, {
-  immediate: false
-})
+
+const {data: response, refresh} = await useFetch(moreMessagesPath)
 
 
 const content = computed(() => {
@@ -113,12 +120,33 @@ function loadMoreMessages() {
 function exitThisChat() {
   emit('update:chat-exited')
 }
+async function onFilePicked() {
+  if (chatImportRef?.value?.files && chatImportRef?.value?.files[0]) {
+    let input = chatImportRef.value;
+    const file = input.files[0]
+
+    const form = new FormData()
+    form.append("file", file);
+    await $fetch(importChatPath.value, {
+      method: "POST",
+      body: form
+    });
+
+    chatImportRef.value.value = ''
+    await refresh()
+  }
+
+
+}
 
 watch(
     () => props.chat.chatId,
     (chatId) => {
       messages.value = []
       nextPage.value = 0
+      if (chatImportRef.value) {
+        chatImportRef.value.value = ''
+      }
     }
 )
 
