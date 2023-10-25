@@ -1,12 +1,12 @@
 <template>
   <div id="message-area"
-       class="message-area flex-column col-12 col-md-9 p-3 h-100 overflow-auto"
+       class="message-area flex-column col-12 col-md-9 h-100 overflow-auto"
        :class="dynamicClass"
        ref="messagesAreaElement"
   >
 
     <div id="navbar"
-         class="d-flex align-items-center p-2 m-0"
+         class="sticky-top d-flex align-items-center p-2 m-0"
          v-if="chatActive">
       <a href="#" class="h2" @click="exitThisChat">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
@@ -113,6 +113,11 @@ watch(content, async (newContent, oldContent) => {
 
 <style scoped>
 .message-area {
+  background: #360d3c;
+}
+
+
+#navbar {
   background: #360d3c;
 }
 </style>
