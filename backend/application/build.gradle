@@ -4,16 +4,6 @@ application {
     mainClass.set("dev.marcal.chatvault.Boot")
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDir '../../frontend/.output'
-        }
-    }
-}
-
-processResources.dependsOn ':frontend:buildFrontend'
-
 dependencies {
     implementation project(":backend:infra:persistence")
     implementation project(":backend:in-out-boundary")

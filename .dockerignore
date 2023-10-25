@@ -1,0 +1,8 @@
+.gradle
+**/build
+**/.nuxt
+**/dist
+**/node_modules
+**/.output
+**/.env
+.idea
