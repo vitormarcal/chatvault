@@ -36,6 +36,7 @@ const classObject = computed(() => {
   box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
   text-align: left;
   position: relative;
+  background: #9E4FB0;
 }
 
 .message-id {

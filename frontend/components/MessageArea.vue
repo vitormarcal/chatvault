@@ -112,5 +112,7 @@ watch(content, async (newContent, oldContent) => {
 </script>
 
 <style scoped>
-
+.message-area {
+  background: #360d3c;
+}
 </style>
