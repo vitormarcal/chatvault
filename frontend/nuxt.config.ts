@@ -1,13 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+const host = process.env.API_HOST || '/api'
 export default defineNuxtConfig({
     devtools: {enabled: true},
     ssr: false,
     runtimeConfig: {
         public: {
             api: {
-                listChats: '/api/chats',
-                getMessagesByIdAndPage: '/api/chats/:chatId?page=:page',
-                getAttachmentByChatIdAndMessageId: '/api/chats/:chatId/messages/:messageId/attachment'
+                listChats: `${host}/chats`,
+                getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page`,
+                getAttachmentByChatIdAndMessageId: `${host}/chats/:chatId/messages/:messageId/attachment`
             }
         }
     },
