@@ -1,29 +1,43 @@
 <template>
   <div id="message-area"
-       class="message-area flex-column col-12 col-md-9 p-3 h-100 overflow-auto"
+       class="message-area flex-column col-12 col-md-9 h-100 overflow-auto"
        :class="dynamicClass"
        ref="messagesAreaElement"
   >
 
     <div id="navbar"
-         class="d-flex align-items-center p-2 m-0"
+         class="sticky-top d-flex p-2 m-0 justify-content-between"
          v-if="chatActive">
-      <a href="#" class="h2" @click="exitThisChat">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
-             viewBox="0 0 16 16">
-          <path fill-rule="evenodd"
-                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-        </svg>
-      </a>
-      <a href="#">
-        <profile-image :chat-id="chat.id"/>
-      </a>
-      <div class="d-flex flex-column">
-        <div class="font-weight-bold" id="name">{{ chat.chatName }}</div>
-        <div class="small d-flex" id="details">last message sent:
-          <message-created-at :date="chat.msgCreatedAt"/>
+      <div class="chat-info-header d-flex align-items-center">
+        <a href="#" class="h2" @click="exitThisChat">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+               viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                  d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+          </svg>
+        </a>
+        <a href="#" class="m-2">
+          <profile-image :chat-id="chat.id"/>
+        </a>
+        <div class="d-flex flex-column">
+          <div class="font-weight-bold" id="name">{{ chat.chatName }}</div>
+          <div class="small d-flex" id="details">last message sent:
+            <message-created-at :date="chat.msgCreatedAt"/>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chat-option d-flex mt-3">
+        <div class="form-group">
+          <label for="exampleFormControlSelect1">Active Author</label>
+          <select class="form-control" v-model="authorActive" id="exampleFormControlSelect1">
+            <option v-for="option in authors" :value="option">{{ option }}</option>
+          </select>
         </div>
       </div>
+
+
     </div>
 
 
@@ -31,7 +45,7 @@
       <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
       </button>
       <template v-for="(message, index) in messages" :key="index">
-        <message-item :message="message" :chatId="chat.chatId"/>
+        <message-item :message="message" :chatId="chat.chatId" :authorActive="authorActive"/>
       </template>
     </div>
 
@@ -46,6 +60,7 @@ const props = defineProps(['chat', 'mobile'])
 const emit = defineEmits(['update:chat-exited'])
 
 const messages = ref([])
+const authorActive = ref({})
 const nextPage = ref(0)
 const messagesAreaElement = ref(null)
 
@@ -62,6 +77,10 @@ const {data: response} = await useLazyFetch(() => moreMessagesPath.value, {
 
 const content = computed(() => {
   return response?.value?.content ?? []
+})
+
+const authors = computed(() => {
+  return [...new Set(messages.value.map(it => it.author))].filter(it => !!it)
 })
 
 const hasNextPages = computed(() => {
@@ -112,5 +131,12 @@ watch(content, async (newContent, oldContent) => {
 </script>
 
 <style scoped>
+.message-area {
+  background: #360d3c;
+}
 
+
+#navbar {
+  background: #360d3c;
+}
 </style>

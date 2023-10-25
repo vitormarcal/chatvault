@@ -1,10 +1,10 @@
 <template>
   <div class="attachment">
-    <img v-if="isImage" :src="url" :alt="message.attachmentName"/>
-    <video v-else-if="isVideo" :src="url" controls></video>
-    <audio v-else-if="isAudio" :src="url" controls></audio>
-    <video v-else-if="isPDF" :src="url" controls></video>
-    <a v-else :download='message.attachmentName'
+    <img class="w-100" v-if="isImage" :src="url" :alt="message.attachmentName"/>
+    <video class="w-100" v-else-if="isVideo" :src="url" controls></video>
+    <audio class="w-100" v-else-if="isAudio" :src="url" controls></audio>
+    <video class="w-100" v-else-if="isPDF" :src="url" controls></video>
+    <a class="w-100" v-else :download='message.attachmentName'
        :href="url">{{ message.attachmentName }}</a>
   </div>
 </template>

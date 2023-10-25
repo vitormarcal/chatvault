@@ -1,10 +1,8 @@
 <template>
-  <div ref="indexRef">
+  <div class="index-page" ref="indexRef">
 
-
-    <div class="navbar">navbar</div>
     <main class="container-fluid">
-      <div class="row h-100">
+      <div class="row h-100 m-3 m-md-4">
         <chat-list :chats="chats"
                    :active-chat="chat"
                    :mobile="isMobile"
@@ -71,14 +69,13 @@ onMounted(() => {
 
 
 <style>
+.index-page {
+  color: white;
+}
 
 main {
   width: 100vw;
   height: 90vh;
-}
-
-.navbar {
-  background: cadetblue;
 }
 
 </style>

@@ -2,6 +2,7 @@
   <div id="chat-list-area"
        class="col-12  col-md-3 flex-column overflow-auto h-100 p-0"
        :class="dynamicClass">
+    <div class="action-bar d-flex flex-row p-2 sticky-top">Action Bar (work in progress)</div>
     <template v-for="item in chats">
       <chat-item :item="item"
                  @update:chat-active="emitThisChatActive"
@@ -31,5 +32,7 @@ function emitThisChatActive(item: any) {
 
 
 <style>
-
+.action-bar {
+  background: #360d3c;
+}
 </style>

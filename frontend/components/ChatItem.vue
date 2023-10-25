@@ -1,7 +1,7 @@
 <template>
-  <div id="chat-item-area" class="chat-item d-flex flex-row p-2 w-100 border-bottom" @click="emitThisChatActive()">
+  <div class="chat-item d-flex flex-row p-2 w-100" @click="emitThisChatActive()">
     <profile-image :id="item.chatId"/>
-    <div class="w-50">
+    <div class="w-50" style="padding-left: .5rem">
       <div class="name">{{ item.chatName }}</div>
       <div class="small text-truncate ">
         <i class="far fa-check-circle mr-1"></i>
@@ -28,10 +28,11 @@ function emitThisChatActive() {
 <style>
 .chat-item {
   cursor: pointer;
-  background: white;
+  background: #9E4FB0;
+  border-bottom: 1px solid #360d3c;
 }
 
-#chat-item-area {
-  background: #00c58e;
+.chat-item:hover {
+  background: #360d3c;
 }
 </style>
