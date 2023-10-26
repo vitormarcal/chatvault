@@ -78,7 +78,7 @@
                 <label for="formFileSm" class="form-label text-black">Import messages to this chat</label>
                 <input class="form-control form-control-sm"
                        @change="onFilePicked"
-
+                       accept=".zip,.txt"
                        id="formFileSm"
                        ref="chatImportRef"
                        type="file">
