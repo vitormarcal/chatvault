@@ -21,5 +21,6 @@ services:
       - 8080:8080
     volumes:
       - '/opt/chatvault:/opt/chatvault'
+      - './config:/config'
     depends_on:
       - database
