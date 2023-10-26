@@ -6,3 +6,4 @@
 **/.output
 **/.env
 .idea
+compose*.yml

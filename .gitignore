@@ -36,3 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 *.sqlite
+
+compose-prd.yml
+config/application.properties
