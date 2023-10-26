@@ -3,7 +3,7 @@
 const host = process.env.API_HOST || '/api'
 export default defineNuxtConfig({
     devtools: {enabled: true},
-    ssr: false,
+    ssr: true,
     runtimeConfig: {
         public: {
             api: {
