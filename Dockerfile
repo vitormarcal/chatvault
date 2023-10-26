@@ -24,4 +24,4 @@ COPY --from=backend_builder /app/backend/application/build/libs/application-0.0.
 VOLUME /config
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "chatvault.jar", "--spring.config.additional-location=file:/config/application.properties", "--spring.web.resources.static-locations=file:/app/public"]
+ENTRYPOINT ["java", "-jar", "chatvault.jar", "--spring.config.additional-location=file:/config/", "--spring.web.resources.static-locations=file:/app/public"]

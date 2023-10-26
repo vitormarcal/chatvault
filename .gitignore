@@ -37,6 +37,5 @@ out/
 .vscode/
 *.sqlite
 
-compose-dev.yml
 compose-prd.yml
-compose.yml
+config/application.properties
