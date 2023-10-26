@@ -36,3 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 *.sqlite
+
+compose-dev.yml
+compose-prd.yml
+compose.yml
