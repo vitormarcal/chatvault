@@ -4,7 +4,7 @@
     <main class="container-fluid">
       <div class="row h-100 m-3 m-md-4">
         <new-chat-uploader v-if="firstChatUpload"
-                           @update:chats="() => refresh()"
+                           @update:chats="() => sleep(2000).then(() => refresh())"
         >
 
         </new-chat-uploader>
@@ -39,6 +39,11 @@ const indexRef = ref(null)
 const firstChatUpload = computed(() => {
   return chats?.value?.length === 0
 })
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 
 function checkWindowSize() {
   if (indexRef.value) {
