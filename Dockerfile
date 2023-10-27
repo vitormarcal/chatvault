@@ -11,7 +11,9 @@ FROM openjdk:17-alpine as backend_builder
 
 WORKDIR /app
 
-COPY . .
+COPY gradle ./gradle
+COPY build.gradle gradlew gradlew.bat settings.gradle ./
+COPY backend ./backend
 
 RUN ./gradlew clean build
 
