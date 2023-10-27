@@ -2,6 +2,10 @@
   <div class="index-page" ref="indexRef">
 
     <main class="container-fluid">
+      <div class="d-flex justify-content-center" v-if="loading">
+        <strong>Loading...</strong>
+        <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+      </div>
       <div class="row h-100 m-3 m-md-4">
         <new-chat-uploader v-if="firstChatUpload"
                            @update:chats="refreshPage"
@@ -34,6 +38,7 @@ import MessageArea from "~/components/MessageArea.vue";
 
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
 const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
+const loading = ref(false)
 const chat = ref({})
 const isMobile = ref(true)
 const indexRef = ref(null)
@@ -56,9 +61,11 @@ function checkWindowSize() {
 }
 
 function refreshPage() {
+  loading.value = true
   sleep(2000).then(() => {
         createChatAction.value = false
         refresh()
+        loading.value = false
       }
   )
 }
