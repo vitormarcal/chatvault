@@ -1,9 +1,8 @@
 <template>
   <div class="attachment">
-    <img class="w-100" v-if="isImage" :src="url" :alt="message.attachmentName"/>
+    <img class="w-100 img-thumbnail" v-if="isImage" :src="url" :alt="message.attachmentName"/>
     <video class="w-100" v-else-if="isVideo" :src="url" controls></video>
     <audio class="w-100" v-else-if="isAudio" :src="url" controls></audio>
-    <video class="w-100" v-else-if="isPDF" :src="url" controls></video>
     <a class="w-100" v-else :download='message.attachmentName'
        :href="url">{{ message.attachmentName }}</a>
   </div>

@@ -5,6 +5,8 @@
     <div class="action-bar d-flex flex-row p-2 sticky-top">
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-outline-primary btn-sm" @click="emitCreateNewChat">Create new chat</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import
+        </button>
       </div>
 
     </div>
@@ -19,7 +21,7 @@
 <script setup lang="ts">
 
 const props = defineProps(['chats', 'mobile', 'activeChat'])
-const emit = defineEmits(['update:chat-active', 'create:chat'])
+const emit = defineEmits(['update:chat-active', 'create:chat', 'update:disk-import'])
 
 const chatOpened = computed(() => props.activeChat?.chatId != null)
 const dynamicClass = computed(() => {
@@ -35,6 +37,11 @@ function emitThisChatActive(item: any) {
 
 function emitCreateNewChat() {
   emit('create:chat')
+}
+
+async function emitDiskImport() {
+  await useFetch(useRuntimeConfig().public.api.importFromDisk, {method: 'post'})
+  emit('update:disk-import')
 }
 
 </script>
