@@ -2,7 +2,12 @@
   <div id="chat-list-area"
        class="col-12  col-md-3 flex-column overflow-auto h-100 p-0"
        :class="dynamicClass">
-    <div class="action-bar d-flex flex-row p-2 sticky-top">Action Bar (work in progress)</div>
+    <div class="action-bar d-flex flex-row p-2 sticky-top">
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitCreateNewChat">Create new chat</button>
+      </div>
+
+    </div>
     <template v-for="item in chats">
       <chat-item :item="item"
                  @update:chat-active="emitThisChatActive"
@@ -14,7 +19,7 @@
 <script setup lang="ts">
 
 const props = defineProps(['chats', 'mobile', 'activeChat'])
-const emit = defineEmits(['update:chat-active'])
+const emit = defineEmits(['update:chat-active', 'create:chat'])
 
 const chatOpened = computed(() => props.activeChat?.chatId != null)
 const dynamicClass = computed(() => {
@@ -26,6 +31,10 @@ const dynamicClass = computed(() => {
 
 function emitThisChatActive(item: any) {
   emit('update:chat-active', item)
+}
+
+function emitCreateNewChat() {
+  emit('create:chat')
 }
 
 </script>

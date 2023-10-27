@@ -4,7 +4,7 @@
     <main class="container-fluid">
       <div class="row h-100 m-3 m-md-4">
         <new-chat-uploader v-if="firstChatUpload"
-                           @update:chats="() => sleep(2000).then(() => refresh())"
+                           @update:chats="refreshPage"
         >
 
         </new-chat-uploader>
@@ -12,6 +12,7 @@
           <chat-list :chats="chats"
                      :active-chat="chat"
                      :mobile="isMobile"
+                     @create:chat="createNewChat"
                      @update:chat-active="updateChatActive"
           />
           <message-area
@@ -35,9 +36,10 @@ const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
 const chat = ref({})
 const isMobile = ref(true)
 const indexRef = ref(null)
+const createChatAction = ref(false)
 
 const firstChatUpload = computed(() => {
-  return chats?.value?.length === 0
+  return chats?.value?.length === 0 || createChatAction.value
 })
 
 function sleep(ms: number) {
@@ -50,6 +52,18 @@ function checkWindowSize() {
     isMobile.value = indexRef.value.offsetWidth <= 575;
   }
 
+}
+
+function refreshPage() {
+  sleep(2000).then(() => {
+        createChatAction.value = false
+        refresh()
+      }
+  )
+}
+
+function createNewChat() {
+  createChatAction.value = true
 }
 
 function updateChatActive(item: any) {

@@ -31,7 +31,7 @@
       <div class="chat-option mt-3 ">
 
 
-        <button type="button" @click="toggleModal" class="btn btn-outline-primary mb-2" data-bs-toggle="modal">
+        <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal">
           Import/Export
         </button>
 
