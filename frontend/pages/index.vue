@@ -4,7 +4,7 @@
     <main class="container-fluid">
       <div class="row h-100 m-3 m-md-4">
         <new-chat-uploader v-if="firstChatUpload"
-                           @update:chats="() => response.refresh"
+                           @update:chats="() => refresh()"
         >
 
         </new-chat-uploader>
@@ -31,14 +31,13 @@ import ChatList from "~/components/ChatList.vue";
 import MessageArea from "~/components/MessageArea.vue";
 
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
-const response = await useFetch(listChatsAPIUrl)
+const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
 const chat = ref({})
 const isMobile = ref(true)
 const indexRef = ref(null)
 
-const chats = computed(() => response?.value?.data || [])
 const firstChatUpload = computed(() => {
-  return chats.value.length === 0
+  return chats?.value?.length === 0
 })
 
 function checkWindowSize() {

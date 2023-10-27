@@ -47,7 +47,23 @@ class ChatController(
     }
 
     @PostMapping("{chatId}/messages/import")
-    fun importFile(@PathVariable chatId: Long, @RequestParam("file") file: MultipartFile): ResponseEntity<String> {
+    fun importFileByChatId(
+        @PathVariable chatId: Long,
+        @RequestParam("file") file: MultipartFile
+    ): ResponseEntity<String> {
+        return importChat(chatId = chatId, file = file)
+    }
+
+    @PostMapping("import/{chatName}")
+    fun importChatByChatName(
+        @PathVariable chatName: String,
+        @RequestParam("file") file: MultipartFile
+    ): ResponseEntity<String> {
+        return importChat(chatName = chatName, file = file)
+    }
+
+
+    fun importChat(chatId: Long? = null, chatName: String? = null, file: MultipartFile): ResponseEntity<String> {
         if (file.isEmpty) {
             return ResponseEntity.badRequest().body("The file is empty")
         }
@@ -60,14 +76,29 @@ class ChatController(
                 .body("media type not supported ${HtmlUtils.htmlEscape(file.contentType!!)}.")
         }
 
-        chatFileImporter.execute(
-            chatId = chatId,
-            inputStream = file.inputStream,
-            fileType = fileType
-        )
-
+        importChat(chatId, file, fileType, chatName)
         return ResponseEntity.ok("The file was imported")
+    }
 
+    private fun importChat(
+        chatId: Long?,
+        file: MultipartFile,
+        fileType: String,
+        chatName: String?
+    ) {
+        chatId?.let {
+            chatFileImporter.execute(
+                chatId = it,
+                inputStream = file.inputStream,
+                fileType = fileType
+            )
+        } ?: run {
+            chatFileImporter.execute(
+                chatName = chatName,
+                inputStream = file.inputStream,
+                fileType = fileType
+            )
+        }
     }
 
     @PostMapping("disk-import")
