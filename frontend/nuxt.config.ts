@@ -11,7 +11,8 @@ export default defineNuxtConfig({
                 getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page`,
                 getAttachmentByChatIdAndMessageId: `${host}/chats/:chatId/messages/:messageId/attachment`,
                 importChatById: `${host}/chats/:chatId/messages/import`,
-                importChatByName: `${host}/chats/import/:chatName`
+                importChatByName: `${host}/chats/import/:chatName`,
+                importFromDisk: `${host}/chats/disk-import`
             }
         }
     },

@@ -14,6 +14,7 @@
                      :mobile="isMobile"
                      @create:chat="createNewChat"
                      @update:chat-active="updateChatActive"
+                     @update:disk-import="refreshPage"
           />
           <message-area
               :mobile="isMobile"
