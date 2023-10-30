@@ -64,11 +64,12 @@ class BucketServiceImpl(
         saveToBucket(bucketFile, bucketImportPath)
     }
 
-    override fun zipPendingImports(): Sequence<Resource> {
+    override fun zipPendingImports(chatName: String?): Sequence<Resource> {
         try {
             return File(bucketImportPath)
                 .getDirectoriesWithContentAndZipFiles()
                 .asSequence()
+                .filter { chatName == null || chatName == it.name }
                 .map { chatGroupDir ->
                     if (chatGroupDir.name.endsWith(".zip")) {
                         UrlResource(chatGroupDir.toURI())

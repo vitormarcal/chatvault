@@ -36,8 +36,12 @@ class EmailMessageHandler(
             if (mimeMessage.isMimeType("multipart/*")) {
                 val multipart = mimeMessage.content as Multipart
 
-                val pendingList = getInputStream(getChatName(mimeMessage), multipart)
-                bucketDiskImporter.saveToImportDir(pendingList)
+                val chatName = getChatName(mimeMessage)
+                val pendingList = getInputStream(chatName, multipart)
+                bucketDiskImporter.apply {
+                    this.saveToImportDir(pendingList)
+                    this.execute(chatName)
+                }
             }
         }
     }

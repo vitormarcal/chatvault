@@ -5,7 +5,7 @@ import java.io.InputStream
 
 interface BucketDiskImporter {
 
-    fun execute()
+    fun execute(chatName: String? = null)
 
     fun saveToImportDir(pendingList: List<PendingChatFile>)
 }

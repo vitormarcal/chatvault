@@ -22,8 +22,8 @@ class BucketDiskImporterUseCase(
     private val chatCreator: ChatCreator
 ) : BucketDiskImporter {
 
-    override fun execute() {
-        bucketService.zipPendingImports()
+    override fun execute(chatName: String?) {
+        bucketService.zipPendingImports(chatName)
             .map { identifyChat(it) }
             .forEach { (chatId, resource) ->
                 chatFileImporter.execute(
