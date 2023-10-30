@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.app_service.bucket_service.BucketService
+import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.model.ChatBucketInfo
 import dev.marcal.chatvault.repository.ChatRepository
@@ -22,7 +23,7 @@ class BucketDiskImporterUseCase(
         bucketService.zipPendingImports()
             .map { identifyChat(it) }
             .forEach { (chatId, resource) ->
-                chatFileImporter.execute(chatId = chatId, fileType = "zip", inputStream = resource.inputStream)
+                chatFileImporter.execute(chatId = chatId, fileType = FileTypeInputEnum.ZIP, inputStream = resource.inputStream)
                 bucketService.deleteZipImported(resource.filename!!)
             }
     }

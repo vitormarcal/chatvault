@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.app_service.bucket_service.BucketService
+import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.model.BucketFile
@@ -28,13 +29,13 @@ class ChatFileImporterUseCase(
 ) : ChatFileImporter {
 
     private val possiblyWhatsappTalk = Regex(".*WhatsApp.*\\.txt$")
-    override fun execute(chatId: Long, inputStream: InputStream, fileType: String) {
+    override fun execute(chatId: Long, inputStream: InputStream, fileType: FileTypeInputEnum) {
         when (fileType) {
-            "zip" -> {
+            FileTypeInputEnum.ZIP -> {
                 iterateOverZip(chatId, inputStream)
             }
 
-            "text" -> {
+            FileTypeInputEnum.TEXT -> {
                 createMessages(inputStream = inputStream, chatId = chatId)
             }
 
@@ -44,7 +45,7 @@ class ChatFileImporterUseCase(
 
     }
 
-    override fun execute(chatName: String?, inputStream: InputStream, fileType: String) {
+    override fun execute(chatName: String?, inputStream: InputStream, fileType: FileTypeInputEnum) {
         val chatId = chatName?.let { chatRepository.findChatBucketInfoByChatName(it)?.chatId } ?: createTodoChat(chatName)
         execute(chatId, inputStream, fileType)
     }
@@ -72,7 +73,7 @@ class ChatFileImporterUseCase(
             bucketService.save(BucketFile(bytes = buffer, fileName = fileName, address = bucket))
 
             if (possiblyWhatsappTalk.find(fileName) != null) {
-                execute(chatId = chatId, inputStream = ByteArrayInputStream(buffer), fileType = "text")
+                execute(chatId = chatId, inputStream = ByteArrayInputStream(buffer), fileType = FileTypeInputEnum.TEXT)
             }
 
             entry = zipInputStream.nextEntry

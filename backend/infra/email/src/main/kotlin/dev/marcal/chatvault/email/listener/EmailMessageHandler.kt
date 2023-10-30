@@ -1,5 +1,6 @@
 package dev.marcal.chatvault.email.listener
 
+import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.service.ChatFileImporter
 import jakarta.mail.Folder
 import jakarta.mail.Multipart
@@ -51,7 +52,6 @@ class EmailMessageHandler(
         try {
             if (!folder.isOpen) { folder.open(Folder.READ_ONLY) }
             doIt(mimeMessage)
-            folder.close(false)
         } catch (e: Exception) {
             logger.error("Fail to handle message ${mimeMessage.subject}", e)
             throw e
@@ -61,16 +61,16 @@ class EmailMessageHandler(
 
     }
 
-    private fun getInputStream(multipart: Multipart): Pair<String, InputStream> {
+    private fun getInputStream(multipart: Multipart): Pair<FileTypeInputEnum, InputStream> {
         val indexStart = 1 // because 0 is the body text (ignored)
         return if (multipart.count == 2) {
             // only one file (body email text and attachment), body text is ignored
             val bodyPart = multipart.getBodyPart(indexStart)
             val attachmentInputStream: InputStream = bodyPart.inputStream
             if (bodyPart.fileName.endsWith(".zip", ignoreCase = true)) {
-                "zip" to attachmentInputStream
+                FileTypeInputEnum.ZIP to attachmentInputStream
             } else {
-                "txt" to attachmentInputStream
+                FileTypeInputEnum.TEXT to attachmentInputStream
             }
         } else {
             //many files
@@ -90,7 +90,7 @@ class EmailMessageHandler(
                 inputStream.close()
             }
             zipOutputStream.close()
-            "zip" to ByteArrayInputStream(outputStream.toByteArray())
+            FileTypeInputEnum.ZIP to ByteArrayInputStream(outputStream.toByteArray())
         }
     }
 

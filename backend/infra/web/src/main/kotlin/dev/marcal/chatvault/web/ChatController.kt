@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.in_out_boundary.input.AttachmentCriteriaInput
+import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.service.*
@@ -70,8 +71,8 @@ class ChatController(
 
         val fileType = when (file.contentType) {
             null -> return ResponseEntity.badRequest().body("media type is required.")
-            "text/plain" -> "text"
-            "application/zip" -> "zip"
+            "text/plain" -> FileTypeInputEnum.TEXT
+            "application/zip" -> FileTypeInputEnum.ZIP
             else -> return ResponseEntity.badRequest()
                 .body("media type not supported ${HtmlUtils.htmlEscape(file.contentType!!)}.")
         }
@@ -83,7 +84,7 @@ class ChatController(
     private fun importChat(
         chatId: Long?,
         file: MultipartFile,
-        fileType: String,
+        fileType: FileTypeInputEnum,
         chatName: String?
     ) {
         chatId?.let {
