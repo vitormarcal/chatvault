@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
-import java.io.InputStream
 
 
 @Service
@@ -51,7 +50,7 @@ class AttachmentLegacyImporterUseCase(
 
     private fun downloadAndSaveFile(message: Message): Mono<Message> {
         return wppLegacyService.getAttachmentsByMessageId(requireNotNull(message.externalId))
-            .flatMap { stream -> writeFile(stream, message) }
+            .flatMap { bytes -> writeFile(bytes, message) }
             .doOnNext { chatRepository.setLegacyAttachmentImported(it.externalId.toString()) }
             .doOnError { logger.error("fail to get $message", it) }
             .onErrorComplete()
@@ -59,16 +58,14 @@ class AttachmentLegacyImporterUseCase(
 
     }
 
-    private fun writeFile(inputStream: InputStream, message: Message): Mono<Message> {
+    private fun writeFile(bytes: ByteArray, message: Message): Mono<Message> {
         return Mono.create { sink: MonoSink<Message> ->
-            inputStream.use {
-                try {
-                    val bucketFile = requireNotNull(message.content.attachment).toBucketFile(inputStream)
-                    bucketService.save(bucketFile)
-                    sink.success(message)
-                } catch (e: BucketServiceException) {
-                    sink.error(e)
-                }
+            try {
+                val bucketFile = requireNotNull(message.content.attachment).toBucketFile(bytes)
+                bucketService.save(bucketFile)
+                sink.success(message)
+            } catch (e: BucketServiceException) {
+                sink.error(e)
             }
 
         }

@@ -55,14 +55,14 @@ class WppLegacyServiceImpl(
         }
     }
 
-    override fun getAttachmentsByMessageId(messageId: String): Mono<InputStream> {
+    override fun getAttachmentsByMessageId(messageId: String): Mono<ByteArray> {
         return webClient
             .get()
             .uri(
-                attachmentsByMessageIdUrl.replace("{messageId}", messageId.toString())
+                attachmentsByMessageIdUrl.replace("{messageId}", messageId)
             )
             .retrieve()
-            .bodyToMono(InputStream::class.java)
+            .bodyToMono(ByteArray::class.java)
             .retry(3)
             .doOnError {
                 logger.error("Fail to get attachments info messageId=$messageId", it)

@@ -9,5 +9,5 @@ import java.io.InputStream
 interface WppLegacyService {
     fun getAllChats(): Mono<WppChatResponse<ChatDTO>>
     fun getMessagesByChatId(chatId: Long, offset: Int, limit: Int): Mono<WppChatResponse<MessageDTO>>
-    fun getAttachmentsByMessageId(messageId: String): Mono<InputStream>
+    fun getAttachmentsByMessageId(messageId: String): Mono<ByteArray>
 }

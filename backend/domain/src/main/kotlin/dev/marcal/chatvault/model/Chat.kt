@@ -41,6 +41,10 @@ data class Attachment(
     fun toBucketFile(inputStream: InputStream? = null): BucketFile {
         return BucketFile(stream = inputStream, fileName = this.name, address = bucket)
     }
+
+    fun toBucketFile(bytes: ByteArray): BucketFile {
+        return BucketFile(bytes = bytes, fileName = this.name, address = bucket)
+    }
 }
 
 data class Bucket(
