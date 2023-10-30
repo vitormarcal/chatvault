@@ -67,6 +67,7 @@ class AttachmentLegacyImporterUseCase(
             } catch (e: BucketServiceException) {
                 sink.error(e)
             }
+
         }
     }
 

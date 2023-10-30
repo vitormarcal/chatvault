@@ -20,7 +20,7 @@ class WppLegacyServiceImpl(
     @Value("\${app.legacy.all-chats}") private val allChatsUrl: String,
     @Value("\${app.legacy.messages-by-chat-id}") private val messagesByChatIdUrl: String,
     @Value("\${app.legacy.attachments-by-message-id}") private val attachmentsByMessageIdUrl: String
-): WppLegacyService {
+) : WppLegacyService {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -58,7 +58,7 @@ class WppLegacyServiceImpl(
         return webClient
             .get()
             .uri(
-                attachmentsByMessageIdUrl.replace("{messageId}", messageId.toString())
+                attachmentsByMessageIdUrl.replace("{messageId}", messageId)
             )
             .retrieve()
             .bodyToMono(ByteArray::class.java)

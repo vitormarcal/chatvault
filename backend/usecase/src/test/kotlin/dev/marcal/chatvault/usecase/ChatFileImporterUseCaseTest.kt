@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.app_service.bucket_service.BucketService
+import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.model.Bucket
 import dev.marcal.chatvault.model.ChatBucketInfo
@@ -41,7 +42,7 @@ class ChatFileImporterUseCaseTest {
             22/09/2023 13:33 - Fulano: ‎IMG-20230922-WA0006.jpg (arquivo anexado)
             Esse é  um teste
         """.trimIndent().byteInputStream()
-        chatFileImporter.execute(chatId = 1, inputStream = inputStream, fileType = "text")
+        chatFileImporter.execute(chatId = 1, inputStream = inputStream, fileType = FileTypeInputEnum.TEXT)
 
 
         verify { messageCreator.execute(any<NewMessagePayloadInput>())}
@@ -49,23 +50,10 @@ class ChatFileImporterUseCaseTest {
     }
 
     @Test
-    fun `when receive input stream is not text and is not zip then should throws  exception`() {
-        val inputStream = """
-            22/09/2023 13:33 - Fulano: ‎IMG-20230922-WA0006.jpg (arquivo anexado)
-            Esse é  um teste
-        """.trimIndent().byteInputStream()
-
-        assertThrows<Exception> { chatFileImporter.execute(chatId = 1, inputStream = inputStream, fileType = "pdf") }
-
-        verify(exactly = 0) { messageCreator.execute(any<NewMessagePayloadInput>())}
-        verify(exactly = 0) { bucketService.save(any()) }
-    }
-
-    @Test
     fun `when receive zip input stream should iterate properly and save files e parse text`() {
         val inputStream = requireNotNull(this.javaClass.classLoader.getResourceAsStream("test_chat.zip")) { "resource test_chat.zip not found! used by unit test" }
 
-        chatFileImporter.execute(chatId = 1, inputStream = inputStream, fileType = "zip")
+        chatFileImporter.execute(chatId = 1, inputStream = inputStream, fileType = FileTypeInputEnum.ZIP)
 
         verify(exactly = 1) { messageCreator.execute(any<NewMessagePayloadInput>())}
         verify(exactly = 2) { bucketService.save(any()) }

@@ -1,5 +1,7 @@
 package dev.marcal.chatvault.email.listener
 
+import dev.marcal.chatvault.in_out_boundary.input.PendingChatFile
+import dev.marcal.chatvault.service.BucketDiskImporter
 import dev.marcal.chatvault.service.ChatFileImporter
 import jakarta.mail.Folder
 import jakarta.mail.Multipart
@@ -10,18 +12,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.integration.annotation.ServiceActivator
 import org.springframework.messaging.Message
 import org.springframework.stereotype.Component
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
+import java.time.LocalDateTime
 
 @Component
 @ConditionalOnProperty(prefix = "app.email", name = ["enabled"], havingValue = "true", matchIfMissing = true)
 class EmailMessageHandler(
     private val chatFileImporter: ChatFileImporter,
     @Value("\${app.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
-    @Value("\${app.email.debug}") private val emailDebug: Boolean
+    @Value("\${app.email.debug}") private val emailDebug: Boolean,
+    private val bucketDiskImporter: BucketDiskImporter
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -36,12 +36,12 @@ class EmailMessageHandler(
             if (mimeMessage.isMimeType("multipart/*")) {
                 val multipart = mimeMessage.content as Multipart
 
-                val (fileType, inputStream) = getInputStream(multipart)
-                chatFileImporter.execute(
-                    chatName = getChatNameOrNull(mimeMessage),
-                    inputStream,
-                    fileType = fileType
-                )
+                val chatName = getChatName(mimeMessage)
+                val pendingList = getInputStream(chatName, multipart)
+                bucketDiskImporter.apply {
+                    this.saveToImportDir(pendingList)
+                    this.execute(chatName)
+                }
             }
         }
     }
@@ -49,9 +49,10 @@ class EmailMessageHandler(
     fun useFolder(mimeMessage: MimeMessage, doIt: (MimeMessage) -> Unit) {
         val folder: Folder = mimeMessage.folder
         try {
-            if (!folder.isOpen) { folder.open(Folder.READ_ONLY) }
+            if (!folder.isOpen) {
+                folder.open(Folder.READ_ONLY)
+            }
             doIt(mimeMessage)
-            folder.close(false)
         } catch (e: Exception) {
             logger.error("Fail to handle message ${mimeMessage.subject}", e)
             throw e
@@ -61,37 +62,37 @@ class EmailMessageHandler(
 
     }
 
-    private fun getInputStream(multipart: Multipart): Pair<String, InputStream> {
+    private fun getInputStream(chatName: String, multipart: Multipart): List<PendingChatFile> {
         val indexStart = 1 // because 0 is the body text (ignored)
         return if (multipart.count == 2) {
             // only one file (body email text and attachment), body text is ignored
             val bodyPart = multipart.getBodyPart(indexStart)
             val attachmentInputStream: InputStream = bodyPart.inputStream
-            if (bodyPart.fileName.endsWith(".zip", ignoreCase = true)) {
-                "zip" to attachmentInputStream
-            } else {
-                "txt" to attachmentInputStream
-            }
+            listOf(
+                PendingChatFile(
+                    stream = bodyPart.inputStream,
+                    fileName = bodyPart.fileName,
+                    chatName = chatName
+                )
+            )
         } else {
             //many files
-            val outputStream = ByteArrayOutputStream()
-            val zipOutputStream = ZipOutputStream(outputStream)
-            for (i in indexStart until multipart.count) {
-                val bodyPart = multipart.getBodyPart(i)
-                val inputStream: InputStream = bodyPart.inputStream
-
-                zipOutputStream.putNextEntry(ZipEntry(bodyPart.fileName))
-                val buffer = ByteArray(1024)
-                var len: Int
-                while (inputStream.read(buffer).also { len = it } > 0) {
-                    zipOutputStream.write(buffer, 0, len)
+            (indexStart until multipart.count)
+                .asSequence()
+                .map { multipart.getBodyPart(it) }
+                .map {
+                    PendingChatFile(
+                        stream = it.inputStream,
+                        fileName = it.fileName,
+                        chatName = chatName
+                    )
                 }
-                zipOutputStream.closeEntry()
-                inputStream.close()
-            }
-            zipOutputStream.close()
-            "zip" to ByteArrayInputStream(outputStream.toByteArray())
+                .toList()
         }
+    }
+
+    private fun getChatName(mimeMessage: MimeMessage): String {
+        return getChatNameOrNull(mimeMessage) ?: ("todo ${mimeMessage.subject} ${LocalDateTime.now()}")
     }
 
     private fun getChatNameOrNull(mimeMessage: MimeMessage): String? {

@@ -1,5 +1,6 @@
 package dev.marcal.chatvault.model
 
+import java.io.InputStream
 import java.time.LocalDateTime
 
 
@@ -37,7 +38,11 @@ data class Attachment(
     val name: String,
     val bucket: Bucket,
 ) {
-    fun toBucketFile(bytes: ByteArray = ByteArray(0)): BucketFile {
+    fun toBucketFile(inputStream: InputStream? = null): BucketFile {
+        return BucketFile(stream = inputStream, fileName = this.name, address = bucket)
+    }
+
+    fun toBucketFile(bytes: ByteArray): BucketFile {
         return BucketFile(bytes = bytes, fileName = this.name, address = bucket)
     }
 }

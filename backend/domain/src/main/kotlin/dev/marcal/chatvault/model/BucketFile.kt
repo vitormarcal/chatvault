@@ -1,10 +1,12 @@
 package dev.marcal.chatvault.model
 
 import java.io.File
+import java.io.InputStream
 import java.nio.file.Paths
 
 class BucketFile(
-    val bytes: ByteArray,
+    val stream: InputStream? = null,
+    val bytes: ByteArray? = null,
     val fileName: String,
     val address: Bucket,
 ) {
