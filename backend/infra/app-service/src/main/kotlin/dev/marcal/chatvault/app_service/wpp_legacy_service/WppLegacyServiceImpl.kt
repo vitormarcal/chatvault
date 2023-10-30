@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import java.io.InputStream
 
 @Service
 @PropertySource("classpath:appservice.properties")
@@ -54,14 +55,14 @@ class WppLegacyServiceImpl(
         }
     }
 
-    override fun getAttachmentsByMessageId(messageId: String): Mono<ByteArray> {
+    override fun getAttachmentsByMessageId(messageId: String): Mono<InputStream> {
         return webClient
             .get()
             .uri(
                 attachmentsByMessageIdUrl.replace("{messageId}", messageId.toString())
             )
             .retrieve()
-            .bodyToMono(ByteArray::class.java)
+            .bodyToMono(InputStream::class.java)
             .retry(3)
             .doOnError {
                 logger.error("Fail to get attachments info messageId=$messageId", it)

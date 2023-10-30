@@ -11,11 +11,9 @@ import org.springframework.context.annotation.PropertySource
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
-import java.io.File
-import java.io.FileFilter
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 
 @Service
@@ -33,14 +31,19 @@ class BucketServiceImpl(
         createBucketIfNotExists(bucketImportPath)
     }
 
-
-    override fun save(bucketFile: BucketFile) {
+    fun saveToBucket(bucketFile: BucketFile, bucketRootPath: String) {
         try {
             val file = bucketFile.file(bucketRootPath).also { createBucketIfNotExists(it.parentFile) }
 
-            FileOutputStream(file).use { fos ->
-                fos.write(bucketFile.bytes)
-                fos.flush()
+            val bytes = bucketFile.bytes
+            if (bytes != null) {
+                FileOutputStream(file).use { fos ->
+                    fos.write(bytes)
+                    fos.flush()
+                }
+            } else {
+                val inputStream = requireNotNull(bucketFile.stream)
+                Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING)
             }
 
             logger.info("File save at ${file.absolutePath}")
@@ -51,6 +54,14 @@ class BucketServiceImpl(
         } catch (e: Exception) {
             throw BucketServiceException("not mapped error when try to save ${bucketFile.fileName}", e)
         }
+    }
+
+    override fun save(bucketFile: BucketFile) {
+        saveToBucket(bucketFile, bucketRootPath)
+    }
+
+    override fun saveToImportDir(bucketFile: BucketFile) {
+        saveToBucket(bucketFile, bucketImportPath)
     }
 
     override fun zipPendingImports(): Sequence<Resource> {
@@ -75,8 +86,7 @@ class BucketServiceImpl(
     override fun deleteZipImported(filename: String) {
         val toDelete = BucketFile(
             fileName = filename,
-            address = Bucket(path = "/"),
-            bytes = ByteArray(0)
+            address = Bucket(path = "/")
         ).file(root = bucketImportPath)
         toDelete.delete()
     }

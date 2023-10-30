@@ -14,8 +14,8 @@ import dev.marcal.chatvault.usecase.mapper.toNewMessageInput
 import org.springframework.stereotype.Service
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.lang.IllegalStateException
 import java.time.LocalDateTime
 import java.util.zip.ZipInputStream
 
@@ -46,7 +46,8 @@ class ChatFileImporterUseCase(
     }
 
     override fun execute(chatName: String?, inputStream: InputStream, fileType: FileTypeInputEnum) {
-        val chatId = chatName?.let { chatRepository.findChatBucketInfoByChatName(it)?.chatId } ?: createTodoChat(chatName)
+        val chatId =
+            chatName?.let { chatRepository.findChatBucketInfoByChatName(it)?.chatId } ?: createTodoChat(chatName)
         execute(chatId, inputStream, fileType)
     }
 
@@ -67,18 +68,32 @@ class ChatFileImporterUseCase(
         while (entry != null) {
             val fileName = entry.name
 
-            val buffer = ByteArray(1024)
-            zipInputStream.read(buffer)
-
-            bucketService.save(BucketFile(bytes = buffer, fileName = fileName, address = bucket))
+            val byteArray = bytes(zipInputStream)
+            bucketService.save(BucketFile(bytes = byteArray, fileName = fileName, address = bucket))
 
             if (possiblyWhatsappTalk.find(fileName) != null) {
-                execute(chatId = chatId, inputStream = ByteArrayInputStream(buffer), fileType = FileTypeInputEnum.TEXT)
+                execute(
+                    chatId = chatId,
+                    inputStream = ByteArrayInputStream(byteArray),
+                    fileType = FileTypeInputEnum.TEXT
+                )
             }
 
             entry = zipInputStream.nextEntry
         }
         zipInputStream.close()
+    }
+
+    private fun bytes(zipInputStream: ZipInputStream): ByteArray {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        val buffer = ByteArray(1024)
+        var len: Int
+
+        while (zipInputStream.read(buffer).also { len = it } > 0) {
+            byteArrayOutputStream.write(buffer, 0, len)
+        }
+
+        return byteArrayOutputStream.toByteArray()
     }
 
     private fun createMessages(inputStream: InputStream, chatId: Long) {
