@@ -7,8 +7,9 @@
         <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
       </div>
       <div class="row h-100 m-3 m-md-4">
-        <new-chat-uploader v-if="firstChatUpload"
+        <new-chat-uploader v-if="createChatAction"
                            @update:chats="refreshPage"
+                           @exit:dialog="() => createChatAction = false"
         >
 
         </new-chat-uploader>
@@ -43,10 +44,6 @@ const chat = ref({})
 const isMobile = ref(true)
 const indexRef = ref(null)
 const createChatAction = ref(false)
-
-const firstChatUpload = computed(() => {
-  return chats?.value?.length === 0 || createChatAction.value
-})
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))

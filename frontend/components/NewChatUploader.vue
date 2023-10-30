@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const emit = defineEmits(['update:chats'])
+const emit = defineEmits(['update:chats', 'exit:dialog'])
 const chatImportRef = ref(null)
 const importChatResult = ref({})
 const fileValid = ref(false)
@@ -42,7 +42,7 @@ async function uploadFile() {
 }
 
 function cancel() {
-  emit('update:chats')
+  emit('exit:dialog')
 }
 
 </script>
