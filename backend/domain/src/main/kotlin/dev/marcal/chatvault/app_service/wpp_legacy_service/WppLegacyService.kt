@@ -4,7 +4,6 @@ import dev.marcal.chatvault.app_service.wpp_legacy_service.dto.ChatDTO
 import dev.marcal.chatvault.app_service.wpp_legacy_service.dto.MessageDTO
 import dev.marcal.chatvault.app_service.wpp_legacy_service.dto.WppChatResponse
 import reactor.core.publisher.Mono
-import java.io.InputStream
 
 interface WppLegacyService {
     fun getAllChats(): Mono<WppChatResponse<ChatDTO>>

@@ -11,7 +11,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import java.io.InputStream
 
 @Service
 @PropertySource("classpath:appservice.properties")
@@ -21,7 +20,7 @@ class WppLegacyServiceImpl(
     @Value("\${app.legacy.all-chats}") private val allChatsUrl: String,
     @Value("\${app.legacy.messages-by-chat-id}") private val messagesByChatIdUrl: String,
     @Value("\${app.legacy.attachments-by-message-id}") private val attachmentsByMessageIdUrl: String
-): WppLegacyService {
+) : WppLegacyService {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
