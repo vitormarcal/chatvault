@@ -98,6 +98,10 @@ class ChatRepositoryImpl(
         return messageCrudRepository.findAllByChatIdIs(chatId, pageable)
     }
 
+    override fun countChatMessages(chatId: Long): Long {
+        return messageCrudRepository.countByChatId(chatId)
+    }
+
     override fun findMessageBy(chatId: Long, messageId: Long): Message? {
         return messageCrudRepository.findMessageEntityByIdAndChatId(id = messageId, chatId = chatId)?.toMessageDomain()
     }

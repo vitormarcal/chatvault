@@ -29,10 +29,15 @@ object DirectoryZipper {
                     }
                 }
             }
-            directory.listFilesName().forEach { it.delete() }
             return UrlResource(zipFile.toURI())
         } catch (e: IOException) {
             throw RuntimeException("fail to zip file  $zipFileName")
+        }
+    }
+
+    fun zipAndDeleteSource(directory: File): UrlResource {
+        return zip(directory).also { _ ->
+            directory.listFilesName().forEach { it.delete() }
         }
     }
 

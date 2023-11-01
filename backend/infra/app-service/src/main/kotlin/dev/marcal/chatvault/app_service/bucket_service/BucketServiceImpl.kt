@@ -64,6 +64,29 @@ class BucketServiceImpl(
         saveToBucket(bucketFile, bucketImportPath)
     }
 
+    override fun saveTextToBucket(bucketFile: BucketFile, messages: Sequence<String>) {
+        val file = bucketFile.file(bucketRootPath)
+        BufferedWriter(FileWriter(file)).use { writer ->
+            messages.forEach { messageLine ->
+                writer.write(messageLine)
+                writer.newLine()
+            }
+        }
+    }
+
+    override fun loadBucketAsZip(path: String): Resource {
+        try {
+            return File(bucketRootPath).getDirectoriesWithContentAndZipFiles()
+                .first { path == it.name }
+                .let { dir ->
+                    DirectoryZipper.zip(dir)
+                }
+        } catch (e: Exception) {
+            throw BucketServiceException(message = "Fail to zip bucket", throwable = e)
+        }
+
+    }
+
     override fun zipPendingImports(chatName: String?): Sequence<Resource> {
         try {
             return File(bucketImportPath)
@@ -74,7 +97,7 @@ class BucketServiceImpl(
                     if (chatGroupDir.name.endsWith(".zip")) {
                         UrlResource(chatGroupDir.toURI())
                     } else {
-                        DirectoryZipper.zip(chatGroupDir)
+                        DirectoryZipper.zipAndDeleteSource(chatGroupDir)
                     }
 
                 }

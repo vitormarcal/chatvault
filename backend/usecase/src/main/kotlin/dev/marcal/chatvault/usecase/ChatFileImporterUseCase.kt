@@ -11,6 +11,7 @@ import dev.marcal.chatvault.service.ChatFileImporter
 import dev.marcal.chatvault.service.ChatMessageParser
 import dev.marcal.chatvault.service.MessageCreator
 import dev.marcal.chatvault.usecase.mapper.toNewMessageInput
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
@@ -28,6 +29,7 @@ class ChatFileImporterUseCase(
     private val chatCreator: ChatCreator
 ) : ChatFileImporter {
 
+    private val logger = LoggerFactory.getLogger(this.javaClass)
     private val possiblyWhatsappTalk = Regex(".*WhatsApp.*\\.txt$")
     override fun execute(chatId: Long, inputStream: InputStream, fileType: FileTypeInputEnum) {
         when (fileType) {
@@ -108,5 +110,6 @@ class ChatFileImporterUseCase(
                 messages = messages
             )
         )
+        logger.info("imported ${messages.size} messages to chatId=$chatId")
     }
 }
