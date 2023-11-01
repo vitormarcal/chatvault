@@ -41,6 +41,12 @@
             <option v-for="option in authors" :value="option">{{ option }}</option>
           </select>
         </div>
+        <div class="form-group">
+          <label for="page-size">Page size</label>
+          <input class="form-control" type="number" max="2000" min="1" placeholder="20" id="page-size"
+                 @input="validatedPageSize">
+          <div class="invalid-feedback" :class="invalidPageSizeClass">page size must be a value between 1 and 2000</div>
+        </div>
       </div>
 
 
@@ -112,6 +118,8 @@ const emit = defineEmits(['update:chat-exited'])
 const messages = ref([])
 const authorActive = ref({})
 const nextPage = ref(0)
+const pageSize = ref(20)
+const invalidPageSize = ref(false)
 const messagesAreaElement = ref(null)
 const chatImportRef = ref(null)
 const clickModal = ref(false)
@@ -121,7 +129,7 @@ const disableUpload = ref(true)
 const chatActive = computed(() => props.chat.chatId > 0)
 
 const moreMessagesPath = computed(() =>
-    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", nextPage.value))
+    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", nextPage.value).replace(":size", pageSize.value))
 
 const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", props.chat.chatId))
 
@@ -138,6 +146,12 @@ const authors = computed(() => {
 const modalClass = computed(() => {
   return {
     'fade show d-block': !!clickModal.value
+  }
+})
+
+const invalidPageSizeClass = computed(() => {
+  return {
+    'd-block': invalidPageSize.value
   }
 })
 
@@ -179,6 +193,20 @@ function loadMoreMessages() {
 
 function exitThisChat() {
   emit('update:chat-exited')
+}
+
+function validatedPageSize(event: any) {
+  event.preventDefault()
+  let pageSizeNumber = event.target.value;
+  if (!isNaN(pageSizeNumber) && pageSizeNumber >= 1 && pageSizeNumber <= 2000) {
+    invalidPageSize.value = false
+    messages.value = []
+    nextPage.value = 0
+    pageSize.value = pageSizeNumber
+
+  } else {
+    invalidPageSize.value = true
+  }
 }
 
 async function uploadFile() {
