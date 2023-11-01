@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.PropertySource
+import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
@@ -79,7 +80,18 @@ class BucketServiceImpl(
             return File(bucketRootPath).getDirectoriesWithContentAndZipFiles()
                 .first { path == it.name }
                 .let { dir ->
-                    DirectoryZipper.zip(dir)
+                    DirectoryZipper.zip(dir).let { resource ->
+                        InputStreamResource(object : FileInputStream(resource.file) {
+                            @Throws(IOException::class)
+                            override fun close() {
+                                super.close()
+                                val isDeleted: Boolean = resource.file.delete()
+                                logger.info(
+                                    "export:'{}':" + if (isDeleted) "deleted" else "preserved", resource.file.name
+                                )
+                            }
+                        })
+                    }
                 }
         } catch (e: Exception) {
             throw BucketServiceException(message = "Fail to zip bucket", throwable = e)
