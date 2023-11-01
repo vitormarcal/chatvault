@@ -75,8 +75,14 @@
               <div class="alert alert-warning" v-if="importChatResult.error" role="alert">
                 Failed to import, check server error logs
               </div>
+
               <div class="form-group d-flex justify-content-center mb-3">
-                <button type="button" class="btn btn-link btn-outline-info">Get the entire chat</button>
+                <a class="d-block text-center"
+                   :href="downloadChatPath"
+                   :download="chat.chatName + '.zip'"
+                >
+                  Get the entire chat
+                </a>
               </div>
 
               <div class="form-group mb-3 pt-4 border-top border-2">
@@ -132,6 +138,8 @@ const moreMessagesPath = computed(() =>
     useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", nextPage.value).replace(":size", pageSize.value))
 
 const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", props.chat.chatId))
+
+const downloadChatPath = computed(() => useRuntimeConfig().public.api.exportChatById.replace(":chatId", props.chat.chatId))
 
 const {data: response, refresh} = await useFetch(moreMessagesPath)
 
