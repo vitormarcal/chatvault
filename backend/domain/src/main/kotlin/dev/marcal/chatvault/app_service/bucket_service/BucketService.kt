@@ -9,6 +9,8 @@ interface BucketService {
     fun zipPendingImports(chatName: String? = null): Sequence<Resource>
     fun deleteZipImported(filename: String)
     fun saveToImportDir(bucketFile: BucketFile)
+    fun saveTextToBucket(bucketFile: BucketFile, messages: Sequence<String>)
+    fun loadBucketAsZip(path: String): Resource
 }
 
 class BucketServiceException(message: String?, throwable: Throwable?): RuntimeException(message, throwable)

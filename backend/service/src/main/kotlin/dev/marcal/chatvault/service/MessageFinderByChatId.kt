@@ -8,4 +8,5 @@ interface MessageFinderByChatId {
 
     fun execute(chatId: Long, pageable: Pageable): Page<MessageOutput>
 
+    fun execute(chatId: Long): Sequence<MessageOutput>
 }

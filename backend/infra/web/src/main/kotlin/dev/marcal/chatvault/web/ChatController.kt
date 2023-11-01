@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.util.HtmlUtils
+import java.util.*
 
 @RestController
 @RequestMapping("/api/chats")
@@ -25,7 +26,8 @@ class ChatController(
     private val messageFinderByChatId: MessageFinderByChatId,
     private val chatFileImporter: ChatFileImporter,
     private val attachmentFinder: AttachmentFinder,
-    private val bucketDiskImporter: BucketDiskImporter
+    private val bucketDiskImporter: BucketDiskImporter,
+    private val chatFileExporter: ChatFileExporter
 ) {
 
     @GetMapping
@@ -61,6 +63,19 @@ class ChatController(
         @RequestParam("file") file: MultipartFile
     ): ResponseEntity<String> {
         return importChat(chatName = chatName, file = file)
+    }
+
+    @GetMapping("{chatId}/export")
+    fun importChatByChatName(
+        @PathVariable chatId: Long,
+    ): ResponseEntity<Resource> {
+        val resource = chatFileExporter.execute(chatId)
+        val headers = HttpHeaders()
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${UUID.randomUUID()}.zip")
+        headers.contentType = MediaType.APPLICATION_OCTET_STREAM
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(resource)
     }
 
 

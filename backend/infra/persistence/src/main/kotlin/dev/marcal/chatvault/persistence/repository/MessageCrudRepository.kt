@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface MessageCrudRepository: JpaRepository<MessageEntity, Long> {
 
+    fun countByChatId(chatId: Long): Long
     fun findAllByChatIdIs(chatId: Long, pageable: Pageable): Page<MessageOutput>
 
     fun findMessageEntityByIdAndChatId(id: Long, chatId: Long): MessageEntity?
