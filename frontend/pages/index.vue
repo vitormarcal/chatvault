@@ -24,7 +24,11 @@
           <message-area
               :mobile="isMobile"
               @update:chat-exited="updateChatExited"
+              @update:open-chat-config="isOpen => toggleOpenChatConfig(isOpen)"
               :chat="chat"/>
+          <chat-config v-if="isChatConfigOpen"
+                       :chat="chat"
+          />
         </template>
 
       </div>
@@ -36,12 +40,14 @@
 <script setup lang="ts">
 import ChatList from "~/components/ChatList.vue";
 import MessageArea from "~/components/MessageArea.vue";
+import ChatConfig from "~/components/ChatConfig.vue";
 
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
 const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
 const loading = ref(false)
 const chat = ref({})
 const isMobile = ref(true)
+const isChatConfigOpen = ref(false)
 const indexRef = ref(null)
 const createChatAction = ref(false)
 
@@ -77,6 +83,10 @@ function updateChatActive(item: any) {
 
 function updateChatExited() {
   chat.value = {}
+}
+
+function toggleOpenChatConfig(isOpen: boolean) {
+  isChatConfigOpen.value = isOpen
 }
 
 watchEffect(() => {

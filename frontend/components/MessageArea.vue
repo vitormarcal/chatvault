@@ -1,6 +1,6 @@
 <template>
   <div id="message-area"
-       class="message-area flex-column col-12 col-md-9 h-100 overflow-auto"
+       class="message-area flex-column col-12 h-100 overflow-auto"
        :class="dynamicClass"
        ref="messagesAreaElement"
   >
@@ -16,10 +16,10 @@
                   d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
           </svg>
         </a>
-        <a href="#" class="m-2">
+        <a href="#" class="m-2" @click="() => emitOpenChatConfig(true)">
           <profile-image :chat-id="chat.id"/>
         </a>
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column" role="button" @click="() => emitOpenChatConfig(true)">
           <div class="font-weight-bold" id="name">{{ chat.chatName }}</div>
           <div class="small d-flex" id="details">last message sent:
             <message-created-at :date="chat.msgCreatedAt"/>
@@ -119,7 +119,7 @@
 import MessageItem from "~/components/MessageItem.vue";
 
 const props = defineProps(['chat', 'mobile'])
-const emit = defineEmits(['update:chat-exited'])
+const emit = defineEmits(['update:chat-exited', 'update:open-chat-config'])
 
 const messages = ref([])
 const authorActive = ref({})
@@ -131,6 +131,7 @@ const chatImportRef = ref(null)
 const clickModal = ref(false)
 const importChatResult = ref({})
 const disableUpload = ref(true)
+const chatConfigOpen = ref(false)
 
 const chatActive = computed(() => props.chat.chatId > 0)
 
@@ -173,7 +174,9 @@ const hasNextPages = computed(() => {
 
 const dynamicClass = computed(() => {
   return {
-    'd-none': props.mobile && props.chat.chatId == null
+    'd-none': props.mobile && (props.chat.chatId == null || chatConfigOpen.value),
+    'col-md-6': !props.mobile && chatConfigOpen.value,
+    'col-md-9': !props.mobile && !chatConfigOpen.value,
   }
 })
 
@@ -201,6 +204,11 @@ function loadMoreMessages() {
 
 function exitThisChat() {
   emit('update:chat-exited')
+}
+
+function emitOpenChatConfig(isOpen: boolean) {
+  chatConfigOpen.value = isOpen
+  emit('update:open-chat-config', isOpen)
 }
 
 function validatedPageSize(event: any) {
