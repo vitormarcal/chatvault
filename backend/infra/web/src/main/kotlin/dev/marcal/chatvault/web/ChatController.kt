@@ -2,6 +2,7 @@ package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.in_out_boundary.input.AttachmentCriteriaInput
 import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
+import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.service.*
@@ -27,7 +28,8 @@ class ChatController(
     private val chatFileImporter: ChatFileImporter,
     private val attachmentFinder: AttachmentFinder,
     private val bucketDiskImporter: BucketDiskImporter,
-    private val chatFileExporter: ChatFileExporter
+    private val chatFileExporter: ChatFileExporter,
+    private val chatNameUpdater: ChatNameUpdater
 ) {
 
     @GetMapping
@@ -55,6 +57,15 @@ class ChatController(
         @RequestParam("file") file: MultipartFile
     ): ResponseEntity<String> {
         return importChat(chatId = chatId, file = file)
+    }
+
+    @PatchMapping("{chatId}/chatName/{chatName}")
+    fun update(
+        @PathVariable chatId: Long,
+        @PathVariable chatName: String,
+    ): ResponseEntity<String> {
+        chatNameUpdater.execute(chatId, chatName)
+        return ResponseEntity.noContent().build()
     }
 
     @PostMapping("import/{chatName}")

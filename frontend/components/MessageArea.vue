@@ -1,6 +1,6 @@
 <template>
   <div id="message-area"
-       class="message-area flex-column col-12 col-md-9 h-100 overflow-auto"
+       class="message-area flex-column col-12 h-100 overflow-auto"
        :class="dynamicClass"
        ref="messagesAreaElement"
   >
@@ -16,10 +16,10 @@
                   d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
           </svg>
         </a>
-        <a href="#" class="m-2">
+        <a href="#" class="m-2" @click="() => toggleOpenChatConfig()">
           <profile-image :chat-id="chat.id"/>
         </a>
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column" role="button" @click="() => toggleOpenChatConfig()">
           <div class="font-weight-bold" id="name">{{ chat.chatName }}</div>
           <div class="small d-flex" id="details">last message sent:
             <message-created-at :date="chat.msgCreatedAt"/>
@@ -34,13 +34,6 @@
         <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal">
           Import/Export
         </button>
-
-        <div class="form-group">
-          <label for="active-author">Active Author</label>
-          <select class="form-control" v-model="authorActive" id="active-author">
-            <option v-for="option in authors" :value="option">{{ option }}</option>
-          </select>
-        </div>
         <div class="form-group">
           <label for="page-size">Page size</label>
           <input class="form-control" type="number" max="2000" min="1" placeholder="20" id="page-size"
@@ -55,7 +48,7 @@
       <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
       </button>
       <template v-for="(message, index) in messages" :key="index">
-        <message-item :message="message" :chatId="chat.chatId" :authorActive="authorActive"/>
+        <message-item :message="message" :chatId="chat.chatId"/>
       </template>
     </div>
 
@@ -117,12 +110,11 @@
 
 <script setup lang="ts">
 import MessageItem from "~/components/MessageItem.vue";
+import {useMainStore} from "~/store";
 
+const store = useMainStore()
 const props = defineProps(['chat', 'mobile'])
 const emit = defineEmits(['update:chat-exited'])
-
-const messages = ref([])
-const authorActive = ref({})
 const nextPage = ref(0)
 const pageSize = ref(20)
 const invalidPageSize = ref(false)
@@ -148,8 +140,10 @@ const content = computed(() => {
 })
 
 const authors = computed(() => {
-  return [...new Set(messages.value.map(it => it.author))].filter(it => !!it)
+  return store.authors
 })
+
+const messages = computed(() => store.messages)
 
 const modalClass = computed(() => {
   return {
@@ -173,7 +167,9 @@ const hasNextPages = computed(() => {
 
 const dynamicClass = computed(() => {
   return {
-    'd-none': props.mobile && props.chat.chatId == null
+    'd-none': props.mobile && (props.chat.chatId == null || store.chatConfigOpen),
+    'col-md-6': !props.mobile && store.chatConfigOpen,
+    'col-md-9': !props.mobile && !store.chatConfigOpen,
   }
 })
 
@@ -203,12 +199,16 @@ function exitThisChat() {
   emit('update:chat-exited')
 }
 
+function toggleOpenChatConfig() {
+  store.chatConfigOpen = !store.chatConfigOpen
+}
+
 function validatedPageSize(event: any) {
   event.preventDefault()
   let pageSizeNumber = event.target.value;
   if (!isNaN(pageSizeNumber) && pageSizeNumber >= 1 && pageSizeNumber <= 2000) {
     invalidPageSize.value = false
-    messages.value = []
+    store.updateMessages([])
     nextPage.value = 0
     pageSize.value = pageSizeNumber
 
@@ -245,7 +245,7 @@ async function onFilePicked() {
 watch(
     () => props.chat.chatId,
     (chatId) => {
-      messages.value = []
+      store.updateMessages([])
       nextPage.value = 0
       disableUpload.value = true
       if (chatImportRef.value) {
@@ -255,7 +255,7 @@ watch(
 )
 
 watch(content, async (newContent, oldContent) => {
-  messages.value = [...newContent.reverse(), ...messages.value]
+  store.updateMessages([...newContent.reverse(), ...messages.value])
   await nextTick()
   scrollBottom()
 })

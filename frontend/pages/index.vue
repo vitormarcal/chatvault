@@ -25,6 +25,9 @@
               :mobile="isMobile"
               @update:chat-exited="updateChatExited"
               :chat="chat"/>
+          <chat-config v-if="store.chatConfigOpen"
+                       :chat="chat"
+          />
         </template>
 
       </div>
@@ -36,7 +39,10 @@
 <script setup lang="ts">
 import ChatList from "~/components/ChatList.vue";
 import MessageArea from "~/components/MessageArea.vue";
+import ChatConfig from "~/components/ChatConfig.vue";
+import {useMainStore} from "~/store";
 
+const store = useMainStore()
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
 const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
 const loading = ref(false)

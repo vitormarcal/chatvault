@@ -3,7 +3,9 @@ package dev.marcal.chatvault.persistence.repository
 import dev.marcal.chatvault.persistence.dto.ChatMessagePairDTO
 import dev.marcal.chatvault.persistence.entity.ChatEntity
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -25,4 +27,10 @@ interface ChatCrudRepository: JpaRepository<ChatEntity, Long> {
          """
     )
     fun findAllChatsWithLastMessage(): List<ChatMessagePairDTO>
+
+
+    @Modifying
+    @Query("update ChatEntity c set c.name = :chatName where c.id = :chatId")
+    fun updateChatNameByChatId(@Param("chatName") chatName: String, @Param("chatId") chatId: Long)
+
 }
