@@ -3,14 +3,17 @@ const props = defineProps(['chat'])
 const chatName = ref(props.chat.chatName)
 const editChatName = ref(false)
 
-function updateChat() {
-  console.log("todo:  update chat")
+async function updateChatName() {
+  const path = useRuntimeConfig().public.api.updateChatNameByChatId.replace(":chatId", props.chat.chatId).replace(":chatName", chatName.value)
+  await $fetch(path, {method: 'PATCH'})
+  props.chat.chatName = chatName.value
+
 }
 
 function toggleChatName() {
   editChatName.value = !editChatName.value
   if (!editChatName.value && chatName.value !== props.chat.chatName) {
-    updateChat()
+    updateChatName()
   }
 }
 </script>

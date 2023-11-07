@@ -11,6 +11,7 @@ interface ChatRepository {
 
     fun create(payload: ChatPayload): ChatBucketInfo
     fun existsByExternalId(externalId: String): Boolean
+    fun existsByChatId(chatId: Long): Boolean
     fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo
     fun findLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message>
     fun findAttachmentLegacyToImport(chatId: Long, page: Int, size: Int): Page<Message>
@@ -25,4 +26,5 @@ interface ChatRepository {
     fun findMessageBy(chatId: Long, messageId: Long): Message?
     fun findChatBucketInfoByChatName(chatName: String): ChatBucketInfo?
     fun countChatMessages(chatId: Long): Long
+    fun setChatNameByChatId(chatId: Long, chatName: String)
 }

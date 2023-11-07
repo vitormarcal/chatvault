@@ -102,6 +102,11 @@ class ChatRepositoryImpl(
         return messageCrudRepository.countByChatId(chatId)
     }
 
+    @Transactional
+    override fun setChatNameByChatId(chatId: Long, chatName: String) {
+        chatCrudRepository.updateChatNameByChatId(chatName = chatName, chatId = chatId)
+    }
+
     override fun findMessageBy(chatId: Long, messageId: Long): Message? {
         return messageCrudRepository.findMessageEntityByIdAndChatId(id = messageId, chatId = chatId)?.toMessageDomain()
     }
@@ -120,6 +125,10 @@ class ChatRepositoryImpl(
 
     override fun existsByExternalId(externalId: String): Boolean {
         return chatCrudRepository.existsByExternalId(externalId)
+    }
+
+    override fun existsByChatId(chatId: Long): Boolean {
+        return chatCrudRepository.existsById(chatId)
     }
 
     override fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo {
