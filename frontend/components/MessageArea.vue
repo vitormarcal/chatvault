@@ -34,13 +34,6 @@
         <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal">
           Import/Export
         </button>
-
-        <div class="form-group">
-          <label for="active-author">Active Author</label>
-          <select class="form-control" v-model="authorActive" id="active-author">
-            <option v-for="option in authors" :value="option">{{ option }}</option>
-          </select>
-        </div>
         <div class="form-group">
           <label for="page-size">Page size</label>
           <input class="form-control" type="number" max="2000" min="1" placeholder="20" id="page-size"
@@ -55,7 +48,7 @@
       <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
       </button>
       <template v-for="(message, index) in messages" :key="index">
-        <message-item :message="message" :chatId="chat.chatId" :authorActive="authorActive"/>
+        <message-item :message="message" :chatId="chat.chatId"/>
       </template>
     </div>
 
@@ -117,12 +110,11 @@
 
 <script setup lang="ts">
 import MessageItem from "~/components/MessageItem.vue";
+import {useMainStore} from "~/store";
 
+const store = useMainStore()
 const props = defineProps(['chat', 'mobile'])
 const emit = defineEmits(['update:chat-exited', 'update:open-chat-config'])
-
-const messages = ref([])
-const authorActive = ref({})
 const nextPage = ref(0)
 const pageSize = ref(20)
 const invalidPageSize = ref(false)
@@ -149,8 +141,10 @@ const content = computed(() => {
 })
 
 const authors = computed(() => {
-  return [...new Set(messages.value.map(it => it.author))].filter(it => !!it)
+  return store.authors
 })
+
+const messages = computed(() => store.messages)
 
 const modalClass = computed(() => {
   return {
@@ -216,7 +210,7 @@ function validatedPageSize(event: any) {
   let pageSizeNumber = event.target.value;
   if (!isNaN(pageSizeNumber) && pageSizeNumber >= 1 && pageSizeNumber <= 2000) {
     invalidPageSize.value = false
-    messages.value = []
+    store.updateMessages([])
     nextPage.value = 0
     pageSize.value = pageSizeNumber
 
@@ -253,7 +247,7 @@ async function onFilePicked() {
 watch(
     () => props.chat.chatId,
     (chatId) => {
-      messages.value = []
+      store.updateMessages([])
       nextPage.value = 0
       disableUpload.value = true
       if (chatImportRef.value) {
@@ -263,7 +257,7 @@ watch(
 )
 
 watch(content, async (newContent, oldContent) => {
-  messages.value = [...newContent.reverse(), ...messages.value]
+  store.updateMessages([...newContent.reverse(), ...messages.value])
   await nextTick()
   scrollBottom()
 })

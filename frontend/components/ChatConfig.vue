@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import {useMainStore} from "~/store";
+
+const store = useMainStore()
 const props = defineProps(['chat'])
 const chatName = ref(props.chat.chatName)
 const editChatName = ref(false)
@@ -40,6 +43,13 @@ function toggleChatName() {
                placeholder="Input group example" aria-label="Input group example" aria-describedby="basic-addon1"
                data-ddg-inputtype="unknown">
       </div>
+    </div>
+
+    <div class="form-group">
+      <label for="active-author">Active Author</label>
+      <select class="form-control" v-model="store.authorActive" id="active-author">
+        <option v-for="option in store.authors" :value="option">{{ option }}</option>
+      </select>
     </div>
 
   </div>
