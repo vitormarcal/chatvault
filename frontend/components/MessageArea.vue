@@ -10,7 +10,7 @@
          v-if="chatActive">
       <div class="chat-info-header d-flex align-items-center">
         <a href="#" class="h2" @click="exitThisChat">
-          <icon-arrow-left/>
+          <rotable-arrow-icon/>
         </a>
         <a href="#" class="m-2" @click="() => toggleOpenChatConfig()">
           <profile-image :chat-id="store.chatActive.chatId"/>

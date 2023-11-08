@@ -41,7 +41,7 @@ function validatedPageSize(event: any) {
   <div class="col-12 col-md-3 h-100 overflow-auto">
     <gallery v-if="showGallery">
       <a href="#" class="h2" @click="() => showGallery = !showGallery">
-        <icon-arrow-left/>
+        <rotable-arrow-icon/>
       </a>
     </gallery>
     <template v-else>
@@ -79,7 +79,7 @@ function validatedPageSize(event: any) {
           :chat="store.chatActive"
       />
       <a href="#" class="h2" @click="() => showGallery = !showGallery">
-        <icon-arrow-left/>
+        <rotable-arrow-icon degree="180"/>
       </a>
     </template>
 
