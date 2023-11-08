@@ -13,12 +13,12 @@
           <icon-arrow-left/>
         </a>
         <a href="#" class="m-2" @click="() => toggleOpenChatConfig()">
-          <profile-image :chat-id="chat.id"/>
+          <profile-image :chat-id="store.chatActive.chatId"/>
         </a>
         <div class="d-flex flex-column" role="button" @click="() => toggleOpenChatConfig()">
-          <div class="font-weight-bold" id="name">{{ chat.chatName }}</div>
+          <div class="font-weight-bold" id="name">{{ store.chatActive.chatName }}</div>
           <div class="small d-flex" id="details">last message sent:
-            <message-created-at :date="chat.msgCreatedAt"/>
+            <message-created-at :date="store.chatActive.msgCreatedAt"/>
           </div>
         </div>
 
@@ -41,14 +41,14 @@ import MessageItem from "~/components/MessageItem.vue";
 import {useMainStore} from "~/store";
 
 const store = useMainStore()
-const props = defineProps(['chat', 'mobile'])
+const props = defineProps(['mobile'])
 const emit = defineEmits(['update:chat-exited'])
 const messagesAreaElement = ref(null)
 
-const chatActive = computed(() => props.chat.chatId > 0)
+const chatActive = computed(() => store.chatActive.chatId > 0)
 
 const moreMessagesPath = computed(() =>
-    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", store.nextPage).replace(":size", store.pageSize))
+    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", store.chatActive.chatId?.toString()).replace(":page", store.nextPage.toString()).replace(":size", store.pageSize.toString()))
 
 const {data: response, refresh} = await useFetch(moreMessagesPath)
 
@@ -72,7 +72,7 @@ const hasNextPages = computed(() => {
 
 const dynamicClass = computed(() => {
   return {
-    'd-none': props.mobile && (props.chat.chatId == null || store.chatConfigOpen),
+    'd-none': props.mobile && (store.chatActive.chatId == null || store.chatConfigOpen),
     'col-md-6': !props.mobile && store.chatConfigOpen,
     'col-md-9': !props.mobile && !store.chatConfigOpen,
   }
@@ -100,7 +100,7 @@ function toggleOpenChatConfig() {
 }
 
 watch(
-    () => props.chat.chatId,
+    () => store.chatActive.chatId,
     (chatId) => {
       store.clearMessages()
     }

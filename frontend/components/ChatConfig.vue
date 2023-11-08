@@ -39,7 +39,7 @@ function validatedPageSize(event: any) {
 
 <template>
   <div class="col-12 col-md-3">
-    <gallery v-if="showGallery" :chat="store.chatActive">
+    <gallery v-if="showGallery">
       <a href="#" class="h2" @click="() => showGallery = !showGallery">
         <icon-arrow-left/>
       </a>
