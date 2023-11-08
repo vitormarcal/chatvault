@@ -76,7 +76,6 @@ function validatedPageSize(event: any) {
       </div>
 
       <import-export-chat
-          :chat="store.chatActive"
       />
       <a href="#" class="h2" @click="() => showGallery = !showGallery">
         <rotable-arrow-icon degree="180"/>
