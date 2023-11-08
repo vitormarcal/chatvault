@@ -15,7 +15,6 @@
         </new-chat-uploader>
         <template v-else>
           <chat-list :chats="chats"
-                     :active-chat="store.chatActive"
                      :mobile="isMobile"
                      @create:chat="createNewChat"
                      @update:chat-active="updateChatActive"
@@ -24,7 +23,7 @@
           <message-area
               :mobile="isMobile"
               @update:chat-exited="updateChatExited"
-              />
+          />
           <chat-config v-if="store.chatConfigOpen"
           />
         </template>

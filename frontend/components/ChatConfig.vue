@@ -38,7 +38,7 @@ function validatedPageSize(event: any) {
 </script>
 
 <template>
-  <div class="col-12 col-md-3">
+  <div class="col-12 col-md-3 h-100 overflow-auto">
     <gallery v-if="showGallery">
       <a href="#" class="h2" @click="() => showGallery = !showGallery">
         <icon-arrow-left/>
