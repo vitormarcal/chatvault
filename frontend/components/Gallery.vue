@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {useMainStore} from "~/store";
-import Attachment from "~/components/Attachment.vue";
 
 const messages = computed(() => store.attachmentMessages)
 
@@ -30,7 +29,7 @@ const store = useMainStore()
     <div class="row">
       <div class="col-md-4" v-for="item in messages" :key="item.id">
         <div class="card">
-          <attachment :attachment="item.attachment"></attachment>
+          <focusable-attachment :attachment="item.attachment"></focusable-attachment>
         </div>
       </div>
     </div>
