@@ -26,7 +26,6 @@
               @update:chat-exited="updateChatExited"
               :chat="store.chatActive"/>
           <chat-config v-if="store.chatConfigOpen"
-                       :chat="store.chatActive"
           />
         </template>
 
