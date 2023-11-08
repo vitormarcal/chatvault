@@ -45,6 +45,10 @@ function validatedPageSize(event: any) {
       </a>
     </gallery>
     <template v-else>
+
+      <a href="#" class="h2 m-2">
+        <rotable-arrow-icon @click="() => store.chatConfigOpen = !store.chatConfigOpen"/>
+      </a>
       <profile-image :id="store.chatActive.chatId"/>
 
       <div class="mt-3">
@@ -75,11 +79,17 @@ function validatedPageSize(event: any) {
         <div class="invalid-feedback" :class="invalidPageSizeClass">page size must be a value between 1 and 2000</div>
       </div>
 
-      <import-export-chat
-      />
-      <a href="#" class="h2" @click="() => showGallery = !showGallery">
-        <rotable-arrow-icon degree="180"/>
-      </a>
+      <div class="d-flex btn-group">
+        <import-export-chat
+        />
+
+        <button class="btn btn-outline-primary btn-sm mt-3 " @click="() => showGallery = !showGallery">
+          Open the media gallery
+          <rotable-arrow-icon degree="180"/>
+        </button>
+      </div>
+
+
     </template>
 
 
