@@ -68,6 +68,10 @@ function validatedPageSize(event: any) {
       <div class="invalid-feedback" :class="invalidPageSizeClass">page size must be a value between 1 and 2000</div>
     </div>
 
+    <import-export-chat
+        :chat="props.chat"
+    />
+
   </div>
 </template>
 
