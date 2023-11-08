@@ -29,7 +29,7 @@
       <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
       </button>
       <template v-for="(message, index) in messages" :key="index">
-        <message-item :message="message" :chatId="chat.chatId"/>
+        <message-item :message="message"/>
       </template>
     </div>
 
@@ -107,7 +107,7 @@ watch(
 )
 
 watch(content, async (newContent, oldContent) => {
-  store.updateMessages([...newContent.reverse(), ...messages.value])
+  store.updateMessages([...newContent.reverse().map((it: any) => store.toChatMessage(it)), ...messages.value])
   await nextTick()
   scrollBottom()
 })

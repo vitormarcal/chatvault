@@ -15,7 +15,7 @@
         </new-chat-uploader>
         <template v-else>
           <chat-list :chats="chats"
-                     :active-chat="chat"
+                     :active-chat="store.chatActive"
                      :mobile="isMobile"
                      @create:chat="createNewChat"
                      @update:chat-active="updateChatActive"
@@ -24,9 +24,9 @@
           <message-area
               :mobile="isMobile"
               @update:chat-exited="updateChatExited"
-              :chat="chat"/>
+              :chat="store.chatActive"/>
           <chat-config v-if="store.chatConfigOpen"
-                       :chat="chat"
+                       :chat="store.chatActive"
           />
         </template>
 
@@ -46,7 +46,6 @@ const store = useMainStore()
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
 const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
 const loading = ref(false)
-const chat = ref({})
 const isMobile = ref(true)
 const indexRef = ref(null)
 const createChatAction = ref(false)
@@ -78,11 +77,11 @@ function createNewChat() {
 }
 
 function updateChatActive(item: any) {
-  chat.value = item
+  store.chatActive = item
 }
 
 function updateChatExited() {
-  chat.value = {}
+  store.chatExited()
 }
 
 watchEffect(() => {
