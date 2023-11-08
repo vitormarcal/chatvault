@@ -3,25 +3,24 @@
     <div class="message-id">{{ message.id }}</div>
     <div class="author font-weight-bold">{{ message.author }}</div>
     <div class="message-content" v-html="safeContent"></div>
-    <attachment v-if="hasAttachment" :message="message" :chatId="chatId"></attachment>
+    <focusable-attachment v-if="hasAttachment" :attachment="message.attachment"></focusable-attachment>
     <div class="message-createdAt">{{ message.createdAt }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Attachment from "~/components/Attachment.vue";
 import {useMainStore} from "~/store";
 
 const store = useMainStore()
 
-const props = defineProps(["message", "chatId"])
+const props = defineProps(["message"])
 
 const safeContent = computed(() => props.message.content.replace(
     /https?:\/\/[^\s]+/g,
     '<a href="$&" target="_blank">$&</a>'
 ))
 
-const hasAttachment = computed(() => !!props.message.attachmentName)
+const hasAttachment = computed(() => !!props.message.attachment)
 const isSystem = computed(() => props.message.authorType === 'SYSTEM')
 
 const self = computed(() => props.message.author === store.authorActive)

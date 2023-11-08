@@ -2,7 +2,6 @@
 import {useMainStore} from "~/store";
 
 const store = useMainStore()
-const props = defineProps(['chat'])
 const clickModal = ref(false)
 const chatImportRef = ref(null)
 const importChatResult = ref({})
@@ -13,9 +12,8 @@ const modalClass = computed(() => {
   }
 })
 
-const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", props.chat.chatId))
-const downloadChatPath = computed(() => useRuntimeConfig().public.api.exportChatById.replace(":chatId", props.chat.chatId))
-
+const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", store.chatActive.chatId.toString()))
+const downloadChatPath = computed(() => useRuntimeConfig().public.api.exportChatById.replace(":chatId", store.chatActive.chatId.toString()))
 
 function toggleModal() {
   clickModal.value = !clickModal.value
@@ -50,9 +48,8 @@ async function uploadFile() {
   }
 }
 
-
 watch(
-    () => props.chat.chatId,
+    () => store.chatActive.chatId,
     (chatId) => {
       disableUpload.value = true
       if (chatImportRef.value) {
@@ -65,11 +62,9 @@ watch(
 <template>
   <div class="chat-option mt-3 ">
 
-
     <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal">
       Import/Export
     </button>
-
 
     <div class="modal" :class="modalClass" tabindex="-1">
       <div class="modal-dialog">
@@ -91,7 +86,7 @@ watch(
               <div class="form-group d-flex justify-content-center mb-3">
                 <a class="d-block text-center"
                    :href="downloadChatPath"
-                   :download="chat.chatName + '.zip'"
+                   :download="store.chatActive.chatName + '.zip'"
                 >
                   Get the entire chat
                 </a>

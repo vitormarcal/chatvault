@@ -2,7 +2,6 @@ package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.in_out_boundary.input.AttachmentCriteriaInput
 import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
-import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.service.*
@@ -11,14 +10,12 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.SortDefault
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.http.MediaTypeFactory
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.util.HtmlUtils
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @RestController
 @RequestMapping("/api/chats")
@@ -148,9 +145,12 @@ class ChatController(
         val contentType: MediaType = MediaTypeFactory.getMediaTypes(resource.filename).firstOrNull()
             ?: MediaType.APPLICATION_OCTET_STREAM
 
+        val cacheControl = CacheControl.maxAge(1, TimeUnit.DAYS)
+
         return ResponseEntity.ok()
             .contentType(contentType)
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${resource.filename}\"")
+            .cacheControl(cacheControl)
             .body(resource)
     }
 }

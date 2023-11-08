@@ -20,10 +20,13 @@
 </template>
 <script setup lang="ts">
 
-const props = defineProps(['chats', 'mobile', 'activeChat'])
+import {useMainStore} from "~/store";
+const store = useMainStore()
+
+const props = defineProps(['chats', 'mobile'])
 const emit = defineEmits(['update:chat-active', 'create:chat', 'update:disk-import'])
 
-const chatOpened = computed(() => props.activeChat?.chatId != null)
+const chatOpened = computed(() => store.chatActive?.chatId != null)
 const dynamicClass = computed(() => {
   return {
     'd-none': props.mobile && chatOpened.value,
