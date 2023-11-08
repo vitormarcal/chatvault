@@ -34,12 +34,7 @@
         <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal">
           Import/Export
         </button>
-        <div class="form-group">
-          <label for="page-size">Page size</label>
-          <input class="form-control" type="number" max="2000" min="1" placeholder="20" id="page-size"
-                 @input="validatedPageSize">
-          <div class="invalid-feedback" :class="invalidPageSizeClass">page size must be a value between 1 and 2000</div>
-        </div>
+
       </div>
 
 
@@ -115,9 +110,6 @@ import {useMainStore} from "~/store";
 const store = useMainStore()
 const props = defineProps(['chat', 'mobile'])
 const emit = defineEmits(['update:chat-exited'])
-const nextPage = ref(0)
-const pageSize = ref(20)
-const invalidPageSize = ref(false)
 const messagesAreaElement = ref(null)
 const chatImportRef = ref(null)
 const clickModal = ref(false)
@@ -127,7 +119,7 @@ const disableUpload = ref(true)
 const chatActive = computed(() => props.chat.chatId > 0)
 
 const moreMessagesPath = computed(() =>
-    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", nextPage.value).replace(":size", pageSize.value))
+    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", store.nextPage).replace(":size", store.pageSize))
 
 const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", props.chat.chatId))
 
@@ -151,11 +143,6 @@ const modalClass = computed(() => {
   }
 })
 
-const invalidPageSizeClass = computed(() => {
-  return {
-    'd-block': invalidPageSize.value
-  }
-})
 
 const hasNextPages = computed(() => {
   if (response?.value) {
@@ -183,7 +170,7 @@ function toggleModal() {
 }
 
 function scrollBottom() {
-  if (messagesAreaElement.value && nextPage.value === 0) {
+  if (messagesAreaElement.value && store.nextPage === 0) {
     messagesAreaElement.value.scrollTo({
       top: messagesAreaElement.value.scrollHeight,
       behavior: 'smooth'
@@ -192,7 +179,7 @@ function scrollBottom() {
 }
 
 function loadMoreMessages() {
-  nextPage.value += 1
+  store.toNextPage()
 }
 
 function exitThisChat() {
@@ -201,20 +188,6 @@ function exitThisChat() {
 
 function toggleOpenChatConfig() {
   store.chatConfigOpen = !store.chatConfigOpen
-}
-
-function validatedPageSize(event: any) {
-  event.preventDefault()
-  let pageSizeNumber = event.target.value;
-  if (!isNaN(pageSizeNumber) && pageSizeNumber >= 1 && pageSizeNumber <= 2000) {
-    invalidPageSize.value = false
-    store.updateMessages([])
-    nextPage.value = 0
-    pageSize.value = pageSizeNumber
-
-  } else {
-    invalidPageSize.value = true
-  }
 }
 
 async function uploadFile() {
@@ -245,8 +218,7 @@ async function onFilePicked() {
 watch(
     () => props.chat.chatId,
     (chatId) => {
-      store.updateMessages([])
-      nextPage.value = 0
+      store.clearMessages()
       disableUpload.value = true
       if (chatImportRef.value) {
         chatImportRef.value.value = ''
