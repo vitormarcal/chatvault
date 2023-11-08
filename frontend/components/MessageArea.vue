@@ -10,11 +10,7 @@
          v-if="chatActive">
       <div class="chat-info-header d-flex align-items-center">
         <a href="#" class="h2" @click="exitThisChat">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
-               viewBox="0 0 16 16">
-            <path fill-rule="evenodd"
-                  d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-          </svg>
+          <icon-arrow-left/>
         </a>
         <a href="#" class="m-2" @click="() => toggleOpenChatConfig()">
           <profile-image :chat-id="chat.id"/>
@@ -28,21 +24,6 @@
 
       </div>
 
-      <div class="chat-option mt-3 ">
-
-
-        <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal">
-          Import/Export
-        </button>
-        <div class="form-group">
-          <label for="page-size">Page size</label>
-          <input class="form-control" type="number" max="2000" min="1" placeholder="20" id="page-size"
-                 @input="validatedPageSize">
-          <div class="invalid-feedback" :class="invalidPageSizeClass">page size must be a value between 1 and 2000</div>
-        </div>
-      </div>
-
-
     </div>
     <div id="infinite-list" class="message-list d-flex flex-column">
       <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
@@ -51,59 +32,6 @@
         <message-item :message="message" :chatId="chat.chatId"/>
       </template>
     </div>
-
-    <div class="modal" :class="modalClass" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title text-black">File importer/exporter</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" @click="toggleModal"
-                    aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="form-control">
-              <div class="alert alert-success" v-if="importChatResult.data" role="alert">
-                {{ importChatResult.data }}
-              </div>
-              <div class="alert alert-warning" v-if="importChatResult.error" role="alert">
-                Failed to import, check server error logs
-              </div>
-
-              <div class="form-group d-flex justify-content-center mb-3">
-                <a class="d-block text-center"
-                   :href="downloadChatPath"
-                   :download="chat.chatName + '.zip'"
-                >
-                  Get the entire chat
-                </a>
-              </div>
-
-              <div class="form-group mb-3 pt-4 border-top border-2">
-                <p class="text-black">Attention, these actions are related to the selected chat! </p>
-                <label for="formFileSm" class="form-label text-black">Import messages to this chat</label>
-                <input class="form-control form-control-sm"
-                       @change="onFilePicked"
-                       accept=".zip,.txt"
-                       id="formFileSm"
-                       ref="chatImportRef"
-                       type="file">
-              </div>
-              <div class="btn-group" role="group">
-                <button type="button" :disabled="disableUpload" @click="uploadFile"
-                        class="btn btn-outline-secondary ml-2">Upload
-                </button>
-              </div>
-            </div>
-
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" @click="toggleModal" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
   </div>
 </template>
@@ -115,23 +43,12 @@ import {useMainStore} from "~/store";
 const store = useMainStore()
 const props = defineProps(['chat', 'mobile'])
 const emit = defineEmits(['update:chat-exited'])
-const nextPage = ref(0)
-const pageSize = ref(20)
-const invalidPageSize = ref(false)
 const messagesAreaElement = ref(null)
-const chatImportRef = ref(null)
-const clickModal = ref(false)
-const importChatResult = ref({})
-const disableUpload = ref(true)
 
 const chatActive = computed(() => props.chat.chatId > 0)
 
 const moreMessagesPath = computed(() =>
-    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", nextPage.value).replace(":size", pageSize.value))
-
-const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", props.chat.chatId))
-
-const downloadChatPath = computed(() => useRuntimeConfig().public.api.exportChatById.replace(":chatId", props.chat.chatId))
+    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", props.chat.chatId).replace(":page", store.nextPage).replace(":size", store.pageSize))
 
 const {data: response, refresh} = await useFetch(moreMessagesPath)
 
@@ -144,18 +61,6 @@ const authors = computed(() => {
 })
 
 const messages = computed(() => store.messages)
-
-const modalClass = computed(() => {
-  return {
-    'fade show d-block': !!clickModal.value
-  }
-})
-
-const invalidPageSizeClass = computed(() => {
-  return {
-    'd-block': invalidPageSize.value
-  }
-})
 
 const hasNextPages = computed(() => {
   if (response?.value) {
@@ -173,17 +78,8 @@ const dynamicClass = computed(() => {
   }
 })
 
-
-function toggleModal() {
-  clickModal.value = !clickModal.value
-  importChatResult.value = {}
-  if (chatImportRef.value) {
-    chatImportRef.value.value = ''
-  }
-}
-
 function scrollBottom() {
-  if (messagesAreaElement.value && nextPage.value === 0) {
+  if (messagesAreaElement.value && store.nextPage === 0) {
     messagesAreaElement.value.scrollTo({
       top: messagesAreaElement.value.scrollHeight,
       behavior: 'smooth'
@@ -192,7 +88,7 @@ function scrollBottom() {
 }
 
 function loadMoreMessages() {
-  nextPage.value += 1
+  store.toNextPage()
 }
 
 function exitThisChat() {
@@ -203,54 +99,10 @@ function toggleOpenChatConfig() {
   store.chatConfigOpen = !store.chatConfigOpen
 }
 
-function validatedPageSize(event: any) {
-  event.preventDefault()
-  let pageSizeNumber = event.target.value;
-  if (!isNaN(pageSizeNumber) && pageSizeNumber >= 1 && pageSizeNumber <= 2000) {
-    invalidPageSize.value = false
-    store.updateMessages([])
-    nextPage.value = 0
-    pageSize.value = pageSizeNumber
-
-  } else {
-    invalidPageSize.value = true
-  }
-}
-
-async function uploadFile() {
-  if (chatImportRef?.value?.files && chatImportRef?.value?.files[0]) {
-    let input = chatImportRef.value;
-    const file = input.files[0]
-    console.log(file)
-
-    const form = new FormData()
-    form.append("file", file);
-    importChatResult.value = await useAsyncData(`upload ${file.name}`, () => $fetch(importChatPath.value, {
-      method: "POST",
-      body: form
-    }))
-    chatImportRef.value.value = ''
-    if (importChatResult.value.data) {
-      await refresh()
-    }
-  }
-}
-
-async function onFilePicked() {
-  if (chatImportRef?.value?.files && chatImportRef?.value?.files[0]) {
-    disableUpload.value = false
-  }
-}
-
 watch(
     () => props.chat.chatId,
     (chatId) => {
-      store.updateMessages([])
-      nextPage.value = 0
-      disableUpload.value = true
-      if (chatImportRef.value) {
-        chatImportRef.value.value = ''
-      }
+      store.clearMessages()
     }
 )
 
