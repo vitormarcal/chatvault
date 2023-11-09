@@ -2,22 +2,25 @@
 import {useMainStore} from "~/store";
 
 const store = useMainStore()
-const chatName = ref(store.chatActive.chatName)
-const editChatName = ref(false)
-const invalidPageSize = ref(false)
-const showGallery = ref(false)
 
-const invalidPageSizeClass = computed(() => ({'d-block': invalidPageSize.value}))
+const chatConfig = ref({
+  chatName: store.chatActive.chatName,
+  editChatName: false,
+  invalidPageSize: false,
+  showGallery: false
+})
+
+const invalidPageSizeClass = computed(() => ({'d-block': chatConfig.value.invalidPageSize}))
 
 async function updateChatName() {
-  const path = useRuntimeConfig().public.api.updateChatNameByChatId.replace(":chatId", store.chatActive.chatId.toString()).replace(":chatName", chatName.value)
+  const path = useRuntimeConfig().public.api.updateChatNameByChatId.replace(":chatId", store.chatActive.chatId.toString()).replace(":chatName", chatConfig.value.chatName)
   await $fetch(path, {method: 'PATCH'})
-  store.chatActive.chatName = chatName.value
+  store.chatActive.chatName = chatConfig.value.chatName
 }
 
 function toggleChatName() {
-  editChatName.value = !editChatName.value
-  if (!editChatName.value && chatName.value !== store.chatActive.chatName) {
+  chatConfig.value.editChatName = !chatConfig.value.editChatName
+  if (!chatConfig.value.editChatName && chatConfig.value.chatName !== store.chatActive.chatName) {
     updateChatName()
   }
 }
@@ -25,7 +28,7 @@ function toggleChatName() {
 watch(
     () => store.chatActive.chatId,
     (chatId) => {
-      chatName.value = store.chatActive.chatName
+      chatConfig.value.chatName = store.chatActive.chatName
     }
 )
 
@@ -33,14 +36,14 @@ function validatedPageSize(event: any) {
   event.preventDefault()
   let pageSizeNumber = event.target.value;
   const updated = store.updatePageSize(pageSizeNumber)
-  invalidPageSize.value = !updated
+  chatConfig.value.invalidPageSize = !updated
 }
 </script>
 
 <template>
   <div class="col-12 col-md-3 h-100 overflow-auto">
-    <gallery v-if="showGallery">
-      <a href="#" class="h2" @click="() => showGallery = !showGallery">
+    <gallery v-if="chatConfig.showGallery">
+      <a href="#" class="h2" @click="() => chatConfig.showGallery = !chatConfig.showGallery">
         <rotable-arrow-icon/>
       </a>
     </gallery>
@@ -56,10 +59,11 @@ function validatedPageSize(event: any) {
         <div class="input-group">
 
       <span class="input-group-text" @click="toggleChatName()">
-        <icon-check v-if="editChatName"/>
+        <icon-check v-if="chatConfig.editChatName"/>
         <icon-pencil-square v-else/>
       </span>
-          <input type="text" :disabled="!editChatName" id="chatname-inpiut" class="form-control" v-model="chatName"
+          <input type="text" :disabled="!chatConfig.editChatName" id="chatname-inpiut" class="form-control"
+                 v-model="chatConfig.chatName"
                  placeholder="Input group example" aria-label="Input group example" aria-describedby="basic-addon1"
                  data-ddg-inputtype="unknown">
         </div>
@@ -83,7 +87,8 @@ function validatedPageSize(event: any) {
         <import-export-chat
         />
 
-        <button class="btn btn-outline-primary btn-sm mt-3 " @click="() => showGallery = !showGallery">
+        <button class="btn btn-outline-primary btn-sm mt-3 "
+                @click="() => chatConfig.showGallery = !chatConfig.showGallery">
           Open the media gallery
           <rotable-arrow-icon degree="180"/>
         </button>
