@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 
 export const useMainStore = defineStore('main', () => {
     const messages = ref([] as ChatMessage[])
+    const attachmentsInfo = ref([] as any)
     const chatActive = ref({} as Chat)
     const authorActive = ref('')
     const chatConfigOpen = ref(false)
@@ -10,7 +11,9 @@ export const useMainStore = defineStore('main', () => {
     const authors = computed(() => {
         return [...new Set(messages.value.map(it => it.author))].filter(it => !!it)
     })
-    const attachmentMessages = computed(() => messages.value.filter(it => !!it.attachment))
+    const attachments = computed<Attachment[]>(() => {
+        return attachmentsInfo.value.map((it: any) => createAttachment(it.name, attachmentUrl(chatActive.value.chatId, it.id)))
+    })
 
     function updateMessages(items: ChatMessage []) {
         messages.value = items
@@ -27,7 +30,19 @@ export const useMainStore = defineStore('main', () => {
 
     function chatExited() {
         chatActive.value = {} as Chat
+        chatConfigOpen.value = false
+        attachmentsInfo.value = []
         clearMessages()
+    }
+
+    async function openChat(chat: Chat) {
+        chatActive.value = chat
+        await findAttachmentsInfo()
+    }
+
+    async function findAttachmentsInfo() {
+        const url = useRuntimeConfig().public.api.getAttachmentsInfoByChatId.replace(":chatId", chatActive.value.chatId.toString())
+        attachmentsInfo.value = await $fetch(url)
     }
 
     function toNextPage() {
@@ -48,7 +63,8 @@ export const useMainStore = defineStore('main', () => {
     return {
         chatActive,
         messages,
-        attachmentMessages,
+        attachmentsInfo,
+        attachments,
         chatConfigOpen,
         nextPage,
         pageSize,
@@ -59,9 +75,34 @@ export const useMainStore = defineStore('main', () => {
         toNextPage,
         updatePageSize,
         chatExited,
+        openChat,
         toChatMessage
     }
 })
+
+function attachmentUrl(chatId: number, messageId: number): string {
+    return useRuntimeConfig().public.api.getAttachmentByChatIdAndMessageId
+        .replace(':chatId', chatId.toString())
+        .replace(':messageId', messageId.toString())
+}
+
+function createAttachment(attachmentName: string | undefined, url: string): Attachment | null {
+    if (!attachmentName) {
+        return null
+    }
+
+    if (/\.(jpg|jpeg|png|gif|webp)$/i.test(attachmentName)) {
+        return {name: attachmentName, type: 'IMAGE', url: url}
+    } else if (/\.(mp4|avi|mov)$/i.test(attachmentName)) {
+        return {name: attachmentName, type: 'VIDEO', url: url}
+    } else if (/\.(mp3|wav|opus)$/i.test(attachmentName)) {
+        return {name: attachmentName, type: 'AUDIO', url: url}
+    } else if (/\.(pdf)$/i.test(attachmentName)) {
+        return {name: attachmentName, type: 'PDF', url: url}
+    }
+
+    return {name: attachmentName, type: 'UNKNOWN', url: url}
+}
 
 interface Chat {
     chatId: number
@@ -97,24 +138,6 @@ export class ChatMessage {
         const url = useRuntimeConfig().public.api.getAttachmentByChatIdAndMessageId
             .replace(':chatId', this.chatId.toString())
             .replace(':messageId', this.id.toString())
-        this.attachment = this.createAttachment(data.attachmentName, url)
-    }
-
-    private createAttachment(attachmentName: string | undefined, url: string): Attachment | null {
-        if (!attachmentName) {
-            return null
-        }
-
-        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(attachmentName)) {
-            return {name: attachmentName, type: 'IMAGE', url: url}
-        } else if (/\.(mp4|avi|mov)$/i.test(attachmentName)) {
-            return {name: attachmentName, type: 'VIDEO', url: url}
-        } else if (/\.(mp3|wav|opus)$/i.test(attachmentName)) {
-            return {name: attachmentName, type: 'AUDIO', url: url}
-        } else if (/\.(pdf)$/i.test(attachmentName)) {
-            return {name: attachmentName, type: 'PDF', url: url}
-        }
-
-        return {name: attachmentName, type: 'UNKNOWN', url: url}
+        this.attachment = createAttachment(data.attachmentName, url)
     }
 }

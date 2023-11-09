@@ -10,6 +10,7 @@ export default defineNuxtConfig({
                 listChats: `${host}/chats`,
                 getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page&size=:size`,
                 getAttachmentByChatIdAndMessageId: `${host}/chats/:chatId/messages/:messageId/attachment`,
+                getAttachmentsInfoByChatId: `${host}/chats/:chatId/attachments`,
                 importChatById: `${host}/chats/:chatId/messages/import`,
                 updateChatNameByChatId: `${host}/chats/:chatId/chatName/:chatName`,
                 exportChatById: `${host}/chats/:chatId/export`,

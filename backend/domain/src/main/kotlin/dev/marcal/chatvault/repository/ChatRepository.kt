@@ -1,5 +1,6 @@
 package dev.marcal.chatvault.repository
 
+import dev.marcal.chatvault.in_out_boundary.output.AttachmentInfoOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.model.*
 import org.springframework.data.domain.Pageable
@@ -27,4 +28,5 @@ interface ChatRepository {
     fun findChatBucketInfoByChatName(chatName: String): ChatBucketInfo?
     fun countChatMessages(chatId: Long): Long
     fun setChatNameByChatId(chatId: Long, chatName: String)
+    fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentInfoOutput>
 }
