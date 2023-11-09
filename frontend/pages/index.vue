@@ -22,7 +22,6 @@
           />
           <message-area
               :mobile="isMobile"
-              @update:chat-exited="updateChatExited"
           />
           <chat-config v-if="store.chatConfigOpen"
           />
@@ -76,10 +75,6 @@ function createNewChat() {
 
 function updateChatActive(item: any) {
   store.openChat(item)
-}
-
-function updateChatExited() {
-  store.chatExited()
 }
 
 watchEffect(() => {

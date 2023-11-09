@@ -5,26 +5,7 @@
        ref="messagesAreaElement"
   >
 
-    <div id="navbar"
-         class="sticky-top d-flex p-2 m-0 justify-content-between"
-         v-if="chatActive">
-      <div class="chat-info-header d-flex align-items-center">
-        <a href="#" class="h2" @click="exitThisChat">
-          <rotable-arrow-icon/>
-        </a>
-        <a href="#" class="m-2" @click="() => toggleOpenChatConfig()">
-          <profile-image :chat-id="store.chatActive.chatId"/>
-        </a>
-        <div class="d-flex flex-column" role="button" @click="() => toggleOpenChatConfig()">
-          <div class="font-weight-bold" id="name">{{ store.chatActive.chatName }}</div>
-          <div class="small d-flex" id="details">last message sent:
-            <message-created-at :date="store.chatActive.msgCreatedAt"/>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
+    <message-area-nav-bar/>
     <div id="infinite-list" class="message-list d-flex flex-column">
       <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
       </button>
@@ -42,10 +23,7 @@ import {useMainStore} from "~/store";
 
 const store = useMainStore()
 const props = defineProps(['mobile'])
-const emit = defineEmits(['update:chat-exited'])
 const messagesAreaElement = ref(null)
-
-const chatActive = computed(() => store.chatActive.chatId > 0)
 
 const moreMessagesPath = computed(() =>
     useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", store.chatActive.chatId?.toString()).replace(":page", store.nextPage.toString()).replace(":size", store.pageSize.toString()))
@@ -91,14 +69,6 @@ function loadMoreMessages() {
   store.toNextPage()
 }
 
-function exitThisChat() {
-  emit('update:chat-exited')
-}
-
-function toggleOpenChatConfig() {
-  store.chatConfigOpen = !store.chatConfigOpen
-}
-
 watch(
     () => store.chatActive.chatId,
     (chatId) => {
@@ -116,11 +86,6 @@ watch(content, async (newContent, oldContent) => {
 
 <style scoped>
 .message-area {
-  background: #360d3c;
-}
-
-
-#navbar {
   background: #360d3c;
 }
 </style>

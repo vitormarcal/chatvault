@@ -21,6 +21,7 @@
 <script setup lang="ts">
 
 import {useMainStore} from "~/store";
+
 const store = useMainStore()
 
 const props = defineProps(['chats', 'mobile'])

@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import {useMainStore} from "~/store";
 
-const fileType = ref('ALL')
+const gallery = ref({
+  fileType: 'ALL',
+  links: [
+    {type: 'ALL', label: 'All'},
+    {type: 'VIDEO', label: 'Video Files'},
+    {type: 'IMAGE', label: 'Image Files'},
+    {type: 'PDF', label: 'Documents'},
+    {type: 'AUDIO', label: 'Audio files'},
+  ]
+})
+
 const attachments = computed(() => {
-  if (fileType.value != 'ALL') {
-    return store.attachments.filter(it => it.type == fileType.value)
+  if (gallery.value.fileType != 'ALL') {
+    return store.attachments.filter(it => it.type == gallery.value.fileType)
   } else {
     return store.attachments
   }
@@ -19,20 +29,10 @@ const store = useMainStore()
     <slot></slot>
     <div class="title">Gallery</div>
     <ul class="nav justify-content-end">
-      <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#" @click="fileType = 'ALL'">All</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#" @click="fileType = 'VIDEO'">Video Files</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#" @click="fileType = 'IMAGE'">Image Files</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#" @click="fileType = 'PDF'">Documents</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#" @click="fileType = 'AUDIO'">Audio files</a>
+      <li class="nav-item" v-for="item in gallery.links">
+        <a class="nav-link active" aria-current="page" href="#" @click="gallery.fileType = item.type">{{
+            item.label
+          }}</a>
       </li>
     </ul>
 
