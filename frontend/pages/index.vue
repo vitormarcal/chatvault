@@ -75,7 +75,7 @@ function createNewChat() {
 }
 
 function updateChatActive(item: any) {
-  store.chatActive = item
+  store.openChat(item)
 }
 
 function updateChatExited() {
