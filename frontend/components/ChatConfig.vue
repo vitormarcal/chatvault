@@ -63,9 +63,7 @@ function validatedPageSize(event: any) {
         <icon-pencil-square v-else/>
       </span>
           <input type="text" :disabled="!chatConfig.editChatName" id="chatname-inpiut" class="form-control"
-                 v-model="chatConfig.chatName"
-                 placeholder="Input group example" aria-label="Input group example" aria-describedby="basic-addon1"
-                 data-ddg-inputtype="unknown">
+                 v-model="chatConfig.chatName">
         </div>
       </div>
 
