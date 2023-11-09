@@ -2,6 +2,7 @@ package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.in_out_boundary.input.AttachmentCriteriaInput
 import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
+import dev.marcal.chatvault.in_out_boundary.output.AttachmentInfoOutput
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.service.*
@@ -26,7 +27,8 @@ class ChatController(
     private val attachmentFinder: AttachmentFinder,
     private val bucketDiskImporter: BucketDiskImporter,
     private val chatFileExporter: ChatFileExporter,
-    private val chatNameUpdater: ChatNameUpdater
+    private val chatNameUpdater: ChatNameUpdater,
+    private val attachmentInfoFinderByChatId: AttachmentInfoFinderByChatId
 ) {
 
     @GetMapping
@@ -152,5 +154,18 @@ class ChatController(
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${resource.filename}\"")
             .cacheControl(cacheControl)
             .body(resource)
+    }
+
+    @GetMapping("{chatId}/attachments")
+    fun downloadAttachment(
+        @PathVariable("chatId") chatId: Long
+    ): ResponseEntity<Sequence<AttachmentInfoOutput>> {
+        attachmentInfoFinderByChatId.execute(chatId)
+
+        val cacheControl = CacheControl.maxAge(5, TimeUnit.MINUTES)
+
+        return ResponseEntity.ok()
+            .cacheControl(cacheControl)
+            .body(attachmentInfoFinderByChatId.execute(chatId))
     }
 }

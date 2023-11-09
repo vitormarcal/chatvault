@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.persistence
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev.marcal.chatvault.in_out_boundary.output.AttachmentInfoOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.model.*
 import dev.marcal.chatvault.persistence.dto.toChatLastMessage
@@ -96,6 +97,12 @@ class ChatRepositoryImpl(
 
     override fun findMessagesBy(chatId: Long, pageable: Pageable): org.springframework.data.domain.Page<MessageOutput> {
         return messageCrudRepository.findAllByChatIdIs(chatId, pageable)
+    }
+
+    override fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentInfoOutput> {
+        return messageCrudRepository.findMessageIdByChatIdAndAttachmentExists(chatId)
+            .asSequence()
+            .map { AttachmentInfoOutput(id = it.messageId, name = it.name) }
     }
 
     override fun countChatMessages(chatId: Long): Long {
