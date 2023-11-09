@@ -13,6 +13,7 @@ export default defineNuxtConfig({
                 getAttachmentsInfoByChatId: `${host}/chats/:chatId/attachments`,
                 importChatById: `${host}/chats/:chatId/messages/import`,
                 updateChatNameByChatId: `${host}/chats/:chatId/chatName/:chatName`,
+                getProfileImage: `${host}/chats/:chatId/profile-image`,
                 exportChatById: `${host}/chats/:chatId/export`,
                 importChatByName: `${host}/chats/import/:chatName`,
                 importFromDisk: `${host}/chats/disk-import`
