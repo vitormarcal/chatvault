@@ -28,7 +28,8 @@ class ChatController(
     private val bucketDiskImporter: BucketDiskImporter,
     private val chatFileExporter: ChatFileExporter,
     private val chatNameUpdater: ChatNameUpdater,
-    private val attachmentInfoFinderByChatId: AttachmentInfoFinderByChatId
+    private val attachmentInfoFinderByChatId: AttachmentInfoFinderByChatId,
+    private val profileImageManager: ProfileImageManager
 ) {
 
     @GetMapping
@@ -144,13 +145,11 @@ class ChatController(
                 messageId = messageId
             )
         )
-        val contentType: MediaType = MediaTypeFactory.getMediaTypes(resource.filename).firstOrNull()
-            ?: MediaType.APPLICATION_OCTET_STREAM
 
         val cacheControl = CacheControl.maxAge(1, TimeUnit.DAYS)
 
         return ResponseEntity.ok()
-            .contentType(contentType)
+            .contentType(resource.getMediaType())
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${resource.filename}\"")
             .cacheControl(cacheControl)
             .body(resource)
@@ -168,4 +167,35 @@ class ChatController(
             .cacheControl(cacheControl)
             .body(attachmentInfoFinderByChatId.execute(chatId))
     }
+
+    @PostMapping("{chatId}/profile-image")
+    fun putProfileImage(
+        @PathVariable("chatId") chatId: Long,
+        @RequestParam("profile-image") file: MultipartFile
+    ): ResponseEntity<Any> {
+        profileImageManager.updateImage(file.inputStream, chatId)
+
+        return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("{chatId}/profile-image")
+    fun getProfileImage(
+        @PathVariable("chatId") chatId: Long
+    ): ResponseEntity<Any> {
+        val image = profileImageManager.getImage(chatId)
+
+        val cacheControl = CacheControl.maxAge(5, TimeUnit.MINUTES)
+
+        return ResponseEntity.ok()
+            .contentType(image.getMediaType())
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${image.filename}\"")
+            .cacheControl(cacheControl)
+            .body(image)
+
+    }
+}
+
+fun Resource.getMediaType(): MediaType {
+    return MediaTypeFactory.getMediaTypes(this.filename).firstOrNull()
+        ?: MediaType.APPLICATION_OCTET_STREAM
 }
