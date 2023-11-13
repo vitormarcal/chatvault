@@ -52,10 +52,7 @@ function validatedPageSize(event: any) {
       <a href="#" class="h2 m-2">
         <rotable-arrow-icon @click="() => store.chatConfigOpen = !store.chatConfigOpen"/>
       </a>
-      <a role="button" aria-label="Change your avatar">
-        <profile-image :id="store.chatActive.chatId"/>
-        <icon-pencil-square class="position-relative" style="right: 1rem;top: 1rem"/>
-      </a>
+      <profile-image-uploader/>
 
 
       <div class="mt-3">
