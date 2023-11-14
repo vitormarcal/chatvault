@@ -11,7 +11,6 @@ const props = defineProps(['date'])
 const dateObject = computed(() => {
   const now = new Date()
   const theDateMessage = new Date(props.date)
-
   const isTheSameYear = now.getFullYear() === theDateMessage.getFullYear()
   const isTheSameMonth = now.getMonth() === theDateMessage.getMonth()
   const isTheSameDay = now.getDate() === theDateMessage.getDate()
@@ -24,7 +23,7 @@ const dateObject = computed(() => {
     }
   } else {
     return reactive({
-      date: theDateMessage.getDate().toString().padStart(2, '0') + '/' + theDateMessage.getMonth().toString().padStart(2, '0'),
+      date: theDateMessage.getDate().toString().padStart(2, '0') + '/' + (theDateMessage.getMonth() + 1).toString().padStart(2, '0'),
       today: false
     })
   }
@@ -32,7 +31,7 @@ const dateObject = computed(() => {
 
 const classObject = computed(() => {
   return {
-    'font-weight-bold': dateObject.today
+    'font-weight-bold': dateObject.value.today
   }
 })
 
