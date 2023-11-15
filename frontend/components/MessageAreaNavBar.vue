@@ -34,6 +34,7 @@ function toggleOpenChatConfig() {
       </div>
 
     </div>
+    <icon-three-dots class="self" role="button" @click="() => toggleOpenChatConfig()"/>
 
   </div>
 </template>
