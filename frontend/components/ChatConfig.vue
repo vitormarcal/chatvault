@@ -52,7 +52,8 @@ function validatedPageSize(event: any) {
       <a href="#" class="h2 m-2">
         <rotable-arrow-icon @click="() => store.chatConfigOpen = !store.chatConfigOpen"/>
       </a>
-      <profile-image :id="store.chatActive.chatId"/>
+      <profile-image-uploader/>
+
 
       <div class="mt-3">
         <label class="form-label">Chat Name</label><br/>

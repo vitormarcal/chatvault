@@ -24,7 +24,7 @@ function toggleOpenChatConfig() {
         <rotable-arrow-icon/>
       </a>
       <a href="#" class="m-2" @click="() => toggleOpenChatConfig()">
-        <profile-image :chat-id="store.chatActive.chatId"/>
+        <profile-image :id="store.chatActive.chatId"/>
       </a>
       <div class="d-flex flex-column" role="button" @click="() => toggleOpenChatConfig()">
         <div class="font-weight-bold" id="name">{{ store.chatActive.chatName }}</div>
