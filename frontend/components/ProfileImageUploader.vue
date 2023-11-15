@@ -7,10 +7,10 @@ let showMedia = ref(false);
 const imageImportRef = ref(null)
 const importChatResult = ref({})
 const fileValid = ref(false)
+const imageUrl = ref(null as string | ArrayBuffer | null)
 
-const importChatPath = computed(() => {
-  return useRuntimeConfig().public.api.importChatByName;
-
+const profileImagePath = computed(() => {
+  return useRuntimeConfig().public.api.getProfileImage.replace(':chatId', store.chatActive.chatId.toString());
 })
 
 const modalClass = computed(() => {
@@ -21,7 +21,14 @@ const modalClass = computed(() => {
 
 async function onFilePicked() {
   if (imageImportRef?.value?.files && imageImportRef?.value?.files[0]) {
+    store.reloadImageProfile = false
     fileValid.value = true
+    const file = imageImportRef?.value?.files[0]
+    const reader = new FileReader();
+    reader.onload = () => {
+      imageUrl.value = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
 }
 
@@ -32,20 +39,24 @@ async function uploadFile() {
     console.log(file)
 
     const form = new FormData()
-    form.append("file", file);
-    importChatResult.value = await useAsyncData(`upload ${file.name}`, () => $fetch(importChatPath.value, {
+    form.append("profile-image", file);
+    importChatResult.value = await useAsyncData(`upload ${file.name}`, () => $fetch(profileImagePath.value, {
       method: "POST",
       body: form
     }))
     imageImportRef.value.value = ''
-    if (importChatResult.value.data) {
-      //do something
-    }
+    store.reloadImageProfile = true
   }
 }
 
 function toggleModal() {
   showMedia.value = !showMedia.value
+  if (imageImportRef?.value?.files) {
+    imageImportRef.value.files = []
+    store.reloadImageProfile = false
+    fileValid.value = false
+    imageImportRef.value = null
+  }
 }
 
 </script>
@@ -55,14 +66,15 @@ function toggleModal() {
   <div>
 
     <a role="button" aria-label="Change your avatar" @click="toggleModal">
-      <profile-image :id="store.chatActive.chatId"/>
+      <profile-image :id="store.chatActive.chatId" :cache-url="true"/>
       <icon-pencil-square class="position-relative" style="right: 1rem;top: 1rem"/>
 
     </a>
 
     <div class="modal d-flex" :class="modalClass" v-if="showMedia">
       <div class="modal-content d-flex align-items-center m-auto">
-        <profile-image :id="store.chatActive.chatId" style="width: 35%; height: auto"/>
+        <profile-image :id="store.chatActive.chatId" :cache-url="false" :url-provided="imageUrl"
+                       style="width: 35%; height: auto"/>
         <input class="form-control form-control-sm"
                @change="onFilePicked"
                accept=".jpg"

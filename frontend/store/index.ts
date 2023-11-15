@@ -9,6 +9,7 @@ export const useMainStore = defineStore('main', () => {
     const chatConfigOpen = ref(false)
     const nextPage = ref(0)
     const pageSize = ref(20)
+    const reloadImageProfile = ref(false)
     const authors = computed(() => {
         return [...new Set(messages.value.map(it => it.author))].filter(it => !!it)
     })
@@ -71,6 +72,7 @@ export const useMainStore = defineStore('main', () => {
         pageSize,
         authorActive,
         authors,
+        reloadImageProfile,
         updateMessages,
         clearMessages,
         toNextPage,
