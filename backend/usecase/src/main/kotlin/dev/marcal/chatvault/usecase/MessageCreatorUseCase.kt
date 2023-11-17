@@ -40,7 +40,7 @@ class MessageCreatorUseCase(
             throw RuntimeException("there are no messages to create, message list is empty $theMessagePayload")
         }
 
-        logger.info("try to save ${input.messages.size} messages, chatInfo=${chatBucketInfo}")
+        logger.info("try to save ${theMessagePayload.messages.size} messages, chatInfo=${chatBucketInfo}")
         chatRepository.saveNewMessages(payload = theMessagePayload, eventSource = input.eventSource)
     }
 

@@ -196,5 +196,36 @@ class MessageDeduplicationUseCaseTest {
 
     }
 
+    @Test
+    fun `when only last messages is new should cut off olders`() {
+        val now = LocalDateTime.of(2023, 1, 1, 1, 0)
+        val messages = (0..10000).map {
+            NewMessageInput(
+                authorName = "Beltrano",
+                createdAt = now.plusMinutes(it.toLong()),
+                chatId = chatId,
+                content = "Bla bla bla bla"
+            )
+        }
+
+
+        every { chatRepository.findLastMessageByChatId(chatId) } returns Message(
+            author = Author(name = "Beltrano", type = AuthorType.USER),
+            createdAt = now.plusMinutes(10000 - 10),
+            content = Content(text = "Bla bla bla bla bla"),
+            externalId = null
+        )
+
+        val expected = messages.subList(10000 - 10, messages.size).toTypedArray()
+
+        val deduplicatedMessages = messageDeduplicationUseCase.execute(
+            chatId = chatId,
+            messages = messages
+        )
+
+        Assertions.assertArrayEquals(expected, deduplicatedMessages.toTypedArray())
+
+    }
+
 
 }

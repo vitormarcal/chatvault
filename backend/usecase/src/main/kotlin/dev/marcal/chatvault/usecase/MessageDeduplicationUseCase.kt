@@ -47,7 +47,7 @@ class MessageDeduplicationUseCase(
 
             val compareTo = middleMessage.createdAt.compareTo(lastSaved.createdAt)
 
-            if (compareTo == -1) {
+            if (compareTo < 0) {
                 low = middle
             } else {
                 high = middle
