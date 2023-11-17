@@ -10,7 +10,8 @@ import java.time.LocalDateTime
 
 @Service
 class MessageCreatorUseCase(
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val messageDeduplicatorUseCase: MessageDeduplicatorUseCase
 ) : MessageCreator {
     override fun execute(input: NewMessageInput) {
         val payloadInput = NewMessagePayloadInput(
@@ -27,7 +28,9 @@ class MessageCreatorUseCase(
 
         val theMessagePayload = MessagePayload(
             chatId = chatBucketInfo.chatId,
-            messages = input.messages.map { buildNewMessage(it, chatBucketInfo) }
+            messages = input.messages
+                .let { messageDeduplicatorUseCase.execute(chatBucketInfo.chatId, it) }
+                .map { buildNewMessage(it, chatBucketInfo) }
         )
 
         chatRepository.saveNewMessages(payload = theMessagePayload, eventSource = input.eventSource)
