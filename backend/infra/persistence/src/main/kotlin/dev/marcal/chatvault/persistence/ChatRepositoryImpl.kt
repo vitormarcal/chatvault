@@ -106,7 +106,7 @@ class ChatRepositoryImpl(
     }
 
     override fun findLastMessageByChatId(chatId: Long): Message? {
-        TODO("Not yet implemented")
+        return messageCrudRepository.findTopByChatId(chatId)?.toMessageDomain()
     }
 
     override fun countChatMessages(chatId: Long): Long {
