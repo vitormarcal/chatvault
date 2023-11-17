@@ -105,6 +105,10 @@ class ChatRepositoryImpl(
             .map { AttachmentInfoOutput(id = it.messageId, name = it.name) }
     }
 
+    override fun findLastMessageByChatId(chatId: Long): Message? {
+        return messageCrudRepository.findTopByChatIdOrderByIdDesc(chatId)?.toMessageDomain()
+    }
+
     override fun countChatMessages(chatId: Long): Long {
         return messageCrudRepository.countByChatId(chatId)
     }

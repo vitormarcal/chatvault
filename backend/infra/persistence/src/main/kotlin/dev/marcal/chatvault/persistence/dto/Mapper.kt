@@ -10,5 +10,6 @@ fun ChatMessagePairDTO.toChatLastMessage(): ChatLastMessage {
         author = this.message.toAuthorDomain(),
         content = this.message.content,
         msgCreatedAt = this.message.createdAt,
+        msgCount = this.amountOfMessages
     )
 }

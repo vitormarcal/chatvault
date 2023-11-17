@@ -20,7 +20,7 @@ interface ChatCrudRepository: JpaRepository<ChatEntity, Long> {
 
     @Query(
         """
-        SELECT new dev.marcal.chatvault.persistence.dto.ChatMessagePairDTO(c, m)
+        SELECT new dev.marcal.chatvault.persistence.dto.ChatMessagePairDTO(c, m, (SELECT COUNT(*) FROM MessageEntity me WHERE me.chatId = c.id) )
         FROM ChatEntity c 
         JOIN MessageEntity m ON c.id = m.chatId  AND m.id = (SELECT MAX(m2.id) FROM MessageEntity m2 WHERE m2.chatId = c.id)
         ORDER BY m.createdAt desc

@@ -27,7 +27,9 @@ function toggleOpenChatConfig() {
         <profile-image :id="store.chatActive.chatId"/>
       </a>
       <div class="d-flex flex-column" role="button" @click="() => toggleOpenChatConfig()">
-        <div class="font-weight-bold" id="name">{{ store.chatActive.chatName }}</div>
+        <div class="font-weight-bold" id="name">{{ store.chatActive.chatName }}
+        </div>
+        <span class="badge align-content-end bg-success">{{store.chatActive.msgCount}} messages</span>
         <div class="small d-flex" id="details">last message sent:
           <message-created-at :date="store.chatActive.msgCreatedAt"/>
         </div>
