@@ -106,7 +106,7 @@ class ChatRepositoryImpl(
     }
 
     override fun findLastMessageByChatId(chatId: Long): Message? {
-        return messageCrudRepository.findTopByChatId(chatId)?.toMessageDomain()
+        return messageCrudRepository.findTopByChatIdOrderByIdDesc(chatId)?.toMessageDomain()
     }
 
     override fun countChatMessages(chatId: Long): Long {

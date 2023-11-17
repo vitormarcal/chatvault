@@ -37,8 +37,7 @@ class MessageCreatorUseCase(
         )
 
         if (theMessagePayload.messages.isEmpty()) {
-            logger.info("there are no messages to create, message list is empty $input")
-            return
+            throw RuntimeException("there are no messages to create, message list is empty $theMessagePayload")
         }
 
         logger.info("try to save ${input.messages.size} messages, chatInfo=${chatBucketInfo}")

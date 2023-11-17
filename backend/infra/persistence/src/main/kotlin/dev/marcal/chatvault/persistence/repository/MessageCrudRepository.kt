@@ -15,7 +15,7 @@ interface MessageCrudRepository : JpaRepository<MessageEntity, Long> {
 
     fun findMessageEntityByIdAndChatId(id: Long, chatId: Long): MessageEntity?
 
-    fun findTopByChatId(chatId: Long): MessageEntity?
+    fun findTopByChatIdOrderByIdDesc(chatId: Long): MessageEntity?
 
     @Query("SELECT new dev.marcal.chatvault.persistence.dto.AttachmentInfoDTO(m.id, m.attachmentName) FROM MessageEntity m WHERE m.chatId = :chatId AND m.attachmentPath IS NOT NULL")
     fun findMessageIdByChatIdAndAttachmentExists(chatId: Long): List<AttachmentInfoDTO>
