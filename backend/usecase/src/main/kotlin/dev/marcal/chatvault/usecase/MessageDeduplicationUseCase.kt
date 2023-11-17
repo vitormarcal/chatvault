@@ -27,10 +27,8 @@ class MessageDeduplicationUseCase(
 
         var low = 0
         var high = messages.size - 1
-        var cont = 1
 
         while (true) {
-            println("${cont++} passada")
             val middle = (low + high).ushr(1)
             if (middle == low) {
                 break
