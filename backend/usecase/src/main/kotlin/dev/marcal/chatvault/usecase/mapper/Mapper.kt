@@ -5,9 +5,8 @@ import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
 import dev.marcal.chatvault.in_out_boundary.output.ChatBucketInfoOutput
 import dev.marcal.chatvault.in_out_boundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
-import dev.marcal.chatvault.model.ChatBucketInfo
-import dev.marcal.chatvault.model.ChatLastMessage
-import dev.marcal.chatvault.model.Message
+import dev.marcal.chatvault.model.*
+import java.time.LocalDateTime
 
 fun ChatBucketInfo.toOutput(): ChatBucketInfoOutput {
     return ChatBucketInfoOutput(
@@ -45,5 +44,22 @@ fun MessageOutput.toNewMessageInput(chatId: Long): NewMessageInput {
         createdAt = this.createdAt,
         content = this.content,
         attachment = this.attachmentName?.let { NewAttachmentInput(name = it, content = "") }
+    )
+}
+
+fun NewMessageInput.toMessageDomain(chatBucketInfo: ChatBucketInfo): Message {
+    return Message(
+        author = Author(
+            name = this.authorName,
+            type = if (this.authorName.isEmpty()) AuthorType.SYSTEM else AuthorType.USER
+        ),
+        createdAt = this.createdAt ?: LocalDateTime.now(),
+        externalId = this.externalId,
+        content = Content(text = this.content, attachment = this.attachment?.let {
+            Attachment(
+                name = it.name,
+                bucket = chatBucketInfo.bucket.withPath("/")
+            )
+        })
     )
 }
