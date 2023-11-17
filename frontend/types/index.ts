@@ -4,7 +4,8 @@ export interface Chat {
     authorName: string
     authorType: string,
     content: string,
-    msgCreatedAt: string
+    msgCreatedAt: string,
+    msgCount: number
 }
 
 export interface Attachment {

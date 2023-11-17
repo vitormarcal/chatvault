@@ -22,7 +22,8 @@ fun ChatLastMessage.toOutput(): ChatLastMessageOutput {
         authorName = this.author.name,
         authorType = this.author.type.name,
         content = this.content,
-        msgCreatedAt = this.msgCreatedAt
+        msgCreatedAt = this.msgCreatedAt,
+        msgCount = this.msgCount
     )
 }
 

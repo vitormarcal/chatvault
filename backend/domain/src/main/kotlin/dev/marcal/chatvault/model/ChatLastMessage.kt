@@ -7,5 +7,6 @@ data class ChatLastMessage(
     val chatName: String,
     val author: Author,
     val content: String,
-    val msgCreatedAt: LocalDateTime
+    val msgCreatedAt: LocalDateTime,
+    val msgCount: Long
 )

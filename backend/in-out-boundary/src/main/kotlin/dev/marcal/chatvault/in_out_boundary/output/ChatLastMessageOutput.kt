@@ -8,5 +8,6 @@ data class ChatLastMessageOutput(
     val authorName: String,
     val authorType: String,
     val content: String,
-    val msgCreatedAt: LocalDateTime
+    val msgCreatedAt: LocalDateTime,
+    val msgCount: Long
 )
