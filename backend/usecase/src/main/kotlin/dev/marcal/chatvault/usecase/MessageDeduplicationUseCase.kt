@@ -3,12 +3,15 @@ package dev.marcal.chatvault.usecase
 import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.usecase.mapper.toMessageDomain
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class MessageDeduplicationUseCase(
     private val chatRepository: ChatRepository
 ) {
+
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     fun execute(chatId: Long, messages: List<NewMessageInput>): List<NewMessageInput> {
 
@@ -17,8 +20,13 @@ class MessageDeduplicationUseCase(
         val chatBucketInfo = chatRepository.findChatBucketInfoByChatId(chatId) ?: return messages
         val lastSaved = chatRepository.findLastMessageByChatId(chatId) ?: return messages
 
+        logger.info("starting message deduplication chatInfo=${chatBucketInfo}, found ${messages.size} messages")
+
         messages[messages.size - 1].toMessageDomain(chatBucketInfo).also { lastInput ->
-            if (lastInput == lastSaved || lastInput.createdAt < lastSaved.createdAt) return emptyList()
+            if (lastInput == lastSaved || lastInput.createdAt < lastSaved.createdAt) {
+                logger.info("messages are older than the last stored chatInfo=${chatBucketInfo}")
+                return emptyList()
+            }
         }
 
         messages[0].toMessageDomain(chatBucketInfo).also { firstInput ->
