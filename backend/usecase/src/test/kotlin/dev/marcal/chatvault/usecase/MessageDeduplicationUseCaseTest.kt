@@ -10,11 +10,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
-class MessageDeduplicatorUseCaseTest {
+class MessageDeduplicationUseCaseTest {
 
     private val chatRepository: ChatRepository = mockk()
 
-    private val messageDeduplicatorUseCase = MessageDeduplicatorUseCase(
+    private val messageDeduplicationUseCase = MessageDeduplicationUseCase(
         chatRepository = chatRepository
     )
     private val chatId = 1L
@@ -49,7 +49,7 @@ class MessageDeduplicatorUseCaseTest {
 
         every { chatRepository.findLastMessageByChatId(chatId) } returns null
 
-        val deduplicatedMessages = messageDeduplicatorUseCase.execute(
+        val deduplicatedMessages = messageDeduplicationUseCase.execute(
             chatId = chatId,
             messages = input
         )
@@ -73,7 +73,7 @@ class MessageDeduplicatorUseCaseTest {
                 externalId = null
             )
 
-            val deduplicatedMessages = messageDeduplicatorUseCase.execute(
+            val deduplicatedMessages = messageDeduplicationUseCase.execute(
                 chatId = chatId,
                 messages = listOf(this)
             )
@@ -93,7 +93,7 @@ class MessageDeduplicatorUseCaseTest {
                 externalId = null
             )
 
-            val deduplicatedMessages = messageDeduplicatorUseCase.execute(
+            val deduplicatedMessages = messageDeduplicationUseCase.execute(
                 chatId = chatId,
                 messages = listOf(this)
             )
@@ -124,7 +124,7 @@ class MessageDeduplicatorUseCaseTest {
             externalId = null
         )
 
-        val deduplicatedMessages = messageDeduplicatorUseCase.execute(
+        val deduplicatedMessages = messageDeduplicationUseCase.execute(
             chatId = chatId,
             messages = messages
         )
@@ -157,12 +157,42 @@ class MessageDeduplicatorUseCaseTest {
             externalId = null
         )
 
-        val deduplicatedMessages = messageDeduplicatorUseCase.execute(
+        val deduplicatedMessages = messageDeduplicationUseCase.execute(
             chatId = chatId,
             messages = messages
         )
 
         Assertions.assertArrayEquals(expected, deduplicatedMessages.toTypedArray())
+
+    }
+
+
+    @Test
+    fun `when first message is after last message saved should return all messages`() {
+        val now = LocalDateTime.of(2023, 1, 1, 1, 2)
+        val messages = (0..10000).map {
+            NewMessageInput(
+                authorName = "Beltrano",
+                createdAt = now.plusMinutes(it.toLong()),
+                chatId = chatId,
+                content = "Bla bla bla bla"
+            )
+        }
+
+
+        every { chatRepository.findLastMessageByChatId(chatId) } returns Message(
+            author = Author(name = "Beltrano", type = AuthorType.USER),
+            createdAt = LocalDateTime.of(2023, 1, 1, 1, 1),
+            content = Content(text = "Bla bla bla bla bla"),
+            externalId = null
+        )
+
+        val deduplicatedMessages = messageDeduplicationUseCase.execute(
+            chatId = chatId,
+            messages = messages
+        )
+
+        Assertions.assertArrayEquals(messages.toTypedArray(), deduplicatedMessages.toTypedArray())
 
     }
 

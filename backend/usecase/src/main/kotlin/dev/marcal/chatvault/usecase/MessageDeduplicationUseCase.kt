@@ -6,7 +6,7 @@ import dev.marcal.chatvault.usecase.mapper.toMessageDomain
 import org.springframework.stereotype.Service
 
 @Service
-class MessageDeduplicatorUseCase(
+class MessageDeduplicationUseCase(
     private val chatRepository: ChatRepository
 ) {
 
@@ -21,19 +21,19 @@ class MessageDeduplicatorUseCase(
             if (lastInput == lastSaved || lastInput.createdAt < lastSaved.createdAt) return emptyList()
         }
 
+        messages[0].toMessageDomain(chatBucketInfo).also { firstInput ->
+            if (firstInput.createdAt > lastSaved.createdAt) return messages
+        }
 
         var low = 0
         var high = messages.size - 1
-        var continueLoop = true
         var cont = 1
 
-
-        while (continueLoop) {
+        while (true) {
             println("${cont++} passada")
             val middle = (low + high).ushr(1)
             if (middle == low) {
-                continueLoop = false
-                continue
+                break
             }
             val middleMessage = messages[middle].toMessageDomain(chatBucketInfo)
 
