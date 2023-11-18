@@ -2,10 +2,16 @@ package dev.marcal.chatvault.model
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 
 
 object MessageParser {
-    private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    private val formatter: DateTimeFormatter = DateTimeFormatterBuilder()
+        .parseCaseSensitive()
+        .appendPattern("[dd.MM.yyyy][dd.MM.yy]")
+        .optionalStart().appendPattern("[,][.]").optionalEnd()
+        .appendPattern("[hh:mma][HH:mm]")
+        .toFormatter()
 
     private const val DATE_REGEX_TEXT =
         "^(\\d{2,4}[-/.]\\d{2,4}[-/.]\\d{2,4}[,.]? \\d{2}:\\d{2}\\s?([aA][mM]|[pP][mM])?)"
@@ -18,9 +24,8 @@ object MessageParser {
         return transform(parse(text))
     }
 
-    fun extractDate(text: String): LocalDateTime? {
-        val dateMatcher = onlyDate.find(text)
-        return dateMatcher?.value?.let { LocalDateTime.parse(it, formatter) }
+    fun parseDate(text: String): LocalDateTime {
+        return text.replace("[.\\s,\\-/]+".toRegex(), ".").let { LocalDateTime.parse(it, formatter) }
     }
 
     fun extractTextDate(text: String): String? {
@@ -58,16 +63,16 @@ object MessageParser {
         text: String
     ): Triple<LocalDateTime, String?, String> {
         return dateWithNameRegex.find(firstLine)?.let { result ->
-            val date = result.groupValues[1].trim().let { LocalDateTime.parse(it, formatter) }
+            val date = parseDate(result.groupValues[1])
             val name = result.groupValues[3].trim()
             val content = result.groupValues[4].trim()
             Triple(date, name, removePrefix(content))
         } ?: dateWithoutNameRegex.find(text)?.let { result ->
-            val date = result.groupValues[1].trim().let { LocalDateTime.parse(it, formatter) }
+            val date = parseDate(result.groupValues[1])
             val content = result.groupValues[3].trim()
             Triple(date, null, removePrefix(content))
 
-        } ?: throw IllegalStateException("situaão inesperada para a linha $firstLine")
+        } ?: throw IllegalStateException("unexpected situation for the line $firstLine")
     }
 
     private fun removePrefix(content: String): String {

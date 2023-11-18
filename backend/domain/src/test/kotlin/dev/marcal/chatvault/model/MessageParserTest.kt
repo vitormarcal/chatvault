@@ -191,5 +191,17 @@ class MessageParserTest {
         }
     }
 
+    @Test
+    fun `must parse date string with order dd mm yy(yy) to localdatetime`() {
+
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/11/2023 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/11/2023, 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/11/23, 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16.11.23. 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16. 11. 23. 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/ 11/ 23/ 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16-11-23 18:44"))
+    }
+
 
 }
