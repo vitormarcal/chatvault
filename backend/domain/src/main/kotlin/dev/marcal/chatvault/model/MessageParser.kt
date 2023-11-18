@@ -1,20 +1,17 @@
 package dev.marcal.chatvault.model
 
 import java.time.LocalDateTime
-import java.time.Year
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.ResolverStyle
-import java.time.temporal.ChronoField
-import java.util.*
 
 
 object MessageParser {
     private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
-    private val dateWithoutNameRegex = "^(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}) - (.*)$".toRegex()
-    private val dateWithNameRegex = "^(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}) - ([^:]+): (.+)$".toRegex()
-    private val onlyDate = "^(\\d{2,4}[-/.]\\d{2,4}[-/.]\\d{2,4}[,.]? \\d{2}:\\d{2}\\s?([aA][mM]|[pP][mM])?)".toRegex()
+    private const val DATE_REGEX_TEXT =
+        "^(\\d{2,4}[-/.]\\d{2,4}[-/.]\\d{2,4}[,.]? \\d{2}:\\d{2}\\s?([aA][mM]|[pP][mM])?)"
+    private val dateWithoutNameRegex = "$DATE_REGEX_TEXT - (.*)$".toRegex()
+    private val dateWithNameRegex = "$DATE_REGEX_TEXT - ([^:]+): (.+)$".toRegex()
+    private val onlyDate = DATE_REGEX_TEXT.toRegex()
     private val attachmentNameRegex = "^(.*?)\\s+\\((.*?)\\)$".toRegex()
 
     fun <R> parse(text: String, transform: (Message) -> R): R {
@@ -34,14 +31,14 @@ object MessageParser {
     private fun parse(
         text: String
     ): Message {
-        val (firstLine, textMessage) = text.split("\n").let {lines ->
+        val (firstLine, textMessage) = text.split("\n").let { lines ->
             lines.first() to lines.drop(1).joinToString("\n")
         }
         val (date, name, firstLineMessage) = extractDateNameFirstLineMessage(firstLine, text)
 
         val content = (firstLineMessage + (textMessage.takeIf { it.isNotEmpty() }?.let { "\n" + it } ?: ""))
 
-        val attachment= attachmentNameRegex.find(firstLineMessage)?.groupValues?.get(1)?.let {
+        val attachment = attachmentNameRegex.find(firstLineMessage)?.groupValues?.get(1)?.let {
             Attachment(name = it, bucket = Bucket("/"))
         }
 
@@ -50,7 +47,7 @@ object MessageParser {
                 name = "",
                 type = AuthorType.SYSTEM
             ),
-            content = Content(text = removeTrailingNulls(content) , attachment = attachment),
+            content = Content(text = removeTrailingNulls(content), attachment = attachment),
             createdAt = date,
             externalId = null
         )
@@ -62,12 +59,12 @@ object MessageParser {
     ): Triple<LocalDateTime, String?, String> {
         return dateWithNameRegex.find(firstLine)?.let { result ->
             val date = result.groupValues[1].trim().let { LocalDateTime.parse(it, formatter) }
-            val name = result.groupValues[2].trim()
-            val content = result.groupValues[3].trim()
+            val name = result.groupValues[3].trim()
+            val content = result.groupValues[4].trim()
             Triple(date, name, removePrefix(content))
         } ?: dateWithoutNameRegex.find(text)?.let { result ->
             val date = result.groupValues[1].trim().let { LocalDateTime.parse(it, formatter) }
-            val content = result.groupValues[2].trim()
+            val content = result.groupValues[3].trim()
             Triple(date, null, removePrefix(content))
 
         } ?: throw IllegalStateException("situaão inesperada para a linha $firstLine")
@@ -76,6 +73,7 @@ object MessageParser {
     private fun removePrefix(content: String): String {
         return content.removePrefix("\u200E")
     }
+
     private fun removeTrailingNulls(content: String): String {
         return content.filterNot { it == '\u0000' }
     }
