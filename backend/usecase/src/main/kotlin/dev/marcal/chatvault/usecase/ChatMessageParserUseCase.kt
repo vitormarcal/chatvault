@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.time.LocalDateTime
 
 @Service
 class ChatMessageParserUseCase(
 ) : ChatMessageParser {
+
+    private val messageParser = MessageParser()
     override fun <R> parseAndTransform(
         inputStream: InputStream,
         transformIn: (MessageOutput) -> R
@@ -35,7 +36,7 @@ class ChatMessageParserUseCase(
 
     override fun parse(inputStream: InputStream): Flow<MessageOutput> {
         return sequenceOfTextMessage(inputStream)
-            .map { messageText -> MessageParser.parse(messageText) { it.toOutput() } }
+            .map { messageText -> messageParser.parse(messageText) { it.toOutput() } }
     }
 
     private fun sequenceOfTextMessage(inputStream: InputStream): Flow<String> {
@@ -46,7 +47,7 @@ class ChatMessageParserUseCase(
 
             reader.forEachLine { line ->
 
-                MessageParser.extractTextDate(line)?.let { lineDate ->
+                messageParser.extractTextDate(line)?.let { lineDate ->
                     if (currentDate != null && currentLines.isNotEmpty()) {
                         trySendBlocking(currentLines)
                     }

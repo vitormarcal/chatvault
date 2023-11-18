@@ -18,7 +18,7 @@ class ChatMessageParserUseCaseTest {
                 author = "",
                 authorType = "SYSTEM",
                 attachmentName = null,
-                createdAt = LocalDateTime.of(2023, 8, 3, 18, 16),
+                createdAt = LocalDateTime.of(2023, 8, 13, 18, 16),
                 content = "As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
             ),
             MessageOutput(
@@ -48,7 +48,7 @@ class ChatMessageParserUseCaseTest {
         )
 
         val inputStream = """
-            03/08/2023 18:16 - As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais.
+            13/08/2023 18:16 - As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais.
             13/08/2023 17:45 - Fulano: Que lindooos. Feliz dia dos pais, Beltrano!
             13/08/2023 18:24 - Beltrano: Opa, vlw Fulano !🙃
             19/09/2023 23:03 - Fulano: Eita

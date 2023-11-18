@@ -2,6 +2,7 @@ package dev.marcal.chatvault.model
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
 
 class MessageParserTest {
@@ -10,11 +11,11 @@ class MessageParserTest {
     @Test
     fun `should return a system message`() {
         val line =
-            "03/08/2023 18:16 - As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
+            "15/08/2023 18:16 - As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
 
-        val message = MessageParser.parse(line) { it }
+        val message = MessageParser().parse(line) { it }
         val expected = Message(
-            createdAt = LocalDateTime.of(2023, 8, 3, 18, 16),
+            createdAt = LocalDateTime.of(2023, 8, 15, 18, 16),
             author = Author(
                 name = "",
                 type = AuthorType.SYSTEM
@@ -36,7 +37,7 @@ class MessageParserTest {
         val line =
             "13/08/2023 18:24 - Beltrano: Opa, vlw Fulano !\uD83D\uDE43"
 
-        val message = MessageParser.parse(line) { it }
+        val message = MessageParser().parse(line) { it }
         val expected = Message(
             createdAt = LocalDateTime.of(2023, 8, 13, 18, 24),
             author = Author(
@@ -63,7 +64,7 @@ class MessageParserTest {
             Hahahahah
         """.trimIndent()
 
-        val message = MessageParser.parse(line) { it }
+        val message = MessageParser().parse(line) { it }
         val expected = Message(
             createdAt = LocalDateTime.of(2023, 9, 19, 22, 58),
             author = Author(
@@ -87,7 +88,7 @@ class MessageParserTest {
             ""
 
         org.junit.jupiter.api.assertThrows<IllegalStateException> {
-            val message = MessageParser.parse(line) { it }
+            val message = MessageParser().parse(line) { it }
             throw UnsupportedOperationException("test error returns $message")
         }
 
@@ -99,7 +100,7 @@ class MessageParserTest {
             """
                 22/09/2023 13:33 - Beltrano: ‎IMG-20230922-WA0006.jpg (arquivo anexado)
             """.trimIndent()
-        val message = MessageParser.parse(line) { it }
+        val message = MessageParser().parse(line) { it }
         val expected = Message(
             createdAt = LocalDateTime.of(2023, 9, 22, 13, 33),
             author = Author(
@@ -124,7 +125,7 @@ class MessageParserTest {
             """
                 22/09/2023 13:33 - Beltrano: ‎IMG-20230922-WA0006.jpg (arquivo anexado) conforme anexo anterior
             """.trimIndent()
-        val message = MessageParser.parse(line) { it }
+        val message = MessageParser().parse(line) { it }
         val expected = Message(
             createdAt = LocalDateTime.of(2023, 9, 22, 13, 33),
             author = Author(
@@ -150,7 +151,7 @@ class MessageParserTest {
                 22/09/2023 13:33 - Beltrano: ‎IMG-20230922-WA0006.jpg (arquivo anexado)
                 Esse é  um teste
             """.trimIndent()
-        val message = MessageParser.parse(line) { it }
+        val message = MessageParser().parse(line) { it }
         val expected = Message(
             createdAt = LocalDateTime.of(2023, 9, 22, 13, 33),
             author = Author(
@@ -180,27 +181,62 @@ class MessageParserTest {
             "16.11.23, 18:44",
             "2023.11.16, 18:44",
         ).forEach {
-            assertEquals(it, MessageParser.extractTextDate(it))
-            assertEquals(it, MessageParser.extractTextDate("${it}xyz"))
-            assertEquals(null, MessageParser.extractTextDate("xyz${it}xyz"))
-            assertEquals(null, MessageParser.extractTextDate("xyz ${it}xyz"))
-            assertEquals("$it am", MessageParser.extractTextDate("$it am"))
-            assertEquals("${it}am", MessageParser.extractTextDate("${it}am"))
-            assertEquals("$it pm", MessageParser.extractTextDate("$it pm"))
-            assertEquals("${it}pm", MessageParser.extractTextDate("${it}pm"))
+            assertEquals(it, MessageParser().extractTextDate(it))
+            assertEquals(it, MessageParser().extractTextDate("${it}xyz"))
+            assertEquals(null, MessageParser().extractTextDate("xyz${it}xyz"))
+            assertEquals(null, MessageParser().extractTextDate("xyz ${it}xyz"))
+            assertEquals("$it am", MessageParser().extractTextDate("$it am"))
+            assertEquals("${it}am", MessageParser().extractTextDate("${it}am"))
+            assertEquals("$it pm", MessageParser().extractTextDate("$it pm"))
+            assertEquals("${it}pm", MessageParser().extractTextDate("${it}pm"))
         }
     }
 
     @Test
     fun `must parse date string with order dd mm yy(yy) to localdatetime`() {
 
-        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/11/2023 18:44"))
-        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/11/2023, 18:44"))
-        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/11/23, 18:44"))
-        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16.11.23. 18:44"))
-        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16. 11. 23. 18:44"))
-        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16/ 11/ 23/ 18:44"))
-        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser.parseDate("16-11-23 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16/11/2023 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16/11/2023, 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16/11/23, 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16.11.23. 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16. 11. 23. 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16/ 11/ 23/ 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16-11-23 18:44"))
+    }
+
+
+    @Test
+    fun `based on previous resolved dates, should resolve ambiguity`() {
+        MessageParser().apply {
+            assertEquals(LocalDateTime.of(2023, 1, 16, 18, 44), this.parseDate("01/16/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("01/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44), this.parseDate("02/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44), this.parseDate("03/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("04/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("05/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("06/01/2023 18:44"))
+
+            assertEquals(LocalDateTime.of(2023, 1, 16, 18, 44), this.parseDate("16/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("01/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44), this.parseDate("01/02/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44), this.parseDate("01/03/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("01/04/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("01/05/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("01/06/2023 18:44"))
+        }
+
+    }
+
+    @Test
+    fun `If there was no previous resolution of ambiguity, throw an exception when ambiguity occurs`() {
+        MessageParser().apply {
+            assertThrows<RuntimeException> { this.parseDate("01/01/2023 18:44") }
+            assertThrows<RuntimeException> { this.parseDate("02/01/2023 18:44") }
+            assertThrows<RuntimeException> { this.parseDate("01/03/2023 18:44") }
+            assertThrows<RuntimeException> { this.parseDate("01/04/2023 18:44") }
+            assertThrows<RuntimeException> { this.parseDate("05/04/2023 18:44") }
+        }
+
     }
 
 

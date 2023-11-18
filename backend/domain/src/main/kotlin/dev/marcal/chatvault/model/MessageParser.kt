@@ -5,27 +5,46 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 
 
-object MessageParser {
-    private val formatter: DateTimeFormatter = DateTimeFormatterBuilder()
-        .parseCaseSensitive()
-        .appendPattern("[dd.MM.yyyy][dd.MM.yy]")
-        .optionalStart().appendPattern("[,][.]").optionalEnd()
-        .appendPattern("[hh:mma][HH:mm]")
-        .toFormatter()
+class MessageParser {
+    private val firstComesTheDayFormatter: DateTimeFormatter = buildWithPattern("[dd.MM.yyyy][dd.MM.yy]")
+    private val firstComesTheMonthFormatter: DateTimeFormatter = buildWithPattern("[MM.dd.yyyy][MM.dd.yy]")
 
-    private const val DATE_REGEX_TEXT =
+    private var lastUsed: DateTimeFormatter? = null
+
+    private val dateRegexText =
         "^(\\d{2,4}[-/.]\\d{2,4}[-/.]\\d{2,4}[,.]? \\d{2}:\\d{2}\\s?([aA][mM]|[pP][mM])?)"
-    private val dateWithoutNameRegex = "$DATE_REGEX_TEXT - (.*)$".toRegex()
-    private val dateWithNameRegex = "$DATE_REGEX_TEXT - ([^:]+): (.+)$".toRegex()
-    private val onlyDate = DATE_REGEX_TEXT.toRegex()
+    private val dateWithoutNameRegex = "$dateRegexText - (.*)$".toRegex()
+    private val dateWithNameRegex = "$dateRegexText - ([^:]+): (.+)$".toRegex()
+    private val onlyDate = dateRegexText.toRegex()
     private val attachmentNameRegex = "^(.*?)\\s+\\((.*?)\\)$".toRegex()
 
     fun <R> parse(text: String, transform: (Message) -> R): R {
         return transform(parse(text))
     }
 
+    private fun buildWithPattern(pattern: String): DateTimeFormatter {
+        return DateTimeFormatterBuilder().parseCaseSensitive().appendPattern(pattern).optionalStart()
+            .appendPattern("[,][.]").optionalEnd().appendPattern("[hh:mma][HH:mm]").toFormatter()
+    }
+
     fun parseDate(text: String): LocalDateTime {
-        return text.replace("[.\\s,\\-/]+".toRegex(), ".").let { LocalDateTime.parse(it, formatter) }
+        return text.replace("[.\\s,\\-/]+".toRegex(), ".").let {
+            val groups = it.split(".")
+            if (groups[0].toInt() > 12) {
+                lastUsed = firstComesTheDayFormatter
+                it to firstComesTheDayFormatter
+            } else if (groups[1].toInt() > 12) {
+                lastUsed = firstComesTheMonthFormatter
+                it to firstComesTheMonthFormatter
+            } else {
+                if (lastUsed == null) {
+                    throw RuntimeException("there is ambiguity in the date, it is not possible to know which value is the day and which is the month $text")
+                } else {
+                    it to lastUsed
+                }
+            }
+
+        }.let { (text, formatter) -> LocalDateTime.parse(text, formatter) }
     }
 
     fun extractTextDate(text: String): String? {
@@ -47,20 +66,16 @@ object MessageParser {
             Attachment(name = it, bucket = Bucket("/"))
         }
 
-        return Message(
-            author = name?.let { Author(name = it, type = AuthorType.USER) } ?: Author(
-                name = "",
-                type = AuthorType.SYSTEM
-            ),
+        return Message(author = name?.let { Author(name = it, type = AuthorType.USER) } ?: Author(
+            name = "", type = AuthorType.SYSTEM
+        ),
             content = Content(text = removeTrailingNulls(content), attachment = attachment),
             createdAt = date,
-            externalId = null
-        )
+            externalId = null)
     }
 
     private fun extractDateNameFirstLineMessage(
-        firstLine: String,
-        text: String
+        firstLine: String, text: String
     ): Triple<LocalDateTime, String?, String> {
         return dateWithNameRegex.find(firstLine)?.let { result ->
             val date = parseDate(result.groupValues[1])
