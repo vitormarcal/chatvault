@@ -41,12 +41,12 @@ class ChatMessageParserUseCase(
     private fun sequenceOfTextMessage(inputStream: InputStream): Flow<String> {
         val message = callbackFlow {
             val reader = BufferedReader(InputStreamReader(inputStream))
-            var currentDate: LocalDateTime? = null
+            var currentDate: String? = null
             var currentLines = StringBuilder()
 
             reader.forEachLine { line ->
 
-                MessageParser.extractDate(line)?.let { lineDate ->
+                MessageParser.extractTextDate(line)?.let { lineDate ->
                     if (currentDate != null && currentLines.isNotEmpty()) {
                         trySendBlocking(currentLines)
                     }
