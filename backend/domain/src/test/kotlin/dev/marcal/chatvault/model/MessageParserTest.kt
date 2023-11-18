@@ -167,5 +167,29 @@ class MessageParserTest {
         assertEquals(expected, message)
     }
 
+    @Test
+    fun `must identify date in the such format `() {
+
+        listOf(
+            "16/11/2023 18:44",
+            "16/11/2023, 18:44",
+            "11/16/23, 18:44",
+            "23/16/11, 18:44",
+            "16.11.23. 18:44",
+            "16.11.2023. 18:44",
+            "16.11.23, 18:44",
+            "2023.11.16, 18:44",
+        ).forEach {
+            assertEquals(it, MessageParser.extractTextDate(it))
+            assertEquals(it, MessageParser.extractTextDate("${it}xyz"))
+            assertEquals(null, MessageParser.extractTextDate("xyz${it}xyz"))
+            assertEquals(null, MessageParser.extractTextDate("xyz ${it}xyz"))
+            assertEquals("$it am", MessageParser.extractTextDate("$it am"))
+            assertEquals("${it}am", MessageParser.extractTextDate("${it}am"))
+            assertEquals("$it pm", MessageParser.extractTextDate("$it pm"))
+            assertEquals("${it}pm", MessageParser.extractTextDate("${it}pm"))
+        }
+    }
+
 
 }

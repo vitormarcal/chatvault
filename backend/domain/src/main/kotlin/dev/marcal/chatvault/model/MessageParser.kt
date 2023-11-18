@@ -1,7 +1,12 @@
 package dev.marcal.chatvault.model
 
 import java.time.LocalDateTime
+import java.time.Year
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.ResolverStyle
+import java.time.temporal.ChronoField
+import java.util.*
 
 
 object MessageParser {
@@ -9,7 +14,7 @@ object MessageParser {
 
     private val dateWithoutNameRegex = "^(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}) - (.*)$".toRegex()
     private val dateWithNameRegex = "^(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}) - ([^:]+): (.+)$".toRegex()
-    private val onlyDate = "\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}".toRegex()
+    private val onlyDate = "^(\\d{2,4}[-/.]\\d{2,4}[-/.]\\d{2,4}[,.]? \\d{2}:\\d{2}\\s?([aA][mM]|[pP][mM])?)".toRegex()
     private val attachmentNameRegex = "^(.*?)\\s+\\((.*?)\\)$".toRegex()
 
     fun <R> parse(text: String, transform: (Message) -> R): R {
@@ -19,6 +24,11 @@ object MessageParser {
     fun extractDate(text: String): LocalDateTime? {
         val dateMatcher = onlyDate.find(text)
         return dateMatcher?.value?.let { LocalDateTime.parse(it, formatter) }
+    }
+
+    fun extractTextDate(text: String): String? {
+        val dateMatcher = onlyDate.find(text)
+        return dateMatcher?.value
     }
 
     private fun parse(
