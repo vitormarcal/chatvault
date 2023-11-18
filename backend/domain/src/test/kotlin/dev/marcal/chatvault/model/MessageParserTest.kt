@@ -189,6 +189,9 @@ class MessageParserTest {
             assertEquals("${it}am", MessageParser().extractTextDate("${it}am"))
             assertEquals("$it pm", MessageParser().extractTextDate("$it pm"))
             assertEquals("${it}pm", MessageParser().extractTextDate("${it}pm"))
+            assertEquals("[${it}pm]", MessageParser().extractTextDate("[${it}pm]"))
+            assertEquals("[${it}am]", MessageParser().extractTextDate("[${it}am]"))
+            assertEquals("[${it}]", MessageParser().extractTextDate("[${it}]"))
         }
     }
 
