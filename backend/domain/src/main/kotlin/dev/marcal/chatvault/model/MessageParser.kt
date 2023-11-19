@@ -30,7 +30,7 @@ class MessageParser(pattern: String? = null) {
 
     fun parseDate(text: String): LocalDateTime {
         if (customFormatter != null) {
-            return LocalDateTime.parse(text)
+            return LocalDateTime.parse(text, customFormatter)
         }
         return tryToInfer(text)
     }

@@ -231,6 +231,37 @@ class MessageParserTest {
     }
 
     @Test
+    fun `should use custom date pattern `() {
+        MessageParser("MM/dd/yyyy HH:mm").apply {
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("01/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44), this.parseDate("02/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44), this.parseDate("03/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("04/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("05/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("06/01/2023 18:44"))
+        }
+
+        MessageParser("dd/MM/yyyy HH:mm").apply {
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("01/01/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44), this.parseDate("01/02/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44), this.parseDate("01/03/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("01/04/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("01/05/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("01/06/2023 18:44"))
+        }
+
+        MessageParser(" dd*MM*yyyy***hh:mm**a ").apply {
+            assertEquals(LocalDateTime.of(2023, 1, 1, 10, 44), this.parseDate(" 01*01*2023***10:44**AM "))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 10, 44), this.parseDate(" 01*02*2023***10:44**AM "))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 10, 44), this.parseDate(" 01*03*2023***10:44**AM "))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 10, 44), this.parseDate(" 01*04*2023***10:44**AM "))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 10, 44), this.parseDate(" 01*05*2023***10:44**AM "))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 10, 44), this.parseDate(" 01*06*2023***10:44**AM "))
+        }
+
+    }
+
+    @Test
     fun `If there was no previous resolution of ambiguity, throw an exception when ambiguity occurs`() {
         MessageParser().apply {
             assertThrows<RuntimeException> { this.parseDate("01/01/2023 18:44") }
