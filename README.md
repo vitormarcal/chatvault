@@ -44,7 +44,7 @@ There are docker image packages on github. You can download the latest image wit
 `docker pull ghcr.io/vitormarcal/chatvault:latest`
 
 ### Environment variables
-For docker replace, the variables must be in upper case and where is "." it must be "_":
+For docker,  the variables must be in upper case and where is "." it must be "_":
 `some.environment.variable` is like `SOME_ENVIRONMENT_VARIABLE` in docker
 
 | Environment variables                     | obs                        | example                                            |
