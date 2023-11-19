@@ -5,7 +5,8 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 
 
-class MessageParser {
+class MessageParser(pattern: String? = null) {
+    private val customFormatter: DateTimeFormatter? = pattern?.let { DateTimeFormatter.ofPattern(it) }
     private val firstComesTheDayFormatter: DateTimeFormatter = buildWithPattern("[dd.MM.yyyy][dd.MM.yy]")
     private val firstComesTheMonthFormatter: DateTimeFormatter = buildWithPattern("[MM.dd.yyyy][MM.dd.yy]")
 
@@ -28,23 +29,29 @@ class MessageParser {
     }
 
     fun parseDate(text: String): LocalDateTime {
-        return text.replace("[.\\s,\\-/]+".toRegex(), ".").let {
+        if (customFormatter != null) {
+            return LocalDateTime.parse(text)
+        }
+        return tryToInfer(text)
+    }
+
+    private fun tryToInfer(text: String): LocalDateTime {
+        text.replace("[.\\s,\\-/]+".toRegex(), ".").let {
             val groups = it.split(".")
             if (groups[0].toInt() > 12) {
                 lastUsed = firstComesTheDayFormatter
-                it to firstComesTheDayFormatter
+                return LocalDateTime.parse(it, firstComesTheDayFormatter)
             } else if (groups[1].toInt() > 12) {
                 lastUsed = firstComesTheMonthFormatter
-                it to firstComesTheMonthFormatter
+                return LocalDateTime.parse(it, firstComesTheMonthFormatter)
             } else {
                 if (lastUsed == null) {
                     throw RuntimeException("there is ambiguity in the date, it is not possible to know which value is the day and which is the month $text")
                 } else {
-                    it to lastUsed
+                    return LocalDateTime.parse(it, lastUsed)
                 }
             }
-
-        }.let { (text, formatter) -> LocalDateTime.parse(text, formatter) }
+        }
     }
 
     fun extractTextDate(text: String): String? {
