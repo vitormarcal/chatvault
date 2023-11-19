@@ -42,3 +42,27 @@ You can use compose.yml to create a database and build the frontend and backend 
 There are docker image packages on github. You can download the latest image with: 
 
 `docker pull ghcr.io/vitormarcal/chatvault:latest`
+
+### Environment variables
+For docker replace, the variables must be in upper case and where is "." it must be "_":
+`some.environment.variable` is like `SOME_ENVIRONMENT_VARIABLE` in docker
+
+| Environment variables                     | obs                        | example                                            |
+|-------------------------------------------|----------------------------|----------------------------------------------------|
+| Database                                  | required                   |                                                    |
+| spring.datasource.url                     | required                   | jdbc:postgresql://database_host:5432/database_name |
+| spring.datasource.username                | required                   | user                                               |
+| spring.datasource.password                | required                   | secret                                             |
+| --------------------------                | -------------------------- | ---------                                          |
+| Email import                              | feat not required          |                                                    |
+| app.email.enabled                         | not required               | true                                               |
+| app.email.host                            | required  to feat          | imap.server.com                                    |
+| app.email.password                        | required  to feat          | secret                                             |
+| app.email.port                            | required  to feat          | 993                                                |
+| app.email.username                        | required  to feat          | someuser                                           |
+| app.email.debug                           | not required               | true                                               |
+| --------------------------                |                            | --------------------------                         |
+| chatvault.host                            | not required               | https://somehost.com ,http://localhost:3000        |
+| spring.servlet.multipart.max-file-size    | not required               | 500MB                                              |
+| spring.servlet.multipart.max-request-size | not required               | 500MB                                              |
+------
