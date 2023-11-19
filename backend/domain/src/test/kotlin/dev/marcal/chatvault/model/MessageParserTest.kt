@@ -205,6 +205,7 @@ class MessageParserTest {
         assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16. 11. 23. 18:44"))
         assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16/ 11/ 23/ 18:44"))
         assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16-11-23 18:44"))
+        assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("[16-11-23 18:44]"))
     }
 
 
@@ -248,6 +249,24 @@ class MessageParserTest {
             assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("01/04/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("01/05/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("01/06/2023 18:44"))
+        }
+
+        MessageParser("[dd/MM/yyyy HH:mm]").apply {
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("[01/01/2023 18:44]"))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44), this.parseDate("[01/02/2023 18:44]"))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44), this.parseDate("[01/03/2023 18:44]"))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("[01/04/2023 18:44]"))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("[01/05/2023 18:44]"))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("[01/06/2023 18:44]"))
+        }
+
+        MessageParser("[dd][MM][yyyy][HH]:[mm]").apply {
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("[01][01][2023][18]:[44]"))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44), this.parseDate("[01][02][2023][18]:[44]"))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44), this.parseDate("[01][03][2023][18]:[44]"))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("[01][04][2023][18]:[44]"))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("[01][05][2023][18]:[44]"))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("[01][06][2023][18]:[44]"))
         }
 
         MessageParser(" dd*MM*yyyy***hh:mm**a ").apply {
