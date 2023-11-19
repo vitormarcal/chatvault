@@ -1,13 +1,14 @@
 package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
+import dev.marcal.chatvault.model.MessageParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class ChatMessageParserUseCaseTest {
 
-    private val chatMessageParser = ChatMessageParserUseCase()
+    private val chatMessageParser = ChatMessageParserUseCase(MessageParser())
 
     @Test
     fun `when receive input stream should build messages`() {
@@ -63,7 +64,7 @@ class ChatMessageParserUseCaseTest {
 
     @Test
     fun `when using custom pattern and receive input stream should build messages`() {
-        val chatMessageParser = ChatMessageParserUseCase("[dd/MM/yyyy HH:mm]")
+        val chatMessageParser = ChatMessageParserUseCase(MessageParser("[dd/MM/yyyy HH:mm]"))
         val expected = listOf(
             MessageOutput(
                 id = null,

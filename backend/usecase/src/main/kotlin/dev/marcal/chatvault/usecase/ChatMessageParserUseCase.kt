@@ -19,10 +19,9 @@ import java.io.InputStreamReader
 
 @Service
 class ChatMessageParserUseCase(
-    @Value("\${chatvault.msgparser.dateformat}")  localDateTimePattern: String? = null
+    private val messageParser: MessageParser
 ) : ChatMessageParser {
 
-    private val messageParser = MessageParser(localDateTimePattern)
     override fun <R> parseAndTransform(
         inputStream: InputStream,
         transformIn: (MessageOutput) -> R
