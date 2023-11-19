@@ -62,6 +62,58 @@ class ChatMessageParserUseCaseTest {
     }
 
     @Test
+    fun `when using custom pattern and receive input stream should build messages`() {
+        val chatMessageParser = ChatMessageParserUseCase("[dd/MM/yyyy HH:mm]")
+        val expected = listOf(
+            MessageOutput(
+                id = null,
+                author = "",
+                authorType = "SYSTEM",
+                attachmentName = null,
+                createdAt = LocalDateTime.of(2023, 8, 13, 18, 16),
+                content = "As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
+            ),
+            MessageOutput(
+                id = null,
+                author = "Fulano",
+                authorType = "USER",
+                attachmentName = null,
+                createdAt = LocalDateTime.of(2023, 8, 13, 17, 45),
+                content = "Que lindooos. Feliz dia dos pais, Beltrano!"
+            ),
+            MessageOutput(
+                id = null,
+                author = "Beltrano",
+                authorType = "USER",
+                attachmentName = null,
+                createdAt = LocalDateTime.of(2023, 8, 13, 18, 24),
+                content = "Opa, vlw Fulano !\uD83D\uDE43"
+            ),
+            MessageOutput(
+                id = null,
+                author = "Fulano",
+                authorType = "USER",
+                attachmentName = null,
+                createdAt = LocalDateTime.of(2023, 9, 19, 23, 3),
+                content = "Eita\nEssa ficou bonita"
+            )
+        )
+
+        val inputStream = """
+            [13/08/2023 18:16] - As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais.
+            [13/08/2023 17:45] - Fulano: Que lindooos. Feliz dia dos pais, Beltrano!
+            [13/08/2023 18:24] - Beltrano: Opa, vlw Fulano !🙃
+            [19/09/2023 23:03] - Fulano: Eita
+            Essa ficou bonita
+        """.trimIndent().byteInputStream()
+
+        val list = chatMessageParser.parseToList(inputStream)
+
+
+        assertEquals(expected, list)
+    }
+
+    @Test
     fun `when receive input stream should build message with attachmentName`() {
 
         val expected = listOf(

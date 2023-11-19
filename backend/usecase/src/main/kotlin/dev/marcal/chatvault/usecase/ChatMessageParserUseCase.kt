@@ -19,7 +19,7 @@ import java.io.InputStreamReader
 
 @Service
 class ChatMessageParserUseCase(
-    @Value("\${chatvault.msgparser.dateformat}") private val localDateTimePattern: String? = null
+    @Value("\${chatvault.msgparser.dateformat}")  localDateTimePattern: String? = null
 ) : ChatMessageParser {
 
     private val messageParser = MessageParser(localDateTimePattern)

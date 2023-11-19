@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatterBuilder
 
 class MessageParser(pattern: String? = null) {
     private val customFormatter: DateTimeFormatter? =
-        pattern?.let { DateTimeFormatter.ofPattern(it.replace("[\\[\\]]+".toRegex(), ".")) }
+        pattern?.let { DateTimeFormatter.ofPattern(it.removeBracketsAndTrim()) }
     private val firstComesTheDayFormatter: DateTimeFormatter = buildWithPattern("[dd.MM.yyyy][dd.MM.yy]")
     private val firstComesTheMonthFormatter: DateTimeFormatter = buildWithPattern("[MM.dd.yyyy][MM.dd.yy]")
 
@@ -31,13 +31,13 @@ class MessageParser(pattern: String? = null) {
 
     fun parseDate(text: String): LocalDateTime {
         if (customFormatter != null) {
-            return LocalDateTime.parse(text.replace("[\\[\\]]+".toRegex(), "."), customFormatter)
+            return LocalDateTime.parse(text.removeBracketsAndTrim(), customFormatter)
         }
         return tryToInfer(text)
     }
 
     private fun tryToInfer(text: String): LocalDateTime {
-        text.replace("[\\[\\]]+".toRegex(), "").replace("[.\\s,\\-/]+".toRegex(), ".").let {
+        text.removeBracketsAndTrim().sanitizeWithDots().let {
             val groups = it.split(".")
             if (groups[0].toInt() > 12) {
                 lastUsed = firstComesTheDayFormatter
@@ -106,3 +106,7 @@ class MessageParser(pattern: String? = null) {
         return content.filterNot { it == '\u0000' }
     }
 }
+
+fun String.removeBracketsAndTrim(): String = this.replace("[\\[\\]]+".toRegex(), " ").trim()
+
+fun String.sanitizeWithDots(): String = this.replace("[.\\s,\\-/]+".toRegex(), ".")
