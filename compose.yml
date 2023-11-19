@@ -17,6 +17,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/chatvault
       - SPRING_DATASOURCE_USERNAME=usr_chatvault
       - SPRING_DATASOURCE_PASSWORD=secret
+      - CHATVAULT_MSGPARSER_DATEFORMAT="dd/MM/yyyy HH:mm"
     ports:
       - 8080:8080
     volumes:

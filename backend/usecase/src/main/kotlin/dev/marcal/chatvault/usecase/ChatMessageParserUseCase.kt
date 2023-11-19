@@ -11,15 +11,17 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.time.LocalDateTime
 
 @Service
 class ChatMessageParserUseCase(
+    private val messageParser: MessageParser
 ) : ChatMessageParser {
+
     override fun <R> parseAndTransform(
         inputStream: InputStream,
         transformIn: (MessageOutput) -> R
@@ -35,18 +37,18 @@ class ChatMessageParserUseCase(
 
     override fun parse(inputStream: InputStream): Flow<MessageOutput> {
         return sequenceOfTextMessage(inputStream)
-            .map { messageText -> MessageParser.parse(messageText) { it.toOutput() } }
+            .map { messageText -> messageParser.parse(messageText) { it.toOutput() } }
     }
 
     private fun sequenceOfTextMessage(inputStream: InputStream): Flow<String> {
         val message = callbackFlow {
             val reader = BufferedReader(InputStreamReader(inputStream))
-            var currentDate: LocalDateTime? = null
+            var currentDate: String? = null
             var currentLines = StringBuilder()
 
             reader.forEachLine { line ->
 
-                MessageParser.extractDate(line)?.let { lineDate ->
+                messageParser.extractTextDate(line)?.let { lineDate ->
                     if (currentDate != null && currentLines.isNotEmpty()) {
                         trySendBlocking(currentLines)
                     }

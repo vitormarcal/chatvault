@@ -5,6 +5,7 @@ import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.model.Bucket
 import dev.marcal.chatvault.model.ChatBucketInfo
+import dev.marcal.chatvault.model.MessageParser
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.ChatCreator
 import dev.marcal.chatvault.service.MessageCreator
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class ChatFileImporterUseCaseTest {
-    private val chatMessageParser = ChatMessageParserUseCase()
+    private val chatMessageParser = ChatMessageParserUseCase(MessageParser())
     private val chatRepository: ChatRepository = mockk()
     private val bucketService: BucketService = mockk()
     private val messageCreator: MessageCreator = mockk()
