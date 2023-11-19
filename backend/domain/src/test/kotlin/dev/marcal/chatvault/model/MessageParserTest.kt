@@ -232,6 +232,14 @@ class MessageParserTest {
     }
 
     @Test
+    fun `should parse with days or months with 1 char date pattern `() {
+        MessageParser().apply {
+            assertEquals(LocalDateTime.of(2023, 1, 16, 18, 44), this.parseDate("1/16/2023 18:44"))
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("1/1/2023 18:44"))
+        }
+    }
+
+    @Test
     fun `should use custom date pattern `() {
         MessageParser("MM/dd/yyyy HH:mm").apply {
             assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("01/01/2023 18:44"))

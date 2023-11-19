@@ -14,7 +14,7 @@ class MessageParser(pattern: String? = null) {
     private var lastUsed: DateTimeFormatter? = null
 
     private val dateRegexText =
-        "^(\\[?\\d{2,4}[-/.]\\d{2,4}[-/.]\\d{2,4}[,.]? \\d{2}:\\d{2}\\s?([aA][mM]|[pP][mM])?\\]?)"
+        "^(\\[?\\d{1,4}[-/.]\\d{1,4}[-/.]\\d{1,4}[,.]? \\d{2}:\\d{2}\\s?([aA][mM]|[pP][mM])?\\]?)"
     private val dateWithoutNameRegex = "$dateRegexText - (.*)$".toRegex()
     private val dateWithNameRegex = "$dateRegexText - ([^:]+): (.+)$".toRegex()
     private val onlyDate = dateRegexText.toRegex()
@@ -37,22 +37,25 @@ class MessageParser(pattern: String? = null) {
     }
 
     private fun tryToInfer(text: String): LocalDateTime {
-        text.removeBracketsAndTrim().sanitizeWithDots().let {
-            val groups = it.split(".")
-            if (groups[0].toInt() > 12) {
-                lastUsed = firstComesTheDayFormatter
-                return LocalDateTime.parse(it, firstComesTheDayFormatter)
-            } else if (groups[1].toInt() > 12) {
-                lastUsed = firstComesTheMonthFormatter
-                return LocalDateTime.parse(it, firstComesTheMonthFormatter)
-            } else {
-                if (lastUsed == null) {
-                    throw RuntimeException("there is ambiguity in the date, it is not possible to know which value is the day and which is the month $text")
+        text.removeBracketsAndTrim()
+            .sanitizeWithDots()
+            .let {
+                val groups = it.split(".")
+                val textToParse = groups.dayAndMonthWith2Digits() ?: it
+                if (groups[0].toInt() > 12) {
+                    lastUsed = firstComesTheDayFormatter
+                    return LocalDateTime.parse(textToParse, firstComesTheDayFormatter)
+                } else if (groups[1].toInt() > 12) {
+                    lastUsed = firstComesTheMonthFormatter
+                    return LocalDateTime.parse(textToParse, firstComesTheMonthFormatter)
                 } else {
-                    return LocalDateTime.parse(it, lastUsed)
+                    if (lastUsed == null) {
+                        throw RuntimeException("there is ambiguity in the date, it is not possible to know which value is the day and which is the month $text")
+                    } else {
+                        return LocalDateTime.parse(textToParse, lastUsed)
+                    }
                 }
             }
-        }
     }
 
     fun extractTextDate(text: String): String? {
@@ -110,3 +113,16 @@ class MessageParser(pattern: String? = null) {
 fun String.removeBracketsAndTrim(): String = this.replace("[\\[\\]]+".toRegex(), " ").trim()
 
 fun String.sanitizeWithDots(): String = this.replace("[.\\s,\\-/]+".toRegex(), ".")
+
+fun List<String>.dayAndMonthWith2Digits(): String? {
+
+    val first = if (this[0].length == 1) "0" + this[0] else null
+    val second = if (this[1].length == 1) "0" + this[1] else null
+    if (first == null && second == null) {
+        return null
+    }
+    val mutable = this.toMutableList()
+    first?.let { mutable[0] = it }
+    second?.let { mutable[1] = it }
+    return mutable.joinToString(".")
+}
