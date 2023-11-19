@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.InputStream
@@ -18,9 +19,10 @@ import java.io.InputStreamReader
 
 @Service
 class ChatMessageParserUseCase(
+    @Value("\${chatvault.msgparser.dateformat}") private val localDateTimePattern: String? = null
 ) : ChatMessageParser {
 
-    private val messageParser = MessageParser()
+    private val messageParser = MessageParser(localDateTimePattern)
     override fun <R> parseAndTransform(
         inputStream: InputStream,
         transformIn: (MessageOutput) -> R
