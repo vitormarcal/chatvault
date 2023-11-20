@@ -43,7 +43,7 @@ class WebControllerAdvice : ResponseEntityExceptionHandler() {
         )
     }
 
-    @ExceptionHandler(value = [ChatImporterException::class])
+    @ExceptionHandler(value = [ChatImporterException::class, BucketServiceException::class])
     fun handleInternalServerError(ex: RuntimeException, request: WebRequest): ResponseStatusException {
         log.error("The request failed due to an unexpected error at", ex)
         return ResponseStatusException(

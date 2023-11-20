@@ -12,5 +12,3 @@ interface BucketService {
     fun saveTextToBucket(bucketFile: BucketFile, messages: Sequence<String>)
     fun loadBucketAsZip(path: String): Resource
 }
-
-class BucketServiceException(message: String?, throwable: Throwable?): RuntimeException(message, throwable)

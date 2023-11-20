@@ -2,6 +2,7 @@ package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.app_service.bucket_service.BucketService
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.ChatNotFoundException
 import dev.marcal.chatvault.model.AuthorType
 import dev.marcal.chatvault.model.BucketFile
 import dev.marcal.chatvault.repository.ChatRepository
@@ -23,7 +24,7 @@ class ChatFileExporterUseCase(
 
     override fun execute(chatId: Long): Resource {
         val chatBucketInfo =
-            chatRepository.findChatBucketInfoByChatId(chatId) ?: throw RuntimeException("chatId not found")
+            chatRepository.findChatBucketInfoByChatId(chatId) ?: throw ChatNotFoundException("The export failed. Chat with id $chatId was not found.")
 
         messageFinderByChatId.execute(chatId).map {
             parseToLineText(it)

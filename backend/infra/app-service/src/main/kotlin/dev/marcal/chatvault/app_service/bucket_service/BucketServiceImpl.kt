@@ -2,6 +2,7 @@ package dev.marcal.chatvault.app_service.bucket_service
 
 import dev.marcal.chatvault.in_out_boundary.output.exceptions.AttachmentFinderException
 import dev.marcal.chatvault.in_out_boundary.output.exceptions.AttachmentNotFoundException
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.BucketServiceException
 import dev.marcal.chatvault.model.Bucket
 import dev.marcal.chatvault.model.BucketFile
 import jakarta.annotation.PostConstruct
