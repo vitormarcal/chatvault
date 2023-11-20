@@ -166,8 +166,6 @@ class ChatController(
     fun downloadAttachment(
         @PathVariable("chatId") chatId: Long
     ): ResponseEntity<Sequence<AttachmentInfoOutput>> {
-        attachmentInfoFinderByChatId.execute(chatId)
-
         val cacheControl = CacheControl.maxAge(5, TimeUnit.MINUTES)
 
         return ResponseEntity.ok()
