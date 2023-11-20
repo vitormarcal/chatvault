@@ -12,12 +12,14 @@ import org.springframework.stereotype.Service
 class AttachmentFinderUseCase(
     private val bucketService: BucketService,
     private val chatRepository: ChatRepository
-): AttachmentFinder {
+) : AttachmentFinder {
     override fun execute(criteriaInput: AttachmentCriteriaInput): Resource {
         val message =
-            chatRepository.findMessageBy(chatId = criteriaInput.chatId, messageId = criteriaInput.messageId) ?: throw AttachmentNotFoundException()
+            chatRepository.findMessageBy(chatId = criteriaInput.chatId, messageId = criteriaInput.messageId)
+                ?: throw AttachmentNotFoundException()
 
-        val bucketFile = requireNotNull(message.content.attachment).toBucketFile()
+        val bucketFile = message.content.attachment?.toBucketFile()
+            ?: throw AttachmentNotFoundException("the message exists but there are no attachments linked to it")
 
         return bucketService.loadFileAsResource(bucketFile)
 

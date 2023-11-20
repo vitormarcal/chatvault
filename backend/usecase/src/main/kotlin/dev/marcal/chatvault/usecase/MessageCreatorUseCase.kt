@@ -2,6 +2,7 @@ package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.in_out_boundary.input.NewMessageInput
 import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.ChatNotFoundException
 import dev.marcal.chatvault.model.*
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.MessageCreator
@@ -27,7 +28,7 @@ class MessageCreatorUseCase(
 
     override fun execute(input: NewMessagePayloadInput) {
         val chatBucketInfo =
-            chatRepository.findChatBucketInfoByChatId(input.chatId) ?: throw RuntimeException("chat not found")
+            chatRepository.findChatBucketInfoByChatId(input.chatId) ?: throw ChatNotFoundException("Unable to create a message because the chat ${input.chatId} was not found")
 
         val theMessagePayload = MessagePayload(
             chatId = chatBucketInfo.chatId,
@@ -37,7 +38,7 @@ class MessageCreatorUseCase(
         )
 
         if (theMessagePayload.messages.isEmpty()) {
-            throw RuntimeException("there are no messages to create, message list is empty $theMessagePayload")
+            throw IllegalStateException("there are no messages to create, message list is empty $theMessagePayload")
         }
 
         logger.info("try to save ${theMessagePayload.messages.size} messages, chatInfo=${chatBucketInfo}")

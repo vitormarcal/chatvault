@@ -2,6 +2,8 @@ package dev.marcal.chatvault.app_service.bucket_service
 
 import dev.marcal.chatvault.in_out_boundary.output.exceptions.AttachmentFinderException
 import dev.marcal.chatvault.in_out_boundary.output.exceptions.AttachmentNotFoundException
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.BucketFileNotFoundException
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.BucketServiceException
 import dev.marcal.chatvault.model.Bucket
 import dev.marcal.chatvault.model.BucketFile
 import jakarta.annotation.PostConstruct
@@ -66,13 +68,20 @@ class BucketServiceImpl(
     }
 
     override fun saveTextToBucket(bucketFile: BucketFile, messages: Sequence<String>) {
-        val file = bucketFile.file(bucketRootPath)
-        BufferedWriter(FileWriter(file)).use { writer ->
-            messages.forEach { messageLine ->
-                writer.write(messageLine)
-                writer.newLine()
+        try {
+            val file = bucketFile.file(bucketRootPath)
+            BufferedWriter(FileWriter(file)).use { writer ->
+                messages.forEach { messageLine ->
+                    writer.write(messageLine)
+                    writer.newLine()
+                }
             }
+        } catch (ex: FileNotFoundException) {
+            throw BucketFileNotFoundException("File to save ${bucketFile.fileName}. Bucket chat was not found", ex)
+        } catch (ex: Exception) {
+            throw BucketServiceException("File to save ${bucketFile.fileName}. Unexpected error", ex)
         }
+
     }
 
     override fun loadBucketAsZip(path: String): Resource {

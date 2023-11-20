@@ -4,6 +4,7 @@ import dev.marcal.chatvault.app_service.bucket_service.BucketService
 import dev.marcal.chatvault.in_out_boundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.ChatImporterException
 import dev.marcal.chatvault.model.BucketFile
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.ChatCreator
@@ -61,7 +62,8 @@ class ChatFileImporterUseCase(
 
     private fun iterateOverZip(chatId: Long, inputStream: InputStream) {
         val chatBucketInfo =
-            chatRepository.findChatBucketInfoByChatId(chatId = chatId) ?: throw RuntimeException("chatId not found")
+            chatRepository.findChatBucketInfoByChatId(chatId = chatId)
+                ?: throw ChatImporterException("Chat id $chatId was not found. File import failed.")
         val bucket = chatBucketInfo.bucket.withPath("/")
 
         val zipInputStream = ZipInputStream(BufferedInputStream(inputStream))
@@ -103,6 +105,8 @@ class ChatFileImporterUseCase(
             messageOutput.toNewMessageInput(chatId = chatId)
         }
 
+        val count = chatRepository.countChatMessages(chatId)
+
         messageCreator.execute(
             NewMessagePayloadInput(
                 chatId = chatId,
@@ -110,6 +114,11 @@ class ChatFileImporterUseCase(
                 messages = messages
             )
         )
-        logger.info("imported ${messages.size} messages to chatId=$chatId")
+
+        val countUpdated = chatRepository.countChatMessages(chatId)
+
+        val newMessages = countUpdated - count
+
+        logger.info("imported $newMessages of ${messages.size} messages  to chatId=$chatId")
     }
 }

@@ -2,6 +2,7 @@ package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.app_service.bucket_service.BucketService
 import dev.marcal.chatvault.in_out_boundary.output.exceptions.AttachmentFinderException
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.ChatNotFoundException
 import dev.marcal.chatvault.model.BucketFile
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.ProfileImageManager
@@ -18,7 +19,8 @@ class ProfileImageManagerUseCase(
 ) : ProfileImageManager {
     override fun updateImage(inputStream: InputStream, chatId: Long) {
         val bucketInfo =
-            chatRepository.findChatBucketInfoByChatId(chatId) ?: throw RuntimeException("chatId not found")
+            chatRepository.findChatBucketInfoByChatId(chatId)
+                ?: throw ChatNotFoundException("Unable to update chat image because chat $chatId was not found")
         bucketService.save(
             BucketFile(
                 stream = inputStream,
@@ -30,7 +32,8 @@ class ProfileImageManagerUseCase(
 
     override fun getImage(chatId: Long): Resource {
         val bucketInfo =
-            chatRepository.findChatBucketInfoByChatId(chatId) ?: throw RuntimeException("chatId not found")
+            chatRepository.findChatBucketInfoByChatId(chatId)
+                ?: throw ChatNotFoundException("Unable to retrieve chat image because chat $chatId was not found")
 
         return try {
             bucketService.loadFileAsResource(

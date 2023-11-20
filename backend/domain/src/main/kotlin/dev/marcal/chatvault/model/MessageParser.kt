@@ -1,5 +1,7 @@
 package dev.marcal.chatvault.model
 
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.AmbiguousDateException
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.MessageParserException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
@@ -50,7 +52,7 @@ class MessageParser(pattern: String? = null) {
                     return LocalDateTime.parse(textToParse, firstComesTheMonthFormatter)
                 } else {
                     if (lastUsed == null) {
-                        throw RuntimeException("there is ambiguity in the date, it is not possible to know which value is the day and which is the month $text")
+                        throw AmbiguousDateException("There is ambiguity in the date, it is not possible to know which value is the day and which is the month $text")
                     } else {
                         return LocalDateTime.parse(textToParse, lastUsed)
                     }
@@ -98,7 +100,7 @@ class MessageParser(pattern: String? = null) {
             val content = result.groupValues[3].trim()
             Triple(date, null, removePrefix(content))
 
-        } ?: throw IllegalStateException("unexpected situation for the line $firstLine")
+        } ?: throw MessageParserException("Parse text fail. Unexpected situation for the line $firstLine")
     }
 
     private fun removePrefix(content: String): String {
