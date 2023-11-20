@@ -32,6 +32,7 @@ class ChatFileImporterUseCaseTest {
     @BeforeEach
     fun setup() {
         every { chatRepository.findChatBucketInfoByChatId(1) } returns ChatBucketInfo(1, Bucket("/"))
+        every { chatRepository.countChatMessages(1) } returns 1
         every { messageCreator.execute(any<NewMessagePayloadInput>()) } just Runs
         every { bucketService.save(any()) } just Runs
     }
