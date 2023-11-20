@@ -14,7 +14,7 @@ class WebControllerAdvice : ResponseEntityExceptionHandler() {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 
-    @ExceptionHandler(value = [AttachmentNotFoundException::class, AttachmentFinderException::class, ChatNotFoundException::class])
+    @ExceptionHandler(value = [AttachmentNotFoundException::class, AttachmentFinderException::class, ChatNotFoundException::class, BucketFileNotFoundException::class])
     fun handleNotFound(
         ex: RuntimeException, request: WebRequest
     ): ResponseStatusException {
