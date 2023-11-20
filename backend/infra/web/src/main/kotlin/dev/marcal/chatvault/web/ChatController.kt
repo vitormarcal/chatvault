@@ -14,6 +14,7 @@ import org.springframework.data.web.SortDefault
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.HtmlUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -92,19 +93,25 @@ class ChatController(
 
     fun importChat(chatId: Long? = null, chatName: String? = null, file: MultipartFile): ResponseEntity<String> {
         if (file.isEmpty) {
-            return ResponseEntity.badRequest().body("The file is empty")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "This file cannot be imported. It is empty.")
         }
 
         val fileType = when (file.contentType) {
-            null -> return ResponseEntity.badRequest().body("media type is required.")
+            null -> throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "This file cannot be imported. Media type is required."
+            )
+
             "text/plain" -> FileTypeInputEnum.TEXT
             "application/zip" -> FileTypeInputEnum.ZIP
-            else -> return ResponseEntity.badRequest()
-                .body("media type not supported ${HtmlUtils.htmlEscape(file.contentType!!)}.")
+            else -> throw ResponseStatusException(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "This file cannot be imported. Media type not supported ${HtmlUtils.htmlEscape(file.contentType!!)}."
+            )
         }
 
         importChat(chatId, file, fileType, chatName)
-        return ResponseEntity.ok("The file was imported")
+        return ResponseEntity.noContent().build()
     }
 
     private fun importChat(
