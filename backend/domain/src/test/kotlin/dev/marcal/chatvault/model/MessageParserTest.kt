@@ -1,5 +1,6 @@
 package dev.marcal.chatvault.model
 
+import dev.marcal.chatvault.in_out_boundary.output.exceptions.MessageParserException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -87,7 +88,7 @@ class MessageParserTest {
         val line =
             ""
 
-        org.junit.jupiter.api.assertThrows<IllegalStateException> {
+        org.junit.jupiter.api.assertThrows<MessageParserException> {
             val message = MessageParser().parse(line) { it }
             throw UnsupportedOperationException("test error returns $message")
         }
