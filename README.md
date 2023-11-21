@@ -35,6 +35,7 @@ The backend application will listen to 8080 port by default.
 
 ### Docker
 
+Note that downloading container images might require you to authenticate to the GitHub Container Registry [steps here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry).
 You can use compose.yml to create a database and build the frontend and backend project locally.
 
 `docker-compose -f compose.yml`
