@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import {type Attachment, AttachmentConstructor, type Chat, ChatMessage} from "~/types";
 
 export const useMainStore = defineStore('main', () => {
+    const loading = ref(false)
     const messages = ref([] as ChatMessage[])
     const attachmentsInfo = ref([] as any)
     const chatActive = ref({} as Chat)
@@ -62,7 +63,12 @@ export const useMainStore = defineStore('main', () => {
         }
     }
 
+    function sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms))
+    }
+
     return {
+        loading,
         chatActive,
         messages,
         attachmentsInfo,
@@ -79,7 +85,8 @@ export const useMainStore = defineStore('main', () => {
         updatePageSize,
         chatExited,
         openChat,
-        toChatMessage
+        toChatMessage,
+        sleep
     }
 })
 

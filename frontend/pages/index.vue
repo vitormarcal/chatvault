@@ -2,7 +2,7 @@
   <div class="index-page" ref="indexRef">
 
     <main class="container-fluid">
-      <div class="d-flex justify-content-center" v-if="loading">
+      <div class="d-flex justify-content-center" v-if="store.loading">
         <strong>Loading...</strong>
         <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
       </div>
@@ -42,15 +42,9 @@ import {useMainStore} from "~/store";
 const store = useMainStore()
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
 const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
-const loading = ref(false)
 const isMobile = ref(true)
 const indexRef = ref(null)
 const createChatAction = ref(false)
-
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
 
 function checkWindowSize() {
   if (indexRef.value) {
@@ -60,13 +54,10 @@ function checkWindowSize() {
 }
 
 function refreshPage() {
-  loading.value = true
-  sleep(2000).then(() => {
-        createChatAction.value = false
-        refresh()
-        loading.value = false
-      }
-  )
+  store.loading = true
+  createChatAction.value = false
+  refresh()
+  store.loading = false
 }
 
 function createNewChat() {

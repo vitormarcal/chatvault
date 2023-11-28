@@ -44,7 +44,9 @@ function emitCreateNewChat() {
 }
 
 async function emitDiskImport() {
+  store.loading = true
   await useFetch(useRuntimeConfig().public.api.importFromDisk, {method: 'post'})
+  store.loading = false
   emit('update:disk-import')
 }
 

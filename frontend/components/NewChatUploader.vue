@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import {useMainStore} from "~/store";
+
+const store = useMainStore()
 const emit = defineEmits(['update:chats', 'exit:dialog'])
 const chatImportRef = ref(null)
 const importChatResult = ref({data: null, errorMessage: null})
@@ -24,20 +27,19 @@ async function onFilePicked() {
 
 async function uploadFile() {
   if (chatImportRef?.value?.files && chatImportRef?.value?.files[0]) {
-    let input = chatImportRef.value;
-    const file = input.files[0]
-    console.log(file)
-
+    store.loading = true
     const form = new FormData()
-    form.append("file", file);
+    form.append("file", chatImportRef.value.files[0]);
 
     $fetch(importChatPath.value, {
       method: "POST",
       body: form
     }).then(() => {
+      store.loading = true
       emit('update:chats')
       chatImportRef.value.value = {}
     }).catch(e => {
+      store.loading = false
       importChatResult.value.errorMessage = e.data.detail
     })
   }
