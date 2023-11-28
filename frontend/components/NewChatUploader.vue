@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const emit = defineEmits(['update:chats', 'exit:dialog'])
 const chatImportRef = ref(null)
-const importChatResult = ref({})
+const importChatResult = ref({data: null, errorMessage: null})
 const fileValid = ref(false)
 const chatName = ref(null)
 const importChatPath = computed(() => {
@@ -30,14 +30,16 @@ async function uploadFile() {
 
     const form = new FormData()
     form.append("file", file);
-    importChatResult.value = await useAsyncData(`upload ${file.name}`, () => $fetch(importChatPath.value, {
+
+    $fetch(importChatPath.value, {
       method: "POST",
       body: form
-    }))
-    chatImportRef.value.value = ''
-    if (importChatResult.value.data) {
+    }).then(() => {
       emit('update:chats')
-    }
+      chatImportRef.value.value = {}
+    }).catch(e => {
+      importChatResult.value.errorMessage = e.data.detail
+    })
   }
 }
 
@@ -50,11 +52,9 @@ function cancel() {
 <template>
   <div class="m-auto col-md-3">
     <div class="form-control">
-      <div class="alert alert-success" v-if="importChatResult.data" role="alert">
-        {{ importChatResult.data }}
-      </div>
-      <div class="alert alert-warning" v-if="importChatResult.error" role="alert">
-        Failed to import, check server error logs
+      <div class="alert alert-warning" v-if="importChatResult.errorMessage" role="alert">
+        Failed to import.<br/>
+        {{ importChatResult.errorMessage }}
       </div>
 
       <div class="form-group">
