@@ -76,6 +76,15 @@ watch(
     }
 )
 
+watch(
+    () => messages.value.length,
+    (sizeOfMessages) => {
+      if (sizeOfMessages === 0) {
+        refresh()
+      }
+    }
+)
+
 watch(content, async (newContent, oldContent) => {
   store.updateMessages([...newContent.reverse().map((it: any) => store.toChatMessage(it)), ...messages.value])
   await nextTick()

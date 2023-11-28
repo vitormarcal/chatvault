@@ -1,6 +1,6 @@
 <template>
   <div class="attachment">
-    <img class="w-100 img-thumbnail" v-if="isImage" :src="attachment.url" :alt="attachment.name"/>
+    <img class="w-100 img-thumbnail" loading="lazy" v-if="isImage" :src="attachment.url" :alt="attachment.name"/>
     <video class="w-100" v-else-if="isVideo" :src="attachment.url" controls></video>
     <audio class="w-100" v-else-if="isAudio" :src="attachment.url" controls></audio>
     <a class="w-100" v-else :download='attachment.name'

@@ -1,10 +1,10 @@
-<script setup lang="ts">
+<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
 import {useMainStore} from "~/store";
 
 const store = useMainStore()
 const clickModal = ref(false)
 const chatImportRef = ref(null)
-const importChatResult = ref({})
+const errorMessage = ref(undefined)
 const disableUpload = ref(true)
 const modalClass = computed(() => {
   return {
@@ -17,7 +17,7 @@ const downloadChatPath = computed(() => useRuntimeConfig().public.api.exportChat
 
 function toggleModal() {
   clickModal.value = !clickModal.value
-  importChatResult.value = {}
+  errorMessage.value = undefined
   if (chatImportRef.value) {
     chatImportRef.value.value = ''
   }
@@ -31,20 +31,20 @@ async function onFilePicked() {
 
 async function uploadFile() {
   if (chatImportRef?.value?.files && chatImportRef?.value?.files[0]) {
-    let input = chatImportRef.value;
-    const file = input.files[0]
-    console.log(file)
-
+    store.loading = true
     const form = new FormData()
-    form.append("file", file);
-    importChatResult.value = await useAsyncData(`upload ${file.name}`, () => $fetch(importChatPath.value, {
+    form.append("file", chatImportRef.value.files[0]);
+    $fetch(importChatPath.value, {
       method: "POST",
       body: form
-    }))
-    chatImportRef.value.value = ''
-    if (importChatResult.value.data) {
+    }).then(() => {
+      store.loading = false
+      chatImportRef.value = null
       store.clearMessages()
-    }
+    }).catch(e => {
+      store.loading = false
+      errorMessage.value = e.data.detail
+    })
   }
 }
 
@@ -76,11 +76,9 @@ watch(
           </div>
           <div class="modal-body">
             <div class="form-control">
-              <div class="alert alert-success" v-if="importChatResult.data" role="alert">
-                {{ importChatResult.data }}
-              </div>
-              <div class="alert alert-warning" v-if="importChatResult.error" role="alert">
-                Failed to import, check server error logs
+              <div class="alert alert-warning" v-if="errorMessage" role="alert">
+                Failed to import<br/>
+                {{ errorMessage }}
               </div>
 
               <div class="form-group d-flex justify-content-center mb-3">
