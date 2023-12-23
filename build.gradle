@@ -2,15 +2,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.2'
-    id 'io.spring.dependency-management' version '1.1.2'
-    id 'org.jetbrains.kotlin.jvm' version '1.8.22'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.22'
-    id 'org.jetbrains.kotlin.plugin.jpa' version '1.8.22'
+    id 'org.springframework.boot' version '3.2.1'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.21'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.21'
 }
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 repositories {
@@ -50,13 +50,13 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
         runtimeOnly 'org.postgresql:postgresql'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        testImplementation("io.mockk:mockk:1.13.5")
+        testImplementation("io.mockk:mockk:1.13.8")
     }
 
     tasks.withType(KotlinCompile) {
         kotlinOptions {
             freeCompilerArgs += '-Xjsr305=strict'
-            jvmTarget = '17'
+            jvmTarget = '21'
         }
     }
 
