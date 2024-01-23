@@ -21,7 +21,7 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 COPY --from=frontend_builder /app/.output/public /app/public
-COPY --from=backend_builder /app/backend/application/build/libs/application-1.11.0.jar chatvault.jar
+COPY --from=backend_builder /app/backend/application/build/libs/application-1.11.1.jar chatvault.jar
 
 VOLUME /config
 EXPOSE 8080
