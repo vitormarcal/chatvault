@@ -10,6 +10,7 @@ import dev.marcal.chatvault.persistence.repository.ChatCrudRepository
 import dev.marcal.chatvault.persistence.repository.EventSourceCrudRepository
 import dev.marcal.chatvault.persistence.repository.MessageCrudRepository
 import dev.marcal.chatvault.repository.ChatRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -24,6 +25,8 @@ class ChatRepositoryImpl(
     private val eventSourceCrudRepository: EventSourceCrudRepository,
     private val objectMapper: ObjectMapper
 ) : ChatRepository {
+
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @Transactional
     override fun saveNewMessages(payload: MessagePayload, eventSource: Boolean) {
@@ -107,6 +110,14 @@ class ChatRepositoryImpl(
 
     override fun findLastMessageByChatId(chatId: Long): Message? {
         return messageCrudRepository.findTopByChatIdOrderByIdDesc(chatId)?.toMessageDomain()
+    }
+
+    @Transactional
+    override fun deleteChat(chatId: Long) {
+        logger.info("start to remove messages from $chatId")
+        messageCrudRepository.deleteAllByChatId(chatId)
+        logger.info("start to remove chat from $chatId")
+        chatCrudRepository.deleteById(chatId)
     }
 
     override fun countChatMessages(chatId: Long): Long {

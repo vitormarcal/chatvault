@@ -22,8 +22,8 @@ import java.nio.file.StandardCopyOption
 @Service
 @PropertySource("classpath:appservice.properties")
 class BucketServiceImpl(
-    @Value("\${app.bucket.root}") val bucketRootPath: String,
-    @Value("\${app.bucket.import}") val bucketImportPath: String
+        @Value("\${chatvault.bucket.root}") val bucketRootPath: String,
+        @Value("\${chatvault.bucket.import}") val bucketImportPath: String
 ) : BucketService {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -87,41 +87,59 @@ class BucketServiceImpl(
     override fun loadBucketAsZip(path: String): Resource {
         try {
             return File(bucketRootPath).getDirectoriesWithContentAndZipFiles()
-                .first { path == it.name }
-                .let { dir ->
-                    DirectoryZipper.zip(dir).let { resource ->
-                        InputStreamResource(object : FileInputStream(resource.file) {
-                            @Throws(IOException::class)
-                            override fun close() {
-                                super.close()
-                                val isDeleted: Boolean = resource.file.delete()
-                                logger.info(
-                                    "export:'{}':" + if (isDeleted) "deleted" else "preserved", resource.file.name
-                                )
-                            }
-                        })
+                    .first { path == it.name }
+                    .let { dir ->
+                        DirectoryZipper.zip(dir).let { resource ->
+                            InputStreamResource(object : FileInputStream(resource.file) {
+                                @Throws(IOException::class)
+                                override fun close() {
+                                    super.close()
+                                    val isDeleted: Boolean = resource.file.delete()
+                                    logger.info(
+                                            "export:'{}':" + if (isDeleted) "deleted" else "preserved", resource.file.name
+                                    )
+                                }
+                            })
+                        }
                     }
-                }
         } catch (e: Exception) {
             throw BucketServiceException(message = "Fail to zip bucket", throwable = e)
         }
 
     }
 
+    override fun delete(bucketFile: BucketFile) {
+        val file = bucketFile.file(bucketRootPath)
+        logger.info("start to delete bucket at: $file")
+
+
+        if (!file.exists()) {
+            return
+        }
+
+        Files.walk(file.toPath())
+                .sorted(reverseOrder())
+                .forEach {
+                    logger.info("item to delete: {}", it)
+                    Files.delete(it)
+                }
+
+    }
+
     override fun zipPendingImports(chatName: String?): Sequence<Resource> {
         try {
             return File(bucketImportPath)
-                .getDirectoriesWithContentAndZipFiles()
-                .asSequence()
-                .filter { chatName == null || chatName == it.name }
-                .map { chatGroupDir ->
-                    if (chatGroupDir.name.endsWith(".zip")) {
-                        UrlResource(chatGroupDir.toURI())
-                    } else {
-                        DirectoryZipper.zipAndDeleteSource(chatGroupDir)
-                    }
+                    .getDirectoriesWithContentAndZipFiles()
+                    .asSequence()
+                    .filter { chatName == null || chatName == it.name }
+                    .map { chatGroupDir ->
+                        if (chatGroupDir.name.endsWith(".zip")) {
+                            UrlResource(chatGroupDir.toURI())
+                        } else {
+                            DirectoryZipper.zipAndDeleteSource(chatGroupDir)
+                        }
 
-                }
+                    }
         } catch (e: Exception) {
             throw BucketServiceException(message = "Fail to zip pending imports", throwable = e)
         }
@@ -130,8 +148,8 @@ class BucketServiceImpl(
 
     override fun deleteZipImported(filename: String) {
         val toDelete = BucketFile(
-            fileName = filename,
-            address = Bucket(path = "/")
+                fileName = filename,
+                address = Bucket(path = "/")
         ).file(root = bucketImportPath)
         toDelete.delete()
     }

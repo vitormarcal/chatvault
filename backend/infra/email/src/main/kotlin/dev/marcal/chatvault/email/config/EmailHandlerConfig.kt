@@ -16,15 +16,15 @@ import org.springframework.integration.support.PropertiesBuilder
 
 @Configuration
 @PropertySource("classpath:email.properties")
-@ConditionalOnProperty(prefix = "app.email", name = ["enabled"], havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "chatvault.email", name = ["enabled"], havingValue = "true", matchIfMissing = true)
 class EmailHandlerConfig(
-    @Value("\${app.email.host}") private val host: String,
-    @Value("\${app.email.port}") private val port: String,
-    @Value("\${app.email.username}") private val username: String,
-    @Value("\${app.email.password}") private val password: String,
-    @Value("\${app.email.fixed-delay-mlss}") private val fixedDelay: Long,
-    @Value("\${app.email.debug}") private val emailDebug: Boolean,
-    @Value("\${app.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
+    @Value("\${chatvault.email.host}") private val host: String,
+    @Value("\${chatvault.email.port}") private val port: String,
+    @Value("\${chatvault.email.username}") private val username: String,
+    @Value("\${chatvault.email.password}") private val password: String,
+    @Value("\${chatvault.email.fixed-delay-mlss}") private val fixedDelay: Long,
+    @Value("\${chatvault.email.debug}") private val emailDebug: Boolean,
+    @Value("\${chatvault.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
 ) {
 
     private val logger = LoggerFactory.getLogger(this::class.java)

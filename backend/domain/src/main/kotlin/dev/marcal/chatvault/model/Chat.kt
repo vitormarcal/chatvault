@@ -53,4 +53,8 @@ data class Bucket(
     fun withPath(path: String): Bucket {
         return this.copy(path = this.path + path)
     }
+
+    fun toBucketFile(): BucketFile {
+        return BucketFile( fileName = "/", address = this)
+    }
 }

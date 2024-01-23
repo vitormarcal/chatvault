@@ -11,4 +11,5 @@ interface BucketService {
     fun saveToImportDir(bucketFile: BucketFile)
     fun saveTextToBucket(bucketFile: BucketFile, messages: Sequence<String>)
     fun loadBucketAsZip(path: String): Resource
+    fun delete(bucketFile: BucketFile)
 }

@@ -58,25 +58,25 @@ There are docker image packages on github. You can download the latest image wit
 For docker,  the variables must be in upper case and where is "." it must be "_":
 `some.environment.variable` is like `SOME_ENVIRONMENT_VARIABLE` in docker
 
-| Environment variables                     | obs                            | example                                            |
-|-------------------------------------------|--------------------------------|----------------------------------------------------|
-| Database                                  | required                       |                                                    |
-| spring.datasource.url                     | required                       | jdbc:postgresql://database_host:5432/database_name |
-| spring.datasource.username                | required                       | user                                               |
-| spring.datasource.password                | required                       | secret                                             |
-| --------------------------                | --------------------------     | ---------                                          |
-| Email import                              | feat not required              |                                                    |
-| app.email.enabled                         | not required                   | true                                               |
-| app.email.host                            | required  to feat              | imap.server.com                                    |
-| app.email.password                        | required  to feat              | secret                                             |
-| app.email.port                            | required  to feat              | 993                                                |
-| app.email.username                        | required  to feat              | someuser                                           |
-| app.email.debug                           | not required                   | true                                               |
-| --------------------------                |                                | --------------------------                         |
-| chatvault.host                            | not required                   | https://somehost.com ,http://localhost:3000        |
-| spring.servlet.multipart.max-file-size    | not required                   | 500MB                                              |
-| spring.servlet.multipart.max-request-size | not required                   | 500MB                                              |
-| chatvault.msgparser.dateformat            | not required but recommended  | dd/MM/yyyy HH:mm                                   |
+| Environment variables                     | obs                          | example                                            |
+|-------------------------------------------|------------------------------|----------------------------------------------------|
+| Database                                  | required                     |                                                    |
+| spring.datasource.url                     | required                     | jdbc:postgresql://database_host:5432/database_name |
+| spring.datasource.username                | required                     | user                                               |
+| spring.datasource.password                | required                     | secret                                             |
+| --------------------------                | --------------------------   | ---------                                          |
+| Email import                              | feat not required            |                                                    |
+| chatvault.email.enabled                   | not required                 | true                                               |
+| chatvault.email.host                      | required  to feat            | imap.server.com                                    |
+| chatvault.email.password                  | required  to feat            | secret                                             |
+| chatvault.email.port                      | required  to feat            | 993                                                |
+| chatvault.email.username                  | required  to feat            | someuser                                           |
+| chatvault.email.debug                     | not required                 | true                                               |
+| --------------------------                |                              | --------------------------                         |
+| chatvault.host                            | not required                 | https://somehost.com ,http://localhost:3000        |
+| spring.servlet.multipart.max-file-size    | not required                 | 500MB                                              |
+| spring.servlet.multipart.max-request-size | not required                 | 500MB                                              |
+| chatvault.msgparser.dateformat            | not required but recommended | dd/MM/yyyy HH:mm                                   |
 ------
 
 * If not defined chatvault.msgparser.dateformat, the application will not be able to resolve ambiguities in certain situations
