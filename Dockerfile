@@ -7,7 +7,7 @@ RUN npm install
 COPY ./frontend .
 RUN npm run generate
 
-FROM openjdk:17-alpine as backend_builder
+FROM amazoncorretto:21-alpine as backend_builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY backend ./backend
 
 RUN ./gradlew clean build
 
-FROM eclipse-temurin:17-jre
+FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 COPY --from=frontend_builder /app/.output/public /app/public
