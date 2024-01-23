@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {useMainStore} from "~/store";
 
+const emit = defineEmits(['refresh:page'])
+
 const store = useMainStore()
 
 const chatConfig = ref({
@@ -52,7 +54,12 @@ function validatedPageSize(event: any) {
       <a href="#" class="h2 m-2">
         <rotable-arrow-icon @click="() => store.chatConfigOpen = !store.chatConfigOpen"/>
       </a>
-      <profile-image-uploader/>
+      <div class="d-flex justify-content-between">
+        <profile-image-uploader/>
+        <chat-deleter @refresh:page="() => emit('refresh:page')"/>
+      </div>
+
+
 
 
       <div class="mt-3">

@@ -30,4 +30,5 @@ interface ChatRepository {
     fun setChatNameByChatId(chatId: Long, chatName: String)
     fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentInfoOutput>
     fun findLastMessageByChatId(chatId: Long): Message?
+    fun deleteChat(chatId: Long)
 }

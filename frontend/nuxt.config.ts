@@ -15,6 +15,7 @@ export default defineNuxtConfig({
                 updateChatNameByChatId: `${host}/chats/:chatId/chatName/:chatName`,
                 getProfileImage: `${host}/chats/:chatId/profile-image`,
                 exportChatById: `${host}/chats/:chatId/export`,
+                deleteChatById: `${host}/chats/:chatId`,
                 importChatByName: `${host}/chats/import/:chatName`,
                 importFromDisk: `${host}/chats/disk-import`
             }

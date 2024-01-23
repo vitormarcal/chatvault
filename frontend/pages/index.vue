@@ -24,6 +24,7 @@
               :mobile="isMobile"
           />
           <chat-config v-if="store.chatConfigOpen"
+                       @refresh:page="() => refresh()"
           />
         </template>
 

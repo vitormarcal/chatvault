@@ -16,11 +16,11 @@ import java.io.InputStream
 import java.time.LocalDateTime
 
 @Component
-@ConditionalOnProperty(prefix = "app.email", name = ["enabled"], havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "chatvault.email", name = ["enabled"], havingValue = "true", matchIfMissing = true)
 class EmailMessageHandler(
     private val chatFileImporter: ChatFileImporter,
-    @Value("\${app.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
-    @Value("\${app.email.debug}") private val emailDebug: Boolean,
+    @Value("\${chatvault.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
+    @Value("\${chatvault.email.debug}") private val emailDebug: Boolean,
     private val bucketDiskImporter: BucketDiskImporter
 ) {
 
