@@ -9,6 +9,16 @@ This project is still in development, and some features may not be fully impleme
 * Automated Email Backup: Set up an email in ChatVault and export your messages as attachments to that email. Chat Vault identifies this email and archives the messages and attachments automatically.
 * Intuitive Frontend: To facilitate access to archived messages and their attachments, Chat Vault also includes a user-friendly frontend. Easily navigate conversations, search messages, and view attachments.
 
+## How to export via the Whatsapp app
+
+Please read the [official Whatsapp FAQ](https://faq.whatsapp.com/1180414079177245/?cms_platform=android).
+
+With the imported file, to ingest it into ChatVault you can:
+
+* map a shared folder between the ChatVault import directory and your cell phone;
+* send by email for automatic import into ChatVault;
+* zip the imported file and upload it to the ChatVault interface.
+
 ## Repository structure
 
 This repository is divided into two main modules. They are the modules: frontend (javascript, vue, nuxt) and backend (kotlin, java, spring boot, gradle)
