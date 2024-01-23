@@ -154,8 +154,11 @@ class BucketServiceImpl(
     private fun createBucketIfNotExists(file: File) {
         file.takeIf { !it.exists() }?.also {
             logger.info("bucket $it not exists, creating...")
-            it.mkdirs()
-            logger.info("bucket $it created")
+            if (it.mkdirs()) {
+                logger.info("bucket $it created")
+            } else {
+                throw BucketServiceException(message = "check if the user has permission to write to chatvault directories: $file. You can change the app.bucket.root environment variable for the location of ChatVault files ", null)
+            }
         }
     }
 
