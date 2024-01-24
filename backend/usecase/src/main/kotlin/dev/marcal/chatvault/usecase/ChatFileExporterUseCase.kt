@@ -41,6 +41,10 @@ class ChatFileExporterUseCase(
 
     }
 
+    override fun execute(chatId: List<Long>): Resource {
+        TODO("Not yet implemented")
+    }
+
     private fun parseToLineText(it: MessageOutput): String {
         val builder = StringBuilder(it.content.length + 100)
         builder.append(formatter.format(it.createdAt))

@@ -58,6 +58,19 @@ class ChatImportExportController(
             .body(resource)
     }
 
+    @PostMapping("zip")
+    fun zipAllChats(
+            @RequestBody chatIdList: List<Long>,
+    ): ResponseEntity<Resource> {
+        val resource = chatFileExporter.execute(chatIdList)
+        val headers = HttpHeaders()
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${UUID.randomUUID()}.zip")
+        headers.contentType = MediaType.APPLICATION_OCTET_STREAM
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource)
+    }
+
     fun importChat(chatId: Long? = null, chatName: String? = null, file: MultipartFile): ResponseEntity<String> {
         if (file.isEmpty) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "This file cannot be imported. It is empty.")

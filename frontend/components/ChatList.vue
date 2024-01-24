@@ -5,8 +5,8 @@
     <div class="action-bar d-flex flex-row p-2 sticky-top">
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-outline-primary btn-sm" @click="emitCreateNewChat">Create new chat</button>
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import
-        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="dowloadAllChats">Download all chats</button>
       </div>
 
     </div>
@@ -48,6 +48,14 @@ async function emitDiskImport() {
   await useFetch(useRuntimeConfig().public.api.importFromDisk, {method: 'post'})
   store.loading = false
   emit('update:disk-import')
+}
+
+async function dowloadAllChats() {
+  store.loading = true
+  await useFetch(useRuntimeConfig().public.api.zipAllChats, {method: 'post', body: props.chats.map((it: { chatId: number; }) => it.chatId)})
+  store.loading = false
+
+
 }
 
 </script>
