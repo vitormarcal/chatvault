@@ -181,6 +181,7 @@ class MessageParserTest {
             "16.11.2023. 18:44",
             "16.11.23, 18:44",
             "2023.11.16, 18:44",
+            "2/22/24, 12:06"
         ).forEach {
             assertEquals(it, MessageParser().extractTextDate(it))
             assertEquals(it, MessageParser().extractTextDate("${it}xyz"))
@@ -192,6 +193,7 @@ class MessageParserTest {
             assertEquals("${it}pm", MessageParser().extractTextDate("${it}pm"))
             assertEquals("[${it}pm]", MessageParser().extractTextDate("[${it}pm]"))
             assertEquals("[${it}am]", MessageParser().extractTextDate("[${it}am]"))
+            assertEquals("[${it}]", MessageParser().extractTextDate("[${it}]"))
             assertEquals("[${it}]", MessageParser().extractTextDate("[${it}]"))
         }
     }
@@ -207,6 +209,7 @@ class MessageParserTest {
         assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16/ 11/ 23/ 18:44"))
         assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("16-11-23 18:44"))
         assertEquals(LocalDateTime.of(2023, 11, 16, 18, 44), MessageParser().parseDate("[16-11-23 18:44]"))
+        assertEquals(LocalDateTime.of(2024, 2, 22, 12, 6), MessageParser().parseDate("2/22/24, 12:06"))
     }
 
 
@@ -214,6 +217,7 @@ class MessageParserTest {
     fun `based on previous resolved dates, should resolve ambiguity`() {
         MessageParser().apply {
             assertEquals(LocalDateTime.of(2023, 1, 16, 18, 44), this.parseDate("01/16/2023 18:44"))
+            assertEquals(LocalDateTime.of(2024, 2, 22, 12, 6), this.parseDate("2/22/24, 12:06"))
             assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("01/01/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44), this.parseDate("02/01/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44), this.parseDate("03/01/2023 18:44"))
@@ -237,6 +241,7 @@ class MessageParserTest {
         MessageParser().apply {
             assertEquals(LocalDateTime.of(2023, 1, 16, 18, 44), this.parseDate("1/16/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44), this.parseDate("1/1/2023 18:44"))
+            assertEquals(LocalDateTime.of(2024, 2, 22, 12, 6), this.parseDate("2/22/24, 12:06"))
         }
     }
 
@@ -249,6 +254,10 @@ class MessageParserTest {
             assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44), this.parseDate("04/01/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("05/01/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("06/01/2023 18:44"))
+        }
+        MessageParser("M/dd/yy, HH:mm").apply {
+            assertEquals(LocalDateTime.of(2024, 2, 22, 12, 6), this.parseDate("2/22/24, 12:06"))
+            assertEquals(LocalDateTime.of(2024, 2, 22, 12, 6), this.parseDate("02/22/24, 12:06"))
         }
 
         MessageParser("dd/MM/yyyy HH:mm").apply {
