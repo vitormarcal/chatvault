@@ -1,19 +1,20 @@
-FROM node:21.0.0-alpine3.18 as frontend_builder
+FROM node:22.0.0-alpine as frontend_builder
 
 WORKDIR /app
 
-COPY ./frontend/package.json ./frontend/package-lock.json ./
+COPY --link ./frontend/package.json ./frontend/package-lock.json ./
 RUN npm install
-COPY ./frontend .
+COPY --link ./frontend .
 RUN npm run generate
+RUN npm prune
 
 FROM amazoncorretto:21-alpine as backend_builder
 
 WORKDIR /app
 
-COPY gradle ./gradle
-COPY build.gradle gradlew gradlew.bat settings.gradle ./
-COPY backend ./backend
+COPY --link gradle ./gradle
+COPY --link build.gradle gradlew gradlew.bat settings.gradle ./
+COPY --link backend ./backend
 
 RUN ./gradlew clean build
 

@@ -14,13 +14,17 @@ function toggleModal() {
 </script>
 
 <template>
-  <attachment :attachment="props.attachment" @click="toggleModal" role="button">
+
+  <lazy-attachment :attachment="props.attachment" @click="toggleModal" role="button" >
     <div class="modal d-flex" :class="modalClass" v-if="showMedia">
       <div class="modal-content d-flex align-items-center m-auto">
-        <attachment :attachment="props.attachment"/>
+        <lazy-attachment :attachment="props.attachment"/>
       </div>
     </div>
-  </attachment>
+  </lazy-attachment>
+
+
+
 
 </template>
 
