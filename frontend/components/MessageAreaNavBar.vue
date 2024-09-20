@@ -43,6 +43,6 @@ function toggleOpenChatConfig() {
 
 <style scoped>
 #navbar {
-  background: #360d3c;
+  background: #000000;
 }
 </style>

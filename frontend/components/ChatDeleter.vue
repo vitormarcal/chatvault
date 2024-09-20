@@ -51,6 +51,6 @@ async function deleteChat() {
 
 <style scoped>
 .modal-content {
-  background: #4e1e55;
+  background: #000000;
 }
 </style>

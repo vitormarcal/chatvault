@@ -55,6 +55,6 @@ async function emitDiskImport() {
 
 <style>
 .action-bar {
-  background: #360d3c;
+  background: #000000;
 }
 </style>

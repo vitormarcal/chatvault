@@ -28,7 +28,7 @@ function emitThisChatActive() {
 <style>
 .chat-item {
   cursor: pointer;
-  background: #9E4FB0;
+  background: #000000;
   border-bottom: 1px solid #360d3c;
 }
 
