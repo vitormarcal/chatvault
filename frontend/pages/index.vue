@@ -97,7 +97,7 @@ onMounted(() => {
 <style>
 .index-page {
   font-size: 18px;
-  color: rgb(255, 255, 200);
+  color: #ffff;
 
 }
 
