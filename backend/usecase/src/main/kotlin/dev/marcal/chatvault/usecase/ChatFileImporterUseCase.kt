@@ -6,6 +6,7 @@ import dev.marcal.chatvault.in_out_boundary.input.NewChatInput
 import dev.marcal.chatvault.in_out_boundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.in_out_boundary.output.exceptions.ChatImporterException
 import dev.marcal.chatvault.model.BucketFile
+import dev.marcal.chatvault.model.ChatNamePatternMatcher
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.ChatCreator
 import dev.marcal.chatvault.service.ChatFileImporter
@@ -31,7 +32,6 @@ class ChatFileImporterUseCase(
 ) : ChatFileImporter {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
-    private val possiblyWhatsappTalk = Regex(".*WhatsApp.*\\.txt$")
     override fun execute(chatId: Long, inputStream: InputStream, fileType: FileTypeInputEnum) {
         when (fileType) {
             FileTypeInputEnum.ZIP -> {
@@ -75,7 +75,7 @@ class ChatFileImporterUseCase(
             val byteArray = bytes(zipInputStream)
             bucketService.save(BucketFile(bytes = byteArray, fileName = fileName, address = bucket))
 
-            if (possiblyWhatsappTalk.find(fileName) != null) {
+            if (ChatNamePatternMatcher.matches(fileName)) {
                 execute(
                     chatId = chatId,
                     inputStream = ByteArrayInputStream(byteArray),
