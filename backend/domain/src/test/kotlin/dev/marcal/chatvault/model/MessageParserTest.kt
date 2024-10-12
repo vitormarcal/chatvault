@@ -34,6 +34,30 @@ class MessageParserTest {
     }
 
     @Test
+    fun `should parse system message correctly with colon as separator`() {
+        val line =
+            "15/08/2023 18:16: As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
+
+        val message = MessageParser().parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 8, 15, 18, 16),
+            author = Author(
+                name = "",
+                type = AuthorType.SYSTEM
+            ),
+            externalId = null,
+            content = Content(
+                attachment = null,
+                text = "As mensagens e as chamadas são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Toque para saber mais."
+            )
+        )
+
+
+        assertEquals(expected, message)
+
+    }
+
+    @Test
     fun `should return a user message`() {
         val line =
             "13/08/2023 18:24 - Beltrano: Opa, vlw Fulano !\uD83D\uDE43"
@@ -81,6 +105,49 @@ class MessageParserTest {
 
         assertEquals(expected, message)
 
+    }
+
+    @Test
+    fun `should parse message correctly with colon as separator`() {
+        val line = "19/09/2023 22:58: Fulano: Olha aquela coisa!"
+
+        val message = MessageParser().parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 9, 19, 22, 58),
+            author = Author(
+                name = "Fulano",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = null,
+                text = "Olha aquela coisa!"
+            )
+        )
+
+        assertEquals(expected, message)
+
+    }
+
+    @Test
+    fun `should parse message correctly with dash as separator`() {
+        val line = "19/09/2023 22:58 - Fulano: Olha aquela coisa!"
+
+        val message = MessageParser().parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 9, 19, 22, 58),
+            author = Author(
+                name = "Fulano",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = null,
+                text = "Olha aquela coisa!"
+            )
+        )
+
+        assertEquals(expected, message)
     }
 
     @Test

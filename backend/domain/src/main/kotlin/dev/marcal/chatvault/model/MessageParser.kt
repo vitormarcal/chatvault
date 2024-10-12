@@ -17,8 +17,8 @@ class MessageParser(pattern: String? = null) {
 
     private val dateRegexText =
         "^(\\[?\\d{1,4}[-/.]\\d{1,4}[-/.]\\d{1,4}[,.]? \\d{2}:\\d{2}(?::\\d{2})?\\s?([aA][mM]|[pP][mM])?\\]?)"
-    private val dateWithoutNameRegex = "$dateRegexText - (.*)$".toRegex()
-    private val dateWithNameRegex = "$dateRegexText - ([^:]+): (.+)$".toRegex()
+    private val dateWithoutNameRegex = "$dateRegexText(?: - |: )(.*)$".toRegex()
+    private val dateWithNameRegex = "$dateRegexText(?: - |: )([^:]+): (.+)$".toRegex()
     private val onlyDate = dateRegexText.toRegex()
     private val attachmentNameRegex = "^(.*?)\\s+\\((.*?)\\)$".toRegex()
 
