@@ -12,4 +12,5 @@ interface BucketService {
     fun saveTextToBucket(bucketFile: BucketFile, messages: Sequence<String>)
     fun loadBucketAsZip(path: String): Resource
     fun delete(bucketFile: BucketFile)
+    fun loadBucketListAsZip(): Resource
 }

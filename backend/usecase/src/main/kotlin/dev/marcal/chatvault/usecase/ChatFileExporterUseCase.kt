@@ -4,6 +4,7 @@ import dev.marcal.chatvault.app_service.bucket_service.BucketService
 import dev.marcal.chatvault.in_out_boundary.output.MessageOutput
 import dev.marcal.chatvault.in_out_boundary.output.exceptions.ChatNotFoundException
 import dev.marcal.chatvault.model.AuthorType
+import dev.marcal.chatvault.model.Bucket
 import dev.marcal.chatvault.model.BucketFile
 import dev.marcal.chatvault.repository.ChatRepository
 import dev.marcal.chatvault.service.ChatFileExporter
@@ -23,8 +24,23 @@ class ChatFileExporterUseCase(
     private val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
     override fun execute(chatId: Long): Resource {
+
+        val bucket = findMessagesAndUpdateBucket(chatId)
+
+        return bucketService.loadBucketAsZip(bucket.path)
+
+    }
+
+    override fun executeAll(): Resource {
+        chatRepository.findAllChatsWithLastMessage()
+            .forEach { findMessagesAndUpdateBucket(it.chatId) }
+        return bucketService.loadBucketListAsZip()
+    }
+
+    fun findMessagesAndUpdateBucket(chatId: Long): Bucket {
         val chatBucketInfo =
-            chatRepository.findChatBucketInfoByChatId(chatId) ?: throw ChatNotFoundException("The export failed. Chat with id $chatId was not found.")
+            chatRepository.findChatBucketInfoByChatId(chatId)
+                ?: throw ChatNotFoundException("The export failed. Chat with id $chatId was not found.")
 
         messageFinderByChatId.execute(chatId).map {
             parseToLineText(it)
@@ -36,9 +52,7 @@ class ChatFileExporterUseCase(
                 ), sequence
             )
         }
-
-        return bucketService.loadBucketAsZip(chatBucketInfo.bucket.path)
-
+        return chatBucketInfo.bucket
     }
 
     private fun parseToLineText(it: MessageOutput): String {

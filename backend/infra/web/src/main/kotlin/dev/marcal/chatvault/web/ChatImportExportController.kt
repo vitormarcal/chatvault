@@ -51,7 +51,18 @@ class ChatImportExportController(
     ): ResponseEntity<Resource> {
         val resource = chatFileExporter.execute(chatId)
         val headers = HttpHeaders()
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${UUID.randomUUID()}.zip")
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${resource.filename ?: UUID.randomUUID()}.zip")
+        headers.contentType = MediaType.APPLICATION_OCTET_STREAM
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(resource)
+    }
+
+    @GetMapping("/export/all")
+    fun executeDiskExport(): ResponseEntity<Resource> {
+        val resource = chatFileExporter.executeAll()
+        val headers = HttpHeaders()
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${resource.filename ?: UUID.randomUUID()}.zip")
         headers.contentType = MediaType.APPLICATION_OCTET_STREAM
         return ResponseEntity.ok()
             .headers(headers)

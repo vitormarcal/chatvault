@@ -67,7 +67,6 @@ class EmailMessageHandler(
         return if (multipart.count == 2) {
             // only one file (body email text and attachment), body text is ignored
             val bodyPart = multipart.getBodyPart(indexStart)
-            val attachmentInputStream: InputStream = bodyPart.inputStream
             listOf(
                 PendingChatFile(
                     stream = bodyPart.inputStream,

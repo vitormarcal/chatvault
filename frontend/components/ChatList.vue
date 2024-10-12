@@ -5,8 +5,8 @@
     <div class="action-bar d-flex flex-row p-2 sticky-top">
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-outline-primary btn-sm" @click="emitCreateNewChat">Create new chat</button>
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import
-        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import</button>
+        <import-export-chat style="margin-top: 0 !important;"  allow-download-all="true" @click="() => exitThisChat()"/>
       </div>
 
     </div>
@@ -48,6 +48,10 @@ async function emitDiskImport() {
   await useFetch(useRuntimeConfig().public.api.importFromDisk, {method: 'post'})
   store.loading = false
   emit('update:disk-import')
+}
+
+function exitThisChat() {
+  store.chatExited()
 }
 
 </script>
