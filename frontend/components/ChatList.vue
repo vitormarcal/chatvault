@@ -6,7 +6,7 @@
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-outline-primary btn-sm" @click="emitCreateNewChat">Create new chat</button>
         <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import</button>
-        <import-export-chat style="margin-top: 0 !important;"  allow-download-all="true" @click="() => exitThisChat()"/>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitChatExport">Execute chat export</button>
       </div>
 
     </div>
@@ -25,7 +25,7 @@ import {useMainStore} from "~/store";
 const store = useMainStore()
 
 const props = defineProps(['chats', 'mobile'])
-const emit = defineEmits(['update:chat-active', 'create:chat', 'update:disk-import'])
+const emit = defineEmits(['update:chat-active', 'create:chat', 'update:disk-import', 'export:chat'])
 
 const chatOpened = computed(() => store.chatActive?.chatId != null)
 const dynamicClass = computed(() => {
@@ -41,6 +41,11 @@ function emitThisChatActive(item: any) {
 
 function emitCreateNewChat() {
   emit('create:chat')
+}
+
+function emitChatExport() {
+  exitThisChat()
+  emit( 'export:chat')
 }
 
 async function emitDiskImport() {
