@@ -181,7 +181,10 @@ class MessageParserTest {
             "16.11.2023. 18:44",
             "16.11.23, 18:44",
             "2023.11.16, 18:44",
-            "2/22/24, 12:06"
+            "2/22/24, 12:06",
+            "30.09.14, 23:25",
+            "30.09.14, 23:25:46",
+            "2/22/24, 12:06:01",
         ).forEach {
             assertEquals(it, MessageParser().extractTextDate(it))
             assertEquals(it, MessageParser().extractTextDate("${it}xyz"))
@@ -255,6 +258,16 @@ class MessageParserTest {
             assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44), this.parseDate("05/01/2023 18:44"))
             assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44), this.parseDate("06/01/2023 18:44"))
         }
+
+        MessageParser("MM/dd/yyyy HH:mm:ss").apply {
+            assertEquals(LocalDateTime.of(2023, 1, 1, 18, 44, 25), this.parseDate("01/01/2023 18:44:25"))
+            assertEquals(LocalDateTime.of(2023, 2, 1, 18, 44, 25), this.parseDate("02/01/2023 18:44:25"))
+            assertEquals(LocalDateTime.of(2023, 3, 1, 18, 44, 25), this.parseDate("03/01/2023 18:44:25"))
+            assertEquals(LocalDateTime.of(2023, 4, 1, 18, 44, 25), this.parseDate("04/01/2023 18:44:25"))
+            assertEquals(LocalDateTime.of(2023, 5, 1, 18, 44, 25), this.parseDate("05/01/2023 18:44:25"))
+            assertEquals(LocalDateTime.of(2023, 6, 1, 18, 44, 25), this.parseDate("06/01/2023 18:44:25"))
+        }
+
         MessageParser("M/dd/yy, HH:mm").apply {
             assertEquals(LocalDateTime.of(2024, 2, 22, 12, 6), this.parseDate("2/22/24, 12:06"))
             assertEquals(LocalDateTime.of(2024, 2, 22, 12, 6), this.parseDate("02/22/24, 12:06"))
