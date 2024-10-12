@@ -54,6 +54,15 @@ There are docker image packages on github. You can download the latest image wit
 
 `docker pull ghcr.io/vitormarcal/chatvault:latest`
 
+### Volumes
+
+The app requires storing chat files in the file system. For Docker usage, please refer to the Environment Variables section.
+
+- `chatvault.bucket.root`: This is the volume used to store your files. Do not delete this!
+- `chatvault.bucket.import`: This volume is used temporarily to store chat files that are to be parsed by the app and then moved to bucket.root.
+- `chatvault.bucket.export`: This volume is used temporarily to store a chat that is to be downloaded.
+    
+
 ### Environment variables
 For docker,  the variables must be in upper case and where is "." it must be "_":
 `some.environment.variable` is like `SOME_ENVIRONMENT_VARIABLE` in docker
@@ -72,6 +81,11 @@ For docker,  the variables must be in upper case and where is "." it must be "_"
 | chatvault.email.port                      | required  to feat            | 993                                                |
 | chatvault.email.username                  | required  to feat            | someuser                                           |
 | chatvault.email.debug                     | not required                 | true                                               |
+| --------------------------                |                              | --------------------------                         |
+| File system                               | not required                 |                                                    |
+| chatvault.bucket.root                     | not required                 | /opt/chatvault/archive                             |
+| chatvault.bucket.import                   | not required                 | /opt/chatvault/import                              |
+| chatvault.bucket.export                   | not required                 | /opt/chatvault/export                              |
 | --------------------------                |                              | --------------------------                         |
 | chatvault.host                            | not required                 | https://somehost.com ,http://localhost:3000        |
 | spring.servlet.multipart.max-file-size    | not required                 | 500MB                                              |

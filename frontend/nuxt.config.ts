@@ -18,7 +18,8 @@ export default defineNuxtConfig({
               exportChatById: `${host}/chats/:chatId/export`,
               deleteChatById: `${host}/chats/:chatId`,
               importChatByName: `${host}/chats/import/:chatName`,
-              importFromDisk: `${host}/chats/disk-import`
+              importFromDisk: `${host}/chats/disk-import`,
+              exportAllChats: `${host}/chats/export/all`
           }
       }
   },

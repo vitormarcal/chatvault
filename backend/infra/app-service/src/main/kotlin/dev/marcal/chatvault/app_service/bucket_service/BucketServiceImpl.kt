@@ -23,7 +23,8 @@ import java.nio.file.StandardCopyOption
 @PropertySource("classpath:appservice.properties")
 class BucketServiceImpl(
         @Value("\${chatvault.bucket.root}") val bucketRootPath: String,
-        @Value("\${chatvault.bucket.import}") val bucketImportPath: String
+        @Value("\${chatvault.bucket.import}") val bucketImportPath: String,
+        @Value("\${chatvault.bucket.export}") val bucketExportPath: String
 ) : BucketService {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -32,6 +33,7 @@ class BucketServiceImpl(
     fun init() {
         createBucketIfNotExists(bucketRootPath)
         createBucketIfNotExists(bucketImportPath)
+        createBucketIfNotExists(bucketExportPath)
     }
 
     fun saveToBucket(bucketFile: BucketFile, bucketRootPath: String) {
@@ -88,25 +90,28 @@ class BucketServiceImpl(
         try {
             return File(bucketRootPath).getDirectoriesWithContentAndZipFiles()
                     .first { path == it.name }
-                    .let { dir ->
-                        DirectoryZipper.zip(dir).let { resource ->
-                            InputStreamResource(object : FileInputStream(resource.file) {
-                                @Throws(IOException::class)
-                                override fun close() {
-                                    super.close()
-                                    val isDeleted: Boolean = resource.file.delete()
-                                    logger.info(
-                                            "export:'{}':" + if (isDeleted) "deleted" else "preserved", resource.file.name
-                                    )
-                                }
-                            })
-                        }
-                    }
+                    .let { dir -> zip(dir, targetDir = bucketExportPath) }
         } catch (e: Exception) {
             throw BucketServiceException(message = "Fail to zip bucket", throwable = e)
         }
 
     }
+
+    override fun loadBucketListAsZip(): Resource = zip(File(bucketRootPath), targetDir = bucketExportPath)
+
+    private fun zip(dir: File, targetDir: String) = DirectoryZipper.zip(dir, targetDir).let { resource ->
+        InputStreamResource(object : FileInputStream(resource.file) {
+            @Throws(IOException::class)
+            override fun close() {
+                super.close()
+                val isDeleted: Boolean = resource.file.delete()
+                logger.info(
+                    "export:'{}':" + if (isDeleted) "deleted" else "preserved", resource.file.name
+                )
+            }
+        })
+    }
+
 
     override fun delete(bucketFile: BucketFile) {
         val file = bucketFile.file(bucketRootPath)

@@ -1,6 +1,6 @@
 <script setup lang="ts" xmlns="http://www.w3.org/1999/html">
 import {useMainStore} from "~/store";
-
+const props = defineProps(['allowDownloadAll'])
 const store = useMainStore()
 const clickModal = ref(false)
 const chatImportRef = ref(null)
@@ -12,8 +12,23 @@ const modalClass = computed(() => {
   }
 })
 
-const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", store.chatActive.chatId.toString()))
-const downloadChatPath = computed(() => useRuntimeConfig().public.api.exportChatById.replace(":chatId", store.chatActive.chatId.toString()))
+const importChatPath = computed(() => useRuntimeConfig().public.api.importChatById.replace(":chatId", store.chatActive?.chatId?.toString()))
+
+const linkDownload = computed(() => {
+  if (props.allowDownloadAll) {
+    return useRuntimeConfig().public.api.exportAllChats
+  } else {
+    return useRuntimeConfig().public.api.exportChatById.replace(":chatId", store.chatActive?.chatId?.toString())
+  }
+})
+
+const chatName = computed(() => {
+  if (props.allowDownloadAll) {
+    return "all-chats.zip"
+  } else {
+    return store.chatActive.chatName + '.zip'
+  }
+})
 
 function toggleModal() {
   clickModal.value = !clickModal.value
@@ -83,14 +98,14 @@ watch(
 
               <div class="form-group d-flex justify-content-center mb-3">
                 <a class="d-block text-center"
-                   :href="downloadChatPath"
-                   :download="store.chatActive.chatName + '.zip'"
+                   :href="linkDownload"
+                   :download="chatName"
                 >
                   Get the entire chat
                 </a>
               </div>
 
-              <div class="form-group mb-3 pt-4 border-top border-2">
+              <div class="form-group mb-3 pt-4 border-top border-2" v-if="!allowDownloadAll">
                 <p class="text-black">Attention, these actions are related to the selected chat! </p>
                 <label for="formFileSm" class="form-label text-black">Import messages to this chat</label>
                 <input class="form-control form-control-sm"
@@ -100,7 +115,7 @@ watch(
                        ref="chatImportRef"
                        type="file">
               </div>
-              <div class="btn-group" role="group">
+              <div class="btn-group" role="group" v-if="!allowDownloadAll">
                 <button type="button" :disabled="disableUpload" @click="uploadFile"
                         class="btn btn-outline-secondary ml-2">Upload
                 </button>

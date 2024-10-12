@@ -11,34 +11,42 @@ import java.util.zip.ZipOutputStream
 
 object DirectoryZipper {
 
-    fun zip(directory: File): UrlResource {
-        val zipFileName: String = directory.getName() + ".zip"
-        val zipFile = File(directory.getParent(), zipFileName)
+    fun zip(directory: File, targetDir: String): UrlResource {
+        val zipFileName: String = "${directory.name}.zip"
+        val zipFile = File(targetDir, zipFileName)
 
         try {
             FileOutputStream(zipFile).use { fos ->
                 ZipOutputStream(fos).use { zipOut ->
-                    directory.listFilesName().forEach { file ->
-                        FileInputStream(file).use { fis ->
-                            val zipEntry = ZipEntry(file.getName())
-                            zipOut.putNextEntry(zipEntry)
-                            StreamUtils.copy(fis, zipOut)
-                            zipOut.closeEntry()
-                        }
-
-                    }
+                    zipDirectory(directory, directory.name, zipOut)
                 }
             }
             return UrlResource(zipFile.toURI())
         } catch (e: IOException) {
-            throw RuntimeException("fail to zip file  $zipFileName")
+            throw RuntimeException("Failed to zip file $zipFileName", e)
+        }
+    }
+
+    private fun zipDirectory(sourceDir: File, baseDirName: String, zipOut: ZipOutputStream) {
+        val files = sourceDir.listFiles() ?: return
+
+        for (file in files) {
+            if (file.isDirectory) {
+                zipDirectory(file, "$baseDirName/${file.name}", zipOut)
+            } else {
+                FileInputStream(file).use { fis ->
+                    val zipEntry = ZipEntry("$baseDirName/${file.name}")
+                    zipOut.putNextEntry(zipEntry)
+                    StreamUtils.copy(fis, zipOut)
+                    zipOut.closeEntry()
+                }
+            }
         }
     }
 
     fun zipAndDeleteSource(directory: File): UrlResource {
-        return zip(directory).also { _ ->
-            directory.listFilesName().forEach { it.delete() }
+        return zip(directory, directory.parent).also { _ ->
+            directory.deleteRecursively()
         }
     }
-
 }
