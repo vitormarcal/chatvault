@@ -11,6 +11,7 @@ class ChatNamePatternMatcherTest {
         @JvmStatic
         fun validPatternStrings() = listOf(
             "_chat.txt",                                // Exact match for _chat.txt
+            "folder/_chat.txt",                         // Exact match for dir with  _chat.txt
             "Conversa com WhatsApp.txt",                // Contains WhatsApp
             "Conversation with WhatsApp.txt",           // Contains WhatsApp
         )
@@ -22,7 +23,8 @@ class ChatNamePatternMatcherTest {
             "mensagem aleatória",                        // No patterns
             "arquivo_chatx.txt",                         // Incorrect pattern (error at the end)
             "arquivo_com_chat e outro conteudo",        // Does not end with .txt
-            "arquivo_chat.txt"                           // Ends with _chat.txt but is not the exact pattern
+            "arquivo_chat.txt" ,                          // Ends with _chat.txt but is not the exact pattern
+            "dir/arquivo_chat.txt"                           // Ends with _chat.txt but is not the exact pattern
         )
     }
 
