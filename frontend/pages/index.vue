@@ -13,11 +13,17 @@
         >
 
         </new-chat-uploader>
+
+        <chat-exporter v-else-if="exportChatAction"
+                            allow-download-all="true"
+                            @exit:dialog="() => exportChatAction = false" />
+
         <template v-else>
           <chat-list :chats="chats"
                      :mobile="isMobile"
                      @create:chat="createNewChat"
                      @update:chat-active="updateChatActive"
+                     @export:chat="exportChat"
                      @update:disk-import="refreshPage"
           />
           <message-area
@@ -46,6 +52,7 @@ const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
 const isMobile = ref(true)
 const indexRef = ref(null)
 const createChatAction = ref(false)
+const exportChatAction = ref(false)
 
 function checkWindowSize() {
   if (indexRef.value) {
@@ -57,12 +64,17 @@ function checkWindowSize() {
 function refreshPage() {
   store.loading = true
   createChatAction.value = false
+  exportChatAction.value = false
   refresh()
   store.loading = false
 }
 
 function createNewChat() {
   createChatAction.value = true
+}
+
+function exportChat() {
+  exportChatAction.value = true
 }
 
 function updateChatActive(item: any) {
