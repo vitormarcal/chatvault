@@ -26,12 +26,17 @@
                      @export:chat="exportChat"
                      @update:disk-import="refreshPage"
           />
-          <message-area
-              :mobile="isMobile"
-          />
-          <chat-config v-if="store.chatConfigOpen"
-                       @refresh:page="() => refresh()"
-          />
+          <app-config v-if="store.appConfigOpen" />
+          <template v-else>
+            <message-area
+                :mobile="isMobile"
+            />
+
+            <chat-config v-if="store.chatConfigOpen"
+                         @refresh:page="() => refresh()"
+            />
+          </template>
+
         </template>
 
       </div>
