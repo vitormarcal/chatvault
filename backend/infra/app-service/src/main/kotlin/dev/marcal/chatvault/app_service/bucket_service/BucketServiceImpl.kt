@@ -99,7 +99,7 @@ class BucketServiceImpl(
 
     override fun loadBucketListAsZip(): Resource = zip(File(bucketRootPath), targetDir = bucketExportPath)
 
-    private fun zip(dir: File, targetDir: String) = DirectoryZipper.zip(dir, targetDir).let { resource ->
+    private fun zip(dir: File, targetDir: String) = DirectoryZipper.zip(dir, targetDir, saveInSameBaseDir = false).let { resource ->
         InputStreamResource(object : FileInputStream(resource.file) {
             @Throws(IOException::class)
             override fun close() {

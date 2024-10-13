@@ -12,7 +12,6 @@ import dev.marcal.chatvault.service.MessageCreator
 import io.mockk.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class ChatFileImporterUseCaseTest {
     private val chatMessageParser = ChatMessageParserUseCase(MessageParser())

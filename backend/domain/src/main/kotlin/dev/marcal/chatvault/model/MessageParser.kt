@@ -10,17 +10,28 @@ import java.time.format.DateTimeFormatterBuilder
 class MessageParser(pattern: String? = null) {
     private val customFormatter: DateTimeFormatter? =
         pattern?.let { DateTimeFormatter.ofPattern(it.removeBracketsAndTrim()) }
-    private val firstComesTheDayFormatter: DateTimeFormatter = buildWithPattern("[dd.MM.yyyy][dd.MM.yy]")
-    private val firstComesTheMonthFormatter: DateTimeFormatter = buildWithPattern("[MM.dd.yyyy][MM.dd.yy]")
+    private val firstComesTheDayFormatter: DateTimeFormatter by lazy {
+        buildWithPattern("[dd.MM.yyyy][dd.MM.yy]")
+    }
+    private val firstComesTheMonthFormatter: DateTimeFormatter by lazy {
+        buildWithPattern("[MM.dd.yyyy][MM.dd.yy]")
+    }
 
     private var lastUsed: DateTimeFormatter? = null
 
-    private val dateRegexText =
-        "^(\\[?\\d{1,4}[-/.]\\d{1,4}[-/.]\\d{1,4}[,.]? \\d{2}:\\d{2}(?::\\d{2})?\\s?([aA][mM]|[pP][mM])?\\]?)"
-    private val dateWithoutNameRegex = "$dateRegexText(?: - |: )(.*)$".toRegex()
-    private val dateWithNameRegex = "$dateRegexText(?: - |: )([^:]+): (.+)$".toRegex()
-    private val onlyDate = dateRegexText.toRegex()
-    private val attachmentNameRegex = "^(.*?)\\s+\\((.*?)\\)$".toRegex()
+
+    companion object {
+
+        private const val UNICODE_LEFT_TO_RIGHT = "\u200E"
+        private const val NULL_CHAR = '\u0000'
+
+        private const val DATE_REGEX =
+            "^(\\[?\\d{1,4}[-/.]\\d{1,4}[-/.]\\d{1,4}[,.]? \\d{2}:\\d{2}(?::\\d{2})?\\s?([aA][mM]|[pP][mM])?\\]?)"
+        private val DATE_WITHOUT_NAME_REGEX = "$DATE_REGEX(?: - |: )(.*)$".toRegex()
+        private val DATE_WITH_NAME_REGEX = "$DATE_REGEX(?: - |: )([^:]+): (.+)$".toRegex()
+        private val ONLY_DATE = DATE_REGEX.toRegex()
+        private val ATTACHMENT_NAME_REGEX = "^(.*?)\\s+\\((.*?)\\)$".toRegex()
+    }
 
     fun <R> parse(text: String, transform: (Message) -> R): R {
         return transform(parse(text))
@@ -32,89 +43,95 @@ class MessageParser(pattern: String? = null) {
     }
 
     fun parseDate(text: String): LocalDateTime {
-        if (customFormatter != null) {
-            return LocalDateTime.parse(text.removeBracketsAndTrim(), customFormatter)
-        }
-        return tryToInfer(text)
+        return customFormatter?.let {
+            LocalDateTime.parse(text.removeBracketsAndTrim(), it)
+        } ?: tryToInfer(text)
     }
 
+    /**
+     * Tries to infer the date from the provided text based on pre-configured formats.
+     * Throws [AmbiguousDateException] if the day and month cannot be distinguished.
+     */
     private fun tryToInfer(text: String): LocalDateTime {
         text.removeBracketsAndTrim()
-            .sanitizeWithDots()
+            .normalizeToDotSeparatedFormat()
             .let {
                 val groups = it.split(".")
                 val textToParse = groups.dayAndMonthWith2Digits() ?: it
-                if (groups[0].toInt() > 12) {
-                    lastUsed = firstComesTheDayFormatter
-                    return LocalDateTime.parse(textToParse, firstComesTheDayFormatter)
-                } else if (groups[1].toInt() > 12) {
-                    lastUsed = firstComesTheMonthFormatter
-                    return LocalDateTime.parse(textToParse, firstComesTheMonthFormatter)
-                } else {
-                    if (lastUsed == null) {
-                        throw AmbiguousDateException("There is ambiguity in the date, it is not possible to know which value is the day and which is the month $text")
-                    } else {
-                        return LocalDateTime.parse(textToParse, lastUsed)
-                    }
+                val formatter = when {
+                    groups[0].toInt() > 12 -> firstComesTheDayFormatter
+                    groups[1].toInt() > 12 -> firstComesTheMonthFormatter
+                    lastUsed != null -> lastUsed
+                    else -> throw AmbiguousDateException("There is ambiguity in the date, it is not possible to know which value is the day and which is the month: $text")
                 }
+                lastUsed = formatter!!
+                return LocalDateTime.parse(textToParse, formatter)
             }
     }
 
     fun extractTextDate(text: String): String? {
-        val dateMatcher = onlyDate.find(text)
+        val dateMatcher = ONLY_DATE.find(text)
         return dateMatcher?.value
     }
 
     private fun parse(
         text: String
     ): Message {
-        val (firstLine, textMessage) = text.split("\n").let { lines ->
-            lines.first() to lines.drop(1).joinToString("\n")
-        }
+        val firstLine = text.lineSequence().first()
+        val textMessage = text.lineSequence().drop(1).joinToString("\n")
+
         val (date, name, firstLineMessage) = extractDateNameFirstLineMessage(firstLine, text)
 
-        val content = (firstLineMessage + (textMessage.takeIf { it.isNotEmpty() }?.let { "\n" + it } ?: ""))
+        val content = buildContent(firstLineMessage, textMessage)
+        val attachment = extractAttachment(firstLineMessage)
 
-        val attachment = attachmentNameRegex.find(firstLineMessage)?.groupValues?.get(1)?.let {
-            Attachment(name = it, bucket = Bucket("/"))
-        }
-
-        return Message(author = name?.let { Author(name = it, type = AuthorType.USER) } ?: Author(
-            name = "", type = AuthorType.SYSTEM
-        ),
-            content = Content(text = removeTrailingNulls(content), attachment = attachment),
+        return Message(
+            author = buildAuthor(name),
+            content = Content(text = content.removeNullCharacters(), attachment = attachment),
             createdAt = date,
-            externalId = null)
+            externalId = null
+        )
     }
 
     private fun extractDateNameFirstLineMessage(
         firstLine: String, text: String
-    ): Triple<LocalDateTime, String?, String> {
-        return dateWithNameRegex.find(firstLine)?.let { result ->
+    ): ParsedMessageInfo {
+        return DATE_WITH_NAME_REGEX.find(firstLine)?.let { result ->
             val date = parseDate(result.groupValues[1])
             val name = result.groupValues[3].trim()
             val content = result.groupValues[4].trim()
-            Triple(date, name, removePrefix(content))
-        } ?: dateWithoutNameRegex.find(text)?.let { result ->
+            ParsedMessageInfo(date, name, content.removeLtrPrefix())
+        } ?: DATE_WITHOUT_NAME_REGEX.find(text)?.let { result ->
             val date = parseDate(result.groupValues[1])
             val content = result.groupValues[3].trim()
-            Triple(date, null, removePrefix(content))
+            ParsedMessageInfo(date, null, content.removeLtrPrefix())
 
         } ?: throw MessageParserException("Parse text fail. Unexpected situation for the line $firstLine")
     }
 
-    private fun removePrefix(content: String): String {
-        return content.removePrefix("\u200E")
+    private fun buildAuthor(name: String?): Author {
+        return name?.let { Author(name = it, type = AuthorType.USER) } ?: Author(name = "", type = AuthorType.SYSTEM)
     }
 
-    private fun removeTrailingNulls(content: String): String {
-        return content.filterNot { it == '\u0000' }
+    private fun buildContent(firstLineMessage: String, textMessage: String): String {
+        return listOf(firstLineMessage, textMessage).filter { it.isNotEmpty() }.joinToString("\n")
     }
+
+    private fun extractAttachment(firstLineMessage: String): Attachment? {
+        return ATTACHMENT_NAME_REGEX.find(firstLineMessage)?.groupValues?.get(1)?.let {
+            Attachment(name = it, bucket = Bucket("/"))
+        }
+    }
+
+    private fun String.removeLtrPrefix() = this.removePrefix(UNICODE_LEFT_TO_RIGHT)
+    private fun String.removeNullCharacters() = this.filterNot { it == NULL_CHAR }
+
+    data class ParsedMessageInfo(val date: LocalDateTime, val name: String?, val content: String)
 }
 
 fun String.removeBracketsAndTrim(): String = this.replace("[\\[\\]]+".toRegex(), " ").trim()
 
-fun String.sanitizeWithDots(): String = this.replace("[.\\s,\\-/]+".toRegex(), ".")
+fun String.normalizeToDotSeparatedFormat(): String = this.replace("[.\\s,\\-/]+".toRegex(), ".")
 
 fun List<String>.dayAndMonthWith2Digits(): String? {
 

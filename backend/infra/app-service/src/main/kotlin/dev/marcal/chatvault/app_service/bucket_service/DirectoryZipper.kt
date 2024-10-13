@@ -11,14 +11,14 @@ import java.util.zip.ZipOutputStream
 
 object DirectoryZipper {
 
-    fun zip(directory: File, targetDir: String): UrlResource {
+    fun zip(directory: File, targetDir: String, saveInSameBaseDir: Boolean = true): UrlResource {
         val zipFileName: String = "${directory.name}.zip"
         val zipFile = File(targetDir, zipFileName)
 
         try {
             FileOutputStream(zipFile).use { fos ->
                 ZipOutputStream(fos).use { zipOut ->
-                    zipDirectory(directory, directory.name, zipOut)
+                    zipDirectory(directory, directory.name, zipOut, saveInSameBaseDir)
                 }
             }
             return UrlResource(zipFile.toURI())
@@ -27,15 +27,16 @@ object DirectoryZipper {
         }
     }
 
-    private fun zipDirectory(sourceDir: File, baseDirName: String, zipOut: ZipOutputStream) {
+    private fun zipDirectory(sourceDir: File, baseDirName: String, zipOut: ZipOutputStream, saveInSameBaseDir: Boolean = true) {
         val files = sourceDir.listFiles() ?: return
 
         for (file in files) {
+            val baseDir = if (saveInSameBaseDir) file.name else "$baseDirName/${file.name}"
             if (file.isDirectory) {
-                zipDirectory(file, "$baseDirName/${file.name}", zipOut)
+                zipDirectory(file, baseDir, zipOut, saveInSameBaseDir)
             } else {
                 FileInputStream(file).use { fis ->
-                    val zipEntry = ZipEntry("$baseDirName/${file.name}")
+                    val zipEntry = ZipEntry(baseDir)
                     zipOut.putNextEntry(zipEntry)
                     StreamUtils.copy(fis, zipOut)
                     zipOut.closeEntry()
@@ -45,7 +46,7 @@ object DirectoryZipper {
     }
 
     fun zipAndDeleteSource(directory: File): UrlResource {
-        return zip(directory, directory.parent).also { _ ->
+        return zip(directory, directory.parent, saveInSameBaseDir = true).also { _ ->
             directory.deleteRecursively()
         }
     }
