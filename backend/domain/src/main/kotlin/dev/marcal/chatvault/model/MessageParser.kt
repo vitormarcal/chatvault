@@ -26,7 +26,7 @@ class MessageParser(pattern: String? = null) {
         private const val NULL_CHAR = '\u0000'
 
         private const val DATE_REGEX =
-            "^(\\[?\\d{1,4}[-/.]\\d{1,4}[-/.]\\d{1,4}[,.]? \\d{2}:\\d{2}(?::\\d{2})?\\s?([aA][mM]|[pP][mM])?\\]?)"
+            "^$UNICODE_LEFT_TO_RIGHT?(\\[?\\d{1,4}[-/.]\\d{1,4}[-/.]\\d{1,4}[,.]? \\d{2}:\\d{2}(?::\\d{2})?\\s?([aA][mM]|[pP][mM])?\\]?)"
         private val DATE_WITHOUT_NAME_REGEX = "$DATE_REGEX(?: - |: )(.*)$".toRegex()
         private val DATE_WITH_NAME_REGEX = "$DATE_REGEX(?: - |: )([^:]+): (.+)$".toRegex()
         private val ONLY_DATE = DATE_REGEX.toRegex()
