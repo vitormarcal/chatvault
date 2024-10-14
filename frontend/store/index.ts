@@ -8,6 +8,7 @@ export const useMainStore = defineStore('main', () => {
     const chatActive = ref({} as Chat)
     const authorActive = ref('')
     const chatConfigOpen = ref(false)
+    const appConfigOpen = ref(true)
     const nextPage = ref(0)
     const pageSize = ref(20)
     const reloadImageProfile = ref(false)
@@ -74,6 +75,7 @@ export const useMainStore = defineStore('main', () => {
         attachmentsInfo,
         attachments,
         chatConfigOpen,
+        appConfigOpen,
         nextPage,
         pageSize,
         authorActive,
