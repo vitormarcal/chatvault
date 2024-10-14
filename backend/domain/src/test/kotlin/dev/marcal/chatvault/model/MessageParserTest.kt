@@ -151,6 +151,27 @@ class MessageParserTest {
     }
 
     @Test
+    fun `should parse message correctly when date has LRM character`() {
+        val line = "\u200E19/09/2023 22:58 - Fulano: Olha aquela coisa!"
+
+        val message = MessageParser().parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2023, 9, 19, 22, 58),
+            author = Author(
+                name = "Fulano",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = null,
+                text = "Olha aquela coisa!"
+            )
+        )
+
+        assertEquals(expected, message)
+    }
+
+    @Test
     fun `should return a exception when unexpected situation`() {
         val line =
             ""
@@ -255,14 +276,18 @@ class MessageParserTest {
         ).forEach {
             assertEquals(it, MessageParser().extractTextDate(it))
             assertEquals(it, MessageParser().extractTextDate("${it}xyz"))
+            assertEquals("\u200E${it}", MessageParser().extractTextDate("\u200E${it}"))
+            assertEquals(null, MessageParser().extractTextDate("\u200Exyz${it}xyz"))
             assertEquals(null, MessageParser().extractTextDate("xyz${it}xyz"))
             assertEquals(null, MessageParser().extractTextDate("xyz ${it}xyz"))
+            assertEquals("$it am", MessageParser().extractTextDate("$it am"))
             assertEquals("$it am", MessageParser().extractTextDate("$it am"))
             assertEquals("${it}am", MessageParser().extractTextDate("${it}am"))
             assertEquals("$it pm", MessageParser().extractTextDate("$it pm"))
             assertEquals("${it}pm", MessageParser().extractTextDate("${it}pm"))
             assertEquals("[${it}pm]", MessageParser().extractTextDate("[${it}pm]"))
             assertEquals("[${it}am]", MessageParser().extractTextDate("[${it}am]"))
+            assertEquals("[${it}]", MessageParser().extractTextDate("[${it}]"))
             assertEquals("[${it}]", MessageParser().extractTextDate("[${it}]"))
             assertEquals("[${it}]", MessageParser().extractTextDate("[${it}]"))
         }
