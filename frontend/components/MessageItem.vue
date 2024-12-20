@@ -1,42 +1,49 @@
 <template>
-  <div class="message-item rounded d-flex flex-column mt-3" :class="classObject">
+  <div
+      class="message-item rounded d-flex flex-column mt-3"
+      :class="classObject"
+  >
     <div class="message-id">{{ message.id }}</div>
     <div class="author font-weight-bold">{{ message.author }}</div>
-    <div class="message-content" v-html="safeContent"></div>
-    <focusable-attachment v-if="hasAttachment" :attachment="message.attachment"></focusable-attachment>
+    <div :class="{ 'blur-sensitive': store.blurEnabled }" class="message-content" v-html="safeContent"></div>
+    <focusable-attachment
+        :class="{ 'blur-sensitive': store.blurEnabled }"
+        v-if="hasAttachment"
+        :attachment="message.attachment"
+    ></focusable-attachment>
     <div class="message-createdAt">{{ message.createdAt }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {useMainStore} from "~/store";
+import {useMainStore} from '~/store';
 
-const store = useMainStore()
+const store = useMainStore();
 
-const props = defineProps(["message"])
+const props = defineProps(['message']);
 
-const safeContent = computed(() => props.message.content.replace(
-    /https?:\/\/[^\s]+/g,
-    '<a href="$&" target="_blank">$&</a>'
-))
+const safeContent = computed(() =>
+    props.message.content.replace(
+        /https?:\/\/[^\s]+/g,
+        '<a href="$&" target="_blank">$&</a>'
+    )
+);
 
-const hasAttachment = computed(() => !!props.message.attachment)
-const isSystem = computed(() => props.message.authorType === 'SYSTEM')
+const hasAttachment = computed(() => !!props.message.attachment);
+const isSystem = computed(() => props.message.authorType === 'SYSTEM');
 
-const self = computed(() => props.message.author === store.authorActive)
+const self = computed(() => props.message.author === store.authorActive);
 
 const classObject = computed(() => {
   return {
     'system-message w-50 align-self-center': isSystem.value,
     'align-self-end': self.value,
-    'align-self-start': !self.value
-  }
-})
+    'align-self-start': !self.value,
+  };
+});
 </script>
 
-
 <style scoped>
-
 .message-item {
   padding: 8px 10px;
   box-shadow: rgba(0, 0, 0, 0.2) 0 1px 1px;
@@ -65,6 +72,7 @@ const classObject = computed(() => {
   opacity: 1;
 }
 
+
 .message-content {
   overflow-wrap: break-word;
   word-break: break-word;
@@ -84,4 +92,12 @@ const classObject = computed(() => {
   align-self: flex-end;
 }
 
+.blur-sensitive {
+  filter: blur(6px);
+  transition: filter 0.3s ease-in-out;
+}
+
+.message-item:hover .blur-sensitive {
+  filter: none;
+}
 </style>

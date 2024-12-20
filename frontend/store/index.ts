@@ -17,6 +17,11 @@ export const useMainStore = defineStore('main', () => {
     const attachments = computed<Attachment[]>(() => {
         return attachmentsInfo.value.map((it: any) => AttachmentConstructor(it.name, attachmentUrl(chatActive.value.chatId, it.id)))
     })
+    const blurEnabled = ref(true);
+
+    function toggleBlur() {
+        blurEnabled.value = !blurEnabled.value;
+    }
 
     function updateMessages(items: ChatMessage []) {
         messages.value = items
@@ -79,6 +84,8 @@ export const useMainStore = defineStore('main', () => {
         authorActive,
         authors,
         reloadImageProfile,
+        blurEnabled,
+        toggleBlur,
         updateMessages,
         clearMessages,
         toNextPage,
