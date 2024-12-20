@@ -1,25 +1,8 @@
-<script setup lang="ts">
-import {useMainStore} from "~/store";
-
-const store = useMainStore()
-
-const chatActive = computed(() => store.chatActive.chatId > 0)
-
-function exitThisChat() {
-  store.chatExited()
-}
-
-function toggleOpenChatConfig() {
-  store.chatConfigOpen = !store.chatConfigOpen
-}
-
-</script>
-
 <template>
   <div id="navbar"
        class="sticky-top d-flex p-2 m-0 justify-content-between"
        v-if="chatActive">
-    <div class="chat-info-header d-flex align-items-center">
+    <div :class="{ 'blur-sensitive': store.blurEnabled }" class="chat-info-header d-flex align-items-center">
       <a href="#" class="h2" @click="exitThisChat">
         <rotable-arrow-icon/>
       </a>
@@ -29,7 +12,7 @@ function toggleOpenChatConfig() {
       <div class="d-flex flex-column" role="button" @click="() => toggleOpenChatConfig()">
         <div class="font-weight-bold" id="name">{{ store.chatActive.chatName }}
         </div>
-        <span class="badge align-content-end bg-success">{{store.chatActive.msgCount}} messages</span>
+        <span class="badge align-content-end bg-success">{{ store.chatActive.msgCount }} messages</span>
         <div class="small d-flex" id="details">last message sent:
           <message-created-at :date="store.chatActive.msgCreatedAt"/>
         </div>
@@ -41,8 +24,32 @@ function toggleOpenChatConfig() {
   </div>
 </template>
 
+<script setup lang="ts">
+import {useMainStore} from '~/store';
+
+const store = useMainStore();
+const chatActive = computed(() => store.chatActive.chatId > 0);
+
+function exitThisChat() {
+  store.chatExited();
+}
+
+function toggleOpenChatConfig() {
+  store.chatConfigOpen = !store.chatConfigOpen;
+}
+</script>
+
 <style scoped>
 #navbar {
   background: #000000;
+}
+
+.blur-sensitive {
+  filter: blur(6px);
+  transition: filter 0.3s ease-in-out;
+}
+
+#navbar:hover .blur-sensitive {
+  filter: none;
 }
 </style>

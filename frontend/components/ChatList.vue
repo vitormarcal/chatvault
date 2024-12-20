@@ -5,8 +5,13 @@
     <div class="action-bar d-flex flex-row p-2 sticky-top">
       <div class="btn-group" role="group">
         <button type="button" class="btn btn-outline-primary btn-sm" @click="emitCreateNewChat">Create new chat</button>
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import</button>
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitChatExport">Execute chat export</button>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitChatExport">Execute chat export
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" @click="store.toggleBlur">
+          {{ store.blurEnabled ? "Disable Blur" : "Enable Blur" }}
+        </button>
       </div>
 
     </div>
@@ -45,7 +50,7 @@ function emitCreateNewChat() {
 
 function emitChatExport() {
   exitThisChat()
-  emit( 'export:chat')
+  emit('export:chat')
 }
 
 async function emitDiskImport() {
