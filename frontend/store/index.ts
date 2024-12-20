@@ -1,90 +1,83 @@
-import {defineStore} from 'pinia'
+import {defineStore} from 'pinia';
 import {type Attachment, AttachmentConstructor, type Chat, ChatMessage} from "~/types";
 
 export const useMainStore = defineStore('main', () => {
-    const loading = ref(false)
-    const messages = ref([] as ChatMessage[])
-    const attachmentsInfo = ref([] as any)
-    const chatActive = ref({} as Chat)
-    const authorActive = ref('')
-    const chatConfigOpen = ref(false)
-    const nextPage = ref(0)
-    const pageSize = ref(20)
-    const reloadImageProfile = ref(false)
+    const state = reactive({
+        loading: false,
+        messages: [] as ChatMessage[],
+        attachmentsInfo: [] as any[],
+        chatActive: {} as Chat,
+        authorActive: '',
+        chatConfigOpen: false,
+        nextPage: 0,
+        pageSize: 20,
+        reloadImageProfile: false,
+        blurEnabled: true,
+    });
+
     const authors = computed(() => {
-        return [...new Set(messages.value.map(it => it.author))].filter(it => !!it)
-    })
+        return [...new Set(state.messages.map(it => it.author))].filter(Boolean);
+    });
+
     const attachments = computed<Attachment[]>(() => {
-        return attachmentsInfo.value.map((it: any) => AttachmentConstructor(it.name, attachmentUrl(chatActive.value.chatId, it.id)))
-    })
-    const blurEnabled = ref(true);
+        return state.attachmentsInfo.map((it: any) =>
+            AttachmentConstructor(it.name, attachmentUrl(state.chatActive.chatId, it.id))
+        );
+    });
 
     function toggleBlur() {
-        blurEnabled.value = !blurEnabled.value;
+        state.blurEnabled = !state.blurEnabled;
     }
 
-    function updateMessages(items: ChatMessage []) {
-        messages.value = items
+    function updateMessages(items: ChatMessage[]) {
+        state.messages = items;
     }
 
     function toChatMessage(item: any): ChatMessage {
-        return new ChatMessage(item, chatActive.value.chatId)
+        return new ChatMessage(item, state.chatActive.chatId);
     }
 
     function clearMessages() {
-        messages.value = []
-        nextPage.value = 0
+        state.messages = [];
+        state.nextPage = 0;
     }
 
     function chatExited() {
-        chatActive.value = {} as Chat
-        chatConfigOpen.value = false
-        attachmentsInfo.value = []
-        clearMessages()
+        state.chatActive = {} as Chat;
+        state.chatConfigOpen = false;
+        state.attachmentsInfo = [];
+        clearMessages();
     }
 
     async function openChat(chat: Chat) {
-        chatActive.value = chat
-        await findAttachmentsInfo()
+        state.chatActive = chat;
+        await findAttachmentsInfo();
     }
 
     async function findAttachmentsInfo() {
-        const url = useRuntimeConfig().public.api.getAttachmentsInfoByChatId.replace(":chatId", chatActive.value.chatId.toString())
-        attachmentsInfo.value = await $fetch(url)
+        const url = useRuntimeConfig().public.api.getAttachmentsInfoByChatId
+            .replace(":chatId", state.chatActive.chatId.toString());
+        state.attachmentsInfo = await $fetch(url);
     }
 
     function toNextPage() {
-        nextPage.value += 1
+        state.nextPage += 1;
     }
 
-    function updatePageSize(value: number) {
-        if (value == pageSize.value) return true
+    function updatePageSize(value: number): boolean {
+        if (value === state.pageSize) return true;
         if (!isNaN(value) && value >= 1 && value <= 2000) {
-            clearMessages()
-            pageSize.value = value
-            return true
-        } else {
-            return false
+            clearMessages();
+            state.pageSize = value;
+            return true;
         }
-    }
-
-    function sleep(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms))
+        return false;
     }
 
     return {
-        loading,
-        chatActive,
-        messages,
-        attachmentsInfo,
-        attachments,
-        chatConfigOpen,
-        nextPage,
-        pageSize,
-        authorActive,
+        ...toRefs(state),
         authors,
-        reloadImageProfile,
-        blurEnabled,
+        attachments,
         toggleBlur,
         updateMessages,
         clearMessages,
@@ -93,12 +86,11 @@ export const useMainStore = defineStore('main', () => {
         chatExited,
         openChat,
         toChatMessage,
-        sleep
-    }
-})
+    };
+});
 
 function attachmentUrl(chatId: number, messageId: number): string {
     return useRuntimeConfig().public.api.getAttachmentByChatIdAndMessageId
         .replace(':chatId', chatId.toString())
-        .replace(':messageId', messageId.toString())
+        .replace(':messageId', messageId.toString());
 }
