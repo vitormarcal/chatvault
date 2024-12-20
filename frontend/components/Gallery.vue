@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import {useMainStore} from "~/store";
+import { useMainStore } from "~/store";
 
-const gallery = ref({
-  fileType: 'ALL',
-  links: [
-    {type: 'ALL', label: 'All'},
-    {type: 'VIDEO', label: 'Video Files'},
-    {type: 'IMAGE', label: 'Image Files'},
-    {type: 'PDF', label: 'Documents'},
-    {type: 'AUDIO', label: 'Audio files'},
-  ]
-})
+const store = useMainStore();
 
-const attachments = computed(() => {
-  if (gallery.value.fileType != 'ALL') {
-    return store.attachments.filter(it => it.type == gallery.value.fileType)
-  } else {
-    return store.attachments
-  }
-})
+const galleryOptions = ref([
+  { type: "ALL", label: "All" },
+  { type: "VIDEO", label: "Video Files" },
+  { type: "IMAGE", label: "Image Files" },
+  { type: "PDF", label: "Documents" },
+  { type: "AUDIO", label: "Audio Files" },
+]);
 
-const store = useMainStore()
+const galleryFileType = ref("ALL");
 
+const attachments = computed(() =>
+    galleryFileType.value === "ALL"
+        ? store.attachments
+        : store.attachments.filter((item) => item.type === galleryFileType.value)
+);
+
+function setGalleryFilter(type: string) {
+  galleryFileType.value = type;
+}
 </script>
 
 <template>
@@ -29,17 +29,30 @@ const store = useMainStore()
     <slot></slot>
     <div class="title">Gallery</div>
     <ul class="nav justify-content-end">
-      <li class="nav-item" v-for="item in gallery.links">
-        <a class="nav-link active" aria-current="page" href="#" @click="gallery.fileType = item.type">{{
-            item.label
-          }}</a>
+      <li
+          v-for="item in galleryOptions"
+          :key="item.type"
+          class="nav-item"
+      >
+        <button
+            class="nav-link active"
+            :class="{ active: galleryFileType === item.type }"
+            @click="setGalleryFilter(item.type)"
+        >
+          {{ item.label }}
+        </button>
       </li>
     </ul>
 
     <div class="row">
-      <div class="col-md-4" v-for="item in attachments" :key="item.url">
+      <div
+          class="col-md-4"
+          v-for="item in attachments"
+          :key="item.url"
+          v-memo="galleryFileType"
+      >
         <div class="card">
-          <focusable-attachment :attachment="item"></focusable-attachment>
+          <focusable-attachment :attachment="item" />
         </div>
       </div>
     </div>
@@ -47,5 +60,7 @@ const store = useMainStore()
 </template>
 
 <style scoped>
-
+.nav-link.active {
+  font-weight: bold;
+}
 </style>
