@@ -19,6 +19,7 @@
       </div>
 
     </div>
+    <search-bar :chatId="store.chatActive.chatId" @search="handleSearch" />
     <icon-three-dots class="self" role="button" @click="() => toggleOpenChatConfig()"/>
 
   </div>
@@ -37,6 +38,12 @@ function exitThisChat() {
 function toggleOpenChatConfig() {
   store.chatConfigOpen = !store.chatConfigOpen;
 }
+
+function handleSearch({ query, chatId }: { query: string; chatId: string | null }) {
+  console.log("Search query:", query, "Chat ID:", chatId);
+  // todo: post search
+}
+
 </script>
 
 <style scoped>
@@ -51,5 +58,14 @@ function toggleOpenChatConfig() {
 
 #navbar:hover .blur-sensitive {
   filter: none;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #000;
+  color: #fff;
 }
 </style>
