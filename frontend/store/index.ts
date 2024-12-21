@@ -7,13 +7,21 @@ export const useMainStore = defineStore('main', () => {
         messages: [] as ChatMessage[],
         attachmentsInfo: [] as any[],
         chatActive: {} as Chat,
-        authorActive: '',
+        authorActive: localStorage.getItem("authorActive") || '',
         chatConfigOpen: false,
         nextPage: 0,
-        pageSize: 20,
+        pageSize: localStorage.getItem("pageSize") || 20,
         searchQuery: undefined,
         reloadImageProfile: false,
-        blurEnabled: true,
+        blurEnabled: localStorage.getItem("blurEnabled") === 'true',
+    });
+
+    watch(() => state.authorActive, (newValue) => {
+        localStorage.setItem("authorActive", newValue || '');
+    });
+
+    watch(() => state.blurEnabled, (newValue) => {
+        localStorage.setItem("blurEnabled", newValue.toString());
     });
 
     const authors = computed(() => {
