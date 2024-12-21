@@ -25,17 +25,12 @@ const store = useMainStore()
 const props = defineProps(['mobile'])
 const messagesAreaElement = ref(null)
 
-const moreMessagesPath = computed(() =>
-    useRuntimeConfig().public.api.getMessagesByIdAndPage.replace(":chatId", store.chatActive.chatId?.toString()).replace(":page", store.nextPage.toString()).replace(":size", store.pageSize.toString()))
+const moreMessagesPath = computed(() => { return store.moreMessagesPath });
 
 const {data: response, refresh} = await useFetch(moreMessagesPath)
 
 const content = computed(() => {
   return response?.value?.content ?? []
-})
-
-const authors = computed(() => {
-  return store.authors
 })
 
 const messages = computed(() => store.messages)

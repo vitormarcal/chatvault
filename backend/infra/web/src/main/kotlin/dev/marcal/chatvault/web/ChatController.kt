@@ -35,6 +35,7 @@ class ChatController(
     @GetMapping("{chatId}")
     fun findChatMessages(
             @PathVariable("chatId") chatId: Long,
+            @RequestParam("query", required = false) query: String? = null,
             @SortDefault(
                     sort = ["createdAt", "id"],
                     direction = Sort.Direction.DESC
@@ -42,6 +43,7 @@ class ChatController(
     ): Page<MessageOutput> {
         return messageFinderByChatId.execute(
                 chatId = chatId,
+                query  = query,
                 pageable = pageable
         )
     }

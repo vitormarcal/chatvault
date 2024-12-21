@@ -4,7 +4,7 @@
         type="text"
         class="form-control"
         placeholder="Search..."
-        v-model="searchQuery"
+        v-model="store.searchQuery"
         @input="onSearch"
     />
   </div>
@@ -12,15 +12,17 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-
+import {useMainStore} from "~/store";
+const store = useMainStore()
 const props = defineProps({
-  chatId: { type: [String, null], default: null },
+  chatId: { type: [Number, null], default: null },
 });
 const emit = defineEmits(["search"]);
 
 const searchQuery = ref("");
 
 function onSearch() {
+  store.clearMessages();
   emit("search", { query: searchQuery.value, chatId: props.chatId });
 }
 

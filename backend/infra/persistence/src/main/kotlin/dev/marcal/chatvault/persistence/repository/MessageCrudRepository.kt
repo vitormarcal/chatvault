@@ -7,11 +7,26 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 interface MessageCrudRepository : JpaRepository<MessageEntity, Long> {
 
     fun countByChatId(chatId: Long): Long
-    fun findAllByChatIdIs(chatId: Long, pageable: Pageable): Page<MessageOutput>
+
+    @Query("""
+        SELECT m FROM MessageEntity m 
+        WHERE 0=0 
+            AND m.chatId = :chatId
+            AND (:query = '' 
+                  OR ((LOWER(m.author) LIKE LOWER(CONCAT('%', :query, '%')) 
+                  OR LOWER(m.content) LIKE LOWER(CONCAT('%', :query, '%')))))
+    """)
+    fun findAllByChatIdIs(
+        @Param("query") query: String,
+        @Param("chatId") chatId: Long,
+        pageable: Pageable
+    ): Page<MessageEntity>
+
 
     fun findMessageEntityByIdAndChatId(id: Long, chatId: Long): MessageEntity?
 

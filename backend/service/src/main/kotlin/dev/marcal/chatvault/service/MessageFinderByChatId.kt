@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable
 
 interface MessageFinderByChatId {
 
-    fun execute(chatId: Long, pageable: Pageable): Page<MessageOutput>
+    fun execute(chatId: Long, query: String?, pageable: Pageable): Page<MessageOutput>
 
     fun execute(chatId: Long): Sequence<MessageOutput>
 }
