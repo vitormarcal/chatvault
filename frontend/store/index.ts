@@ -11,6 +11,7 @@ export const useMainStore = defineStore('main', () => {
         chatConfigOpen: false,
         nextPage: 0,
         pageSize: 20,
+        searchQuery: undefined,
         reloadImageProfile: false,
         blurEnabled: true,
     });
@@ -23,6 +24,14 @@ export const useMainStore = defineStore('main', () => {
         return state.attachmentsInfo.map((it: any) =>
             AttachmentConstructor(it.name, attachmentUrl(state.chatActive.chatId, it.id))
         );
+    });
+
+    const moreMessagesPath = computed(() => {
+        return useRuntimeConfig().public.api.getMessagesByIdAndPage
+            .replace(":chatId", state.chatActive.chatId?.toString())
+            .replace(":page", state.nextPage.toString())
+            .replace(":size", state.pageSize.toString())
+            .replace(":query", state.searchQuery || "")
     });
 
     function toggleBlur() {
@@ -79,6 +88,7 @@ export const useMainStore = defineStore('main', () => {
         authors,
         attachments,
         toggleBlur,
+        moreMessagesPath,
         updateMessages,
         clearMessages,
         toNextPage,

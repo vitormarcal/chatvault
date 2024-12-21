@@ -98,8 +98,12 @@ class ChatRepositoryImpl(
         return chatCrudRepository.findAllChatsWithLastMessage().asSequence().map { it.toChatLastMessage() }
     }
 
-    override fun findMessagesBy(chatId: Long, pageable: Pageable): org.springframework.data.domain.Page<MessageOutput> {
-        return messageCrudRepository.findAllByChatIdIs(chatId, pageable)
+    override fun findMessagesBy(chatId: Long, query: String?, pageable: Pageable): org.springframework.data.domain.Page<MessageOutput> {
+        return messageCrudRepository.findAllByChatIdIs(
+            chatId = chatId,
+            query = query ?: "",
+            pageable = pageable
+        ).map { objectMapper.convertValue(it, MessageOutput::class.java) }
     }
 
     override fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentInfoOutput> {

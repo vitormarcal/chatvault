@@ -9,7 +9,7 @@ export default defineNuxtConfig({
       public: {
           api: {
               listChats: `${host}/chats`,
-              getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page&size=:size`,
+              getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page&size=:size&query=:query`,
               getAttachmentByChatIdAndMessageId: `${host}/chats/:chatId/messages/:messageId/attachment`,
               getAttachmentsInfoByChatId: `${host}/chats/:chatId/attachments`,
               importChatById: `${host}/chats/:chatId/messages/import`,
