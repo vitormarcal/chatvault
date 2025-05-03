@@ -47,7 +47,7 @@ object DirectoryZipper {
 
     fun zipAndDeleteSource(directory: File): UrlResource {
         return zip(directory, directory.parent, saveInSameBaseDir = true).also { _ ->
-            directory.deleteRecursively()
+            directory.listFiles()?.forEach { it.deleteRecursively() }
         }
     }
 }
