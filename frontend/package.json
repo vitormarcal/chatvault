@@ -12,9 +12,9 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "nuxt": "^3.13.2",
-    "vue": "^3.3.7",
-    "vue-router": "^4.2.5"
+    "nuxt": "^3.14.1592",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",
