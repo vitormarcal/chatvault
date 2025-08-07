@@ -151,6 +151,27 @@ class MessageParserTest {
     }
 
     @Test
+    fun `should1 parse message correctly without date and name separator`() {
+        val line = "[11/04/2013, 21:56:03] Name: \u200EName changed the group name to “my family”"
+
+        val message = MessageParser("[dd/MM/yyyy, HH:mm:ss]").parse(line) { it }
+        val expected = Message(
+            createdAt = LocalDateTime.of(2013, 4, 11, 21, 56, 3),
+            author = Author(
+                name = "Name",
+                type = AuthorType.USER
+            ),
+            externalId = null,
+            content = Content(
+                attachment = null,
+                text = "Name changed the group name to “my family”"
+            )
+        )
+
+        assertEquals(expected, message)
+    }
+
+    @Test
     fun `should parse message correctly when date has LRM character`() {
         val line = "\u200E19/09/2023 22:58 - Fulano: Olha aquela coisa!"
 
