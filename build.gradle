@@ -63,6 +63,12 @@ subprojects {
     tasks.named('test') {
         useJUnitPlatform()
     }
+
+    processResources {
+        filesMatching('**/application.properties') {
+            expand(project.properties)
+        }
+    }
 }
 
 
