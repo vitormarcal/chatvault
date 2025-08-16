@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
       public: {
           api: {
+              appVersion: `${host}/version`,
               listChats: `${host}/chats`,
               getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page&size=:size&query=:query`,
               getAttachmentByChatIdAndMessageId: `${host}/chats/:chatId/messages/:messageId/attachment`,

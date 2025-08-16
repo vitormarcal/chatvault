@@ -15,8 +15,8 @@
         </new-chat-uploader>
 
         <chat-exporter v-else-if="exportChatAction"
-                            allow-download-all="true"
-                            @exit:dialog="() => exportChatAction = false" />
+                       allow-download-all="true"
+                       @exit:dialog="() => exportChatAction = false"/>
 
         <template v-else>
           <chat-list :chats="chats"
@@ -33,6 +33,7 @@
                        @refresh:page="() => refresh()"
           />
         </template>
+        <p class="app-version">ChatVault - v{{ appVersion }} </p>
 
       </div>
     </main>
@@ -48,7 +49,10 @@ import {useMainStore} from "~/store";
 
 const store = useMainStore()
 const listChatsAPIUrl = useRuntimeConfig().public.api.listChats
+const getAppVersionAPIUrl = useRuntimeConfig().public.api.appVersion
 const {data: chats, refresh} = await useFetch(listChatsAPIUrl)
+const {data: versionData} = await useFetch(getAppVersionAPIUrl)
+const appVersion = computed(() => versionData.value?.version ?? '')
 const isMobile = ref(true)
 const indexRef = ref(null)
 const createChatAction = ref(false)
@@ -116,6 +120,15 @@ onMounted(() => {
 main {
   width: 100vw;
   height: 90vh;
+}
+
+.app-version {
+  font-size: 14px;
+  color: #aaa;
+  margin-top: 24px;
+  margin-bottom: 0;
+  margin-right: 8px;
+  letter-spacing: 1px;
 }
 
 </style>
