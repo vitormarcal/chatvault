@@ -22,7 +22,7 @@ FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 COPY --from=frontend_builder /app/.output/public /app/public
-COPY --from=backend_builder /app/backend/application/build/libs/application-1.15.2.jar chatvault.jar
+COPY --from=backend_builder /app/backend/application/build/libs/application-1.16.0.jar chatvault.jar
 
 VOLUME /config
 EXPOSE 8080
