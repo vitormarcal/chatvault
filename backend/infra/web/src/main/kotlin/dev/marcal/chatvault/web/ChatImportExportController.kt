@@ -80,6 +80,11 @@ class ChatImportExportController(
         return ResponseEntity.noContent().build()
     }
 
+    private val zipMimeTypes = setOf(
+        "application/zip",
+        "application/x-zip-compressed",
+        "application/octet-stream"
+    )
 
     private fun getFileType(file: MultipartFile): FileTypeInputEnum {
         val fileType = when (file.contentType) {
@@ -89,7 +94,8 @@ class ChatImportExportController(
             )
 
             "text/plain" -> FileTypeInputEnum.TEXT
-            "application/zip" -> FileTypeInputEnum.ZIP
+            in zipMimeTypes -> FileTypeInputEnum.ZIP
+
             else -> throw ResponseStatusException(
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                 "This file cannot be imported. Media type not supported ${HtmlUtils.htmlEscape(file.contentType!!)}."
@@ -97,6 +103,8 @@ class ChatImportExportController(
         }
         return fileType
     }
+
+
 
     private fun importChat(
         chatId: Long?,
