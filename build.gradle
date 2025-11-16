@@ -2,15 +2,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.1'
-    id 'io.spring.dependency-management' version '1.1.4'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.21'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.21'
-    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+    id 'org.springframework.boot' version '3.4.11'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
 }
 
 java {
-    sourceCompatibility = '21'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
@@ -31,7 +33,7 @@ subprojects {
 
 
     group = 'dev.marcal'
-    version = '1.18.0-dev-0.0.1'
+    version = '1.18.0-dev-0.0.2'
 
     repositories {
         mavenCentral()
@@ -46,11 +48,16 @@ subprojects {
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.boot:spring-boot-starter-webflux'
         implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+        implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
         implementation 'org.jetbrains.kotlin:kotlin-reflect'
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+        implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
         runtimeOnly 'org.postgresql:postgresql'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        testImplementation("io.mockk:mockk:1.13.8")
+        testImplementation 'io.projectreactor:reactor-test'
+        testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+        testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation("io.mockk:mockk:1.14.6")
     }
 
     tasks.withType(KotlinCompile) {
