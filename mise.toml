@@ -1,0 +1,5 @@
+[tools]
+gradle = "8"
+java = "temurin-21"
+node = "latest"
+pnpm = "latest"

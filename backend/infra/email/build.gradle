@@ -4,5 +4,5 @@ dependencies {
 
 
     implementation "org.springframework.integration:spring-integration-mail"
-    implementation("org.eclipse.angus:jakarta.mail:2.0.2")
+    implementation("org.eclipse.angus:jakarta.mail:2.0.5")
 }
