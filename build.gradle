@@ -33,7 +33,7 @@ subprojects {
 
 
     group = 'dev.marcal'
-    version = '1.18.0-dev-0.0.2'
+    version = '1.18.0'
 
     repositories {
         mavenCentral()
