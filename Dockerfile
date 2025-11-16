@@ -1,4 +1,4 @@
-FROM node:22.0.0-alpine as frontend_builder
+FROM node:25-alpine as frontend_builder
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 COPY --from=frontend_builder /app/.output/public /app/public
-COPY --from=backend_builder /app/backend/application/build/libs/application-1.17.0.jar chatvault.jar
+COPY --from=backend_builder /app/backend/application/build/libs/application-1.18.0-dev-0.0.1.jar chatvault.jar
 
 VOLUME /config
 EXPOSE 8080

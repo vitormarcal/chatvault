@@ -1,18 +1,18 @@
 {
   "name": "chatvault",
   "private": true,
-  "version": "1.17.0",
+  "version": "1.18.0-dev-0.0.1",
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "API_HOST=https://chatvault.marcal.dev/api nuxt dev ",
+    "dev": "API_HOST=http://localhost:8080/api nuxt dev ",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "upgrade": "nuxt upgrade --force",
     "postinstall": "nuxt prepare"
   },
   "engines": {
-    "node": ">=20.16.0"
+    "node": ">=25.0.0"
   },
   "devDependencies": {
     "nuxt": "^3.17.5"
