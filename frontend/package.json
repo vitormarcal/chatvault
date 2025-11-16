@@ -1,7 +1,7 @@
 {
   "name": "chatvault",
   "private": true,
-  "version": "1.17.0",
+  "version": "1.18.0-dev-0.0.1",
   "type": "module",
   "scripts": {
     "build": "nuxt build",
@@ -11,10 +11,11 @@
     "upgrade": "nuxt upgrade --force",
     "postinstall": "nuxt prepare"
   },
+  "engines": {
+    "node": ">=25.0.0"
+  },
   "devDependencies": {
-    "nuxt": "^3.14.1592",
-    "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
+    "nuxt": "^3.17.5"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",
