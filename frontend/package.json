@@ -5,16 +5,17 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "API_HOST=http://localhost:8080/api nuxt dev ",
+    "dev": "API_HOST=https://chatvault.marcal.dev/api nuxt dev ",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "upgrade": "nuxt upgrade --force",
     "postinstall": "nuxt prepare"
   },
+  "engines": {
+    "node": ">=20.16.0"
+  },
   "devDependencies": {
-    "nuxt": "^3.14.1592",
-    "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
+    "nuxt": "^3.17.5"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.1",

@@ -31,5 +31,5 @@ export default defineNuxtConfig({
       '@pinia/nuxt',
   ],
 
-  compatibilityDate: '2024-09-19',
+  compatibilityDate: '2025-01-12',
 })
