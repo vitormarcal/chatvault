@@ -1,8 +1,0 @@
-dependencies {
-    implementation project(":backend:service")
-    implementation project(":backend:in-out-boundary")
-
-
-    implementation "org.springframework.integration:spring-integration-mail"
-    implementation("org.eclipse.angus:jakarta.mail:2.0.5")
-}
