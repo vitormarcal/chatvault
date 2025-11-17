@@ -1,14 +1,13 @@
 package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.domain.repository.ChatRepository
-import dev.marcal.chatvault.service.ChatNameUpdater
 import org.springframework.stereotype.Service
 
 @Service
 class ChatNameUpdaterUseCase(
     private val chatRepository: ChatRepository,
-) : ChatNameUpdater {
-    override fun execute(
+) {
+    fun execute(
         chatId: Long,
         chatName: String,
     ) {

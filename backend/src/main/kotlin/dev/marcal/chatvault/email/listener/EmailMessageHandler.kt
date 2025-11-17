@@ -1,8 +1,8 @@
 package dev.marcal.chatvault.email.listener
 
 import dev.marcal.chatvault.ioboundary.input.PendingChatFile
-import dev.marcal.chatvault.service.BucketDiskImporter
-import dev.marcal.chatvault.service.ChatFileImporter
+import dev.marcal.chatvault.usecase.BucketDiskImporterUseCase
+import dev.marcal.chatvault.usecase.ChatFileImporterUseCase
 import jakarta.mail.Folder
 import jakarta.mail.Multipart
 import jakarta.mail.internet.MimeMessage
@@ -17,10 +17,10 @@ import java.time.LocalDateTime
 @Component
 @ConditionalOnProperty(prefix = "chatvault.email", name = ["enabled"], havingValue = "true", matchIfMissing = true)
 class EmailMessageHandler(
-    private val chatFileImporter: ChatFileImporter,
+    private val chatFileImporter: ChatFileImporterUseCase,
     @Value("\${chatvault.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
     @Value("\${chatvault.email.debug}") private val emailDebug: Boolean,
-    private val bucketDiskImporter: BucketDiskImporter,
+    private val bucketDiskImporter: BucketDiskImporterUseCase,
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 

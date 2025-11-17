@@ -5,7 +5,6 @@ import dev.marcal.chatvault.domain.model.BucketFile
 import dev.marcal.chatvault.domain.repository.ChatRepository
 import dev.marcal.chatvault.ioboundary.output.exceptions.AttachmentFinderException
 import dev.marcal.chatvault.ioboundary.output.exceptions.ChatNotFoundException
-import dev.marcal.chatvault.service.ProfileImageManager
 import org.springframework.context.ApplicationContext
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
@@ -16,8 +15,8 @@ class ProfileImageManagerUseCase(
     private val bucketService: BucketService,
     private val chatRepository: ChatRepository,
     private val context: ApplicationContext,
-) : ProfileImageManager {
-    override fun updateImage(
+) {
+    fun updateImage(
         inputStream: InputStream,
         chatId: Long,
     ) {
@@ -33,7 +32,7 @@ class ProfileImageManagerUseCase(
         )
     }
 
-    override fun getImage(chatId: Long): Resource {
+    fun getImage(chatId: Long): Resource {
         val bucketInfo =
             chatRepository.findChatBucketInfoByChatId(chatId)
                 ?: throw ChatNotFoundException("Unable to retrieve chat image because chat $chatId was not found")

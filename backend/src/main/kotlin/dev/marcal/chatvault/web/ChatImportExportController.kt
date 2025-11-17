@@ -1,9 +1,9 @@
 package dev.marcal.chatvault.web
 
 import dev.marcal.chatvault.ioboundary.input.FileTypeInputEnum
-import dev.marcal.chatvault.service.BucketDiskImporter
-import dev.marcal.chatvault.service.ChatFileExporter
-import dev.marcal.chatvault.service.ChatFileImporter
+import dev.marcal.chatvault.usecase.BucketDiskImporterUseCase
+import dev.marcal.chatvault.usecase.ChatFileExporterUseCase
+import dev.marcal.chatvault.usecase.ChatFileImporterUseCase
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -23,9 +23,9 @@ import java.util.UUID
 @RestController
 @RequestMapping("/api/chats")
 class ChatImportExportController(
-    private val chatFileImporter: ChatFileImporter,
-    private val bucketDiskImporter: BucketDiskImporter,
-    private val chatFileExporter: ChatFileExporter,
+    private val chatFileImporter: ChatFileImporterUseCase,
+    private val bucketDiskImporter: BucketDiskImporterUseCase,
+    private val chatFileExporter: ChatFileExporterUseCase,
 ) {
     @PostMapping("disk-import")
     fun executeDiskImport() {

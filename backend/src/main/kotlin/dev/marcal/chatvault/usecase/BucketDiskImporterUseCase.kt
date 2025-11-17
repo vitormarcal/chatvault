@@ -8,9 +8,6 @@ import dev.marcal.chatvault.domain.repository.ChatRepository
 import dev.marcal.chatvault.ioboundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.ioboundary.input.NewChatInput
 import dev.marcal.chatvault.ioboundary.input.PendingChatFile
-import dev.marcal.chatvault.service.BucketDiskImporter
-import dev.marcal.chatvault.service.ChatCreator
-import dev.marcal.chatvault.service.ChatFileImporter
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 
@@ -18,10 +15,10 @@ import org.springframework.stereotype.Service
 class BucketDiskImporterUseCase(
     private val bucketService: BucketService,
     private val chatRepository: ChatRepository,
-    private val chatFileImporter: ChatFileImporter,
-    private val chatCreator: ChatCreator,
-) : BucketDiskImporter {
-    override fun execute(chatName: String?) {
+    private val chatFileImporter: ChatFileImporterUseCase,
+    private val chatCreator: ChatCreatorUseCase,
+) {
+    fun execute(chatName: String?) {
         bucketService
             .zipPendingImports(chatName)
             .map { identifyChat(it) }
@@ -35,7 +32,7 @@ class BucketDiskImporterUseCase(
             }
     }
 
-    override fun saveToImportDir(pendingList: List<PendingChatFile>) {
+    fun saveToImportDir(pendingList: List<PendingChatFile>) {
         pendingList
             .map {
                 BucketFile(

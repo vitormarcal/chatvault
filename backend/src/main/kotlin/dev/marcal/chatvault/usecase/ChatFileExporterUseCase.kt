@@ -7,8 +7,6 @@ import dev.marcal.chatvault.domain.model.BucketFile
 import dev.marcal.chatvault.domain.repository.ChatRepository
 import dev.marcal.chatvault.ioboundary.output.MessageOutput
 import dev.marcal.chatvault.ioboundary.output.exceptions.ChatNotFoundException
-import dev.marcal.chatvault.service.ChatFileExporter
-import dev.marcal.chatvault.service.MessageFinderByChatId
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import java.time.format.DateTimeFormatter
@@ -17,17 +15,17 @@ import java.time.format.DateTimeFormatter
 class ChatFileExporterUseCase(
     private val bucketService: BucketService,
     private val chatRepository: ChatRepository,
-    private val messageFinderByChatId: MessageFinderByChatId,
-) : ChatFileExporter {
+    private val messageFinderByChatId: MessageFinderByChatIdUseCase,
+) {
     private val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
-    override fun execute(chatId: Long): Resource {
+    fun execute(chatId: Long): Resource {
         val bucket = findMessagesAndUpdateBucket(chatId)
 
         return bucketService.loadBucketAsZip(bucket.path)
     }
 
-    override fun executeAll(): Resource {
+    fun executeAll(): Resource {
         chatRepository
             .findAllChatsWithLastMessage()
             .forEach { findMessagesAndUpdateBucket(it.chatId) }

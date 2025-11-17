@@ -2,7 +2,6 @@ package dev.marcal.chatvault.usecase
 
 import dev.marcal.chatvault.domain.model.MessageParser
 import dev.marcal.chatvault.ioboundary.output.MessageOutput
-import dev.marcal.chatvault.service.ChatMessageParser
 import dev.marcal.chatvault.usecase.mapper.toOutput
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.trySendBlocking
@@ -19,15 +18,15 @@ import java.io.InputStreamReader
 @Service
 class ChatMessageParserUseCase(
     private val messageParser: MessageParser,
-) : ChatMessageParser {
-    override fun <R> parseAndTransform(
+) {
+    fun <R> parseAndTransform(
         inputStream: InputStream,
         transformIn: (MessageOutput) -> R,
     ): List<R> = runBlocking { parse(inputStream).map { transformIn(it) }.toList() }
 
-    override fun parseToList(inputStream: InputStream): List<MessageOutput> = parseAndTransform(inputStream) { it }
+    fun parseToList(inputStream: InputStream): List<MessageOutput> = parseAndTransform(inputStream) { it }
 
-    override fun parse(inputStream: InputStream): Flow<MessageOutput> =
+    fun parse(inputStream: InputStream): Flow<MessageOutput> =
         sequenceOfTextMessage(inputStream)
             .map { messageText -> messageParser.parse(messageText) { it.toOutput() } }
 

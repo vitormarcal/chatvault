@@ -8,10 +8,6 @@ import dev.marcal.chatvault.ioboundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.ioboundary.input.NewChatInput
 import dev.marcal.chatvault.ioboundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.ioboundary.output.exceptions.ChatImporterException
-import dev.marcal.chatvault.service.ChatCreator
-import dev.marcal.chatvault.service.ChatFileImporter
-import dev.marcal.chatvault.service.ChatMessageParser
-import dev.marcal.chatvault.service.MessageCreator
 import dev.marcal.chatvault.usecase.mapper.toNewMessageInput
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -24,15 +20,15 @@ import java.util.zip.ZipInputStream
 
 @Service
 class ChatFileImporterUseCase(
-    private val chatMessageParser: ChatMessageParser,
-    private val messageCreator: MessageCreator,
+    private val chatMessageParser: ChatMessageParserUseCase,
+    private val messageCreator: MessageCreatorUseCase,
     private val bucketService: BucketService,
     private val chatRepository: ChatRepository,
-    private val chatCreator: ChatCreator,
-) : ChatFileImporter {
+    private val chatCreator: ChatCreatorUseCase,
+) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun execute(
+    fun execute(
         chatId: Long,
         inputStream: InputStream,
         fileType: FileTypeInputEnum,
@@ -50,7 +46,7 @@ class ChatFileImporterUseCase(
         }
     }
 
-    override fun execute(
+    fun execute(
         chatName: String?,
         inputStream: InputStream,
         fileType: FileTypeInputEnum,

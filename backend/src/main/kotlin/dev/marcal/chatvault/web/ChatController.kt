@@ -4,13 +4,13 @@ import dev.marcal.chatvault.ioboundary.input.AttachmentCriteriaInput
 import dev.marcal.chatvault.ioboundary.output.AttachmentInfoOutput
 import dev.marcal.chatvault.ioboundary.output.ChatLastMessageOutput
 import dev.marcal.chatvault.ioboundary.output.MessageOutput
-import dev.marcal.chatvault.service.AttachmentFinder
-import dev.marcal.chatvault.service.AttachmentInfoFinderByChatId
-import dev.marcal.chatvault.service.ChatDeleter
-import dev.marcal.chatvault.service.ChatLister
-import dev.marcal.chatvault.service.ChatNameUpdater
-import dev.marcal.chatvault.service.MessageFinderByChatId
-import dev.marcal.chatvault.service.ProfileImageManager
+import dev.marcal.chatvault.usecase.AttachmentFinderUseCase
+import dev.marcal.chatvault.usecase.AttachmentInfoFinderByChatIdUseCase
+import dev.marcal.chatvault.usecase.ChatDeleterUseCase
+import dev.marcal.chatvault.usecase.ChatListerUseCase
+import dev.marcal.chatvault.usecase.ChatNameUpdaterUseCase
+import dev.marcal.chatvault.usecase.MessageFinderByChatIdUseCase
+import dev.marcal.chatvault.usecase.ProfileImageManagerUseCase
 import org.springframework.core.io.Resource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -35,13 +35,13 @@ import java.util.concurrent.TimeUnit
 @RestController
 @RequestMapping("/api/chats")
 class ChatController(
-    private val chatLister: ChatLister,
-    private val messageFinderByChatId: MessageFinderByChatId,
-    private val attachmentFinder: AttachmentFinder,
-    private val chatNameUpdater: ChatNameUpdater,
-    private val attachmentInfoFinderByChatId: AttachmentInfoFinderByChatId,
-    private val profileImageManager: ProfileImageManager,
-    private val chatDeleter: ChatDeleter,
+    private val chatLister: ChatListerUseCase,
+    private val messageFinderByChatId: MessageFinderByChatIdUseCase,
+    private val attachmentFinder: AttachmentFinderUseCase,
+    private val chatNameUpdater: ChatNameUpdaterUseCase,
+    private val attachmentInfoFinderByChatId: AttachmentInfoFinderByChatIdUseCase,
+    private val profileImageManager: ProfileImageManagerUseCase,
+    private val chatDeleter: ChatDeleterUseCase,
 ) {
     @GetMapping
     fun listChats(): List<ChatLastMessageOutput> = chatLister.execute()

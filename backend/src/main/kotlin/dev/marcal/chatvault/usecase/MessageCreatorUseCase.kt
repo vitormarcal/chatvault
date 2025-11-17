@@ -11,7 +11,6 @@ import dev.marcal.chatvault.domain.repository.ChatRepository
 import dev.marcal.chatvault.ioboundary.input.NewMessageInput
 import dev.marcal.chatvault.ioboundary.input.NewMessagePayloadInput
 import dev.marcal.chatvault.ioboundary.output.exceptions.ChatNotFoundException
-import dev.marcal.chatvault.service.MessageCreator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -20,10 +19,10 @@ import java.time.LocalDateTime
 class MessageCreatorUseCase(
     private val chatRepository: ChatRepository,
     private val messageDeduplicationUseCase: MessageDeduplicationUseCase,
-) : MessageCreator {
+) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun execute(input: NewMessageInput) {
+    fun execute(input: NewMessageInput) {
         val payloadInput =
             NewMessagePayloadInput(
                 chatId = input.chatId,
@@ -33,7 +32,7 @@ class MessageCreatorUseCase(
         execute(payloadInput)
     }
 
-    override fun execute(input: NewMessagePayloadInput) {
+    fun execute(input: NewMessagePayloadInput) {
         val chatBucketInfo =
             chatRepository.findChatBucketInfoByChatId(input.chatId)
                 ?: throw ChatNotFoundException("Unable to create a message because the chat ${input.chatId} was not found")

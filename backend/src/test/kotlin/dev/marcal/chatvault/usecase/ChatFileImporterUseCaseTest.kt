@@ -7,8 +7,6 @@ import dev.marcal.chatvault.domain.model.MessageParser
 import dev.marcal.chatvault.domain.repository.ChatRepository
 import dev.marcal.chatvault.ioboundary.input.FileTypeInputEnum
 import dev.marcal.chatvault.ioboundary.input.NewMessagePayloadInput
-import dev.marcal.chatvault.service.ChatCreator
-import dev.marcal.chatvault.service.MessageCreator
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -21,8 +19,8 @@ class ChatFileImporterUseCaseTest {
     private val chatMessageParser = ChatMessageParserUseCase(MessageParser())
     private val chatRepository: ChatRepository = mockk()
     private val bucketService: BucketService = mockk()
-    private val messageCreator: MessageCreator = mockk()
-    private val chatCreator: ChatCreator = mockk()
+    private val messageCreator: MessageCreatorUseCase = mockk()
+    private val chatCreator: ChatCreatorUseCase = mockk()
     private val chatFileImporter =
         ChatFileImporterUseCase(
             chatMessageParser = chatMessageParser,
