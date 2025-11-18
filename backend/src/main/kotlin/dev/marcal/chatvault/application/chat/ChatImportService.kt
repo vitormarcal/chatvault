@@ -1,7 +1,6 @@
 package dev.marcal.chatvault.application.chat
 
 import dev.marcal.chatvault.api.dto.input.FileTypeInputEnum
-import dev.marcal.chatvault.api.dto.input.NewChatInput
 import dev.marcal.chatvault.api.dto.input.NewMessagePayloadInput
 import dev.marcal.chatvault.api.dto.mapper.toNewMessageInput
 import dev.marcal.chatvault.api.web.exception.ChatImporterException
@@ -53,17 +52,13 @@ class ChatImportService(
         inputStream: InputStream,
         fileType: FileTypeInputEnum,
     ) {
-        val chatId =
-            chatName?.let { chatRepository.findChatBucketInfoByChatName(it)?.chatId } ?: createTodoChat(chatName)
-        execute(chatId, inputStream, fileType)
-    }
+        val effectiveName =
+            chatName?.takeIf { it.isNotBlank() }
+                ?: "todo imported at ${LocalDateTime.now()}"
 
-    private fun createTodoChat(chatName: String?): Long {
-        val tempChatName = chatName?.takeIf { it.isNotEmpty() } ?: "todo imported at ${LocalDateTime.now()}"
-        chatCreator.executeIfNotExists(NewChatInput(name = tempChatName))
-        return requireNotNull(chatRepository.findChatBucketInfoByChatName(tempChatName)?.chatId) {
-            "temp chat creation fails: chatName: $tempChatName"
-        }
+        val chatBucketInfo = chatCreator.findOrCreateByName(effectiveName)
+
+        execute(chatBucketInfo.chatId, inputStream, fileType)
     }
 
     private fun iterateOverZip(
