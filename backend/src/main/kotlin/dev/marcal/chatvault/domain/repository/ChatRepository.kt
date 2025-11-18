@@ -1,7 +1,6 @@
 package dev.marcal.chatvault.domain.repository
 
-import dev.marcal.chatvault.api.dto.output.AttachmentInfoOutput
-import dev.marcal.chatvault.api.dto.output.MessageOutput
+import dev.marcal.chatvault.domain.model.AttachmentSummary
 import dev.marcal.chatvault.domain.model.ChatBucketInfo
 import dev.marcal.chatvault.domain.model.ChatLastMessage
 import dev.marcal.chatvault.domain.model.ChatPayload
@@ -50,7 +49,7 @@ interface ChatRepository {
         chatId: Long,
         query: String? = null,
         pageable: Pageable,
-    ): org.springframework.data.domain.Page<MessageOutput>
+    ): org.springframework.data.domain.Page<Message>
 
     fun findMessageBy(
         chatId: Long,
@@ -66,7 +65,7 @@ interface ChatRepository {
         chatName: String,
     )
 
-    fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentInfoOutput>
+    fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentSummary>
 
     fun findLastMessageByChatId(chatId: Long): Message?
 

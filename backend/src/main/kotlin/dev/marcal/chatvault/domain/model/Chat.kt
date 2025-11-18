@@ -1,7 +1,6 @@
 package dev.marcal.chatvault.domain.model
 
 import java.io.InputStream
-import java.time.LocalDateTime
 
 data class Chat(
     val id: Long,
@@ -9,13 +8,6 @@ data class Chat(
     val name: String,
     val messages: List<Message> = emptyList(),
     val bucket: Bucket,
-)
-
-data class Message(
-    val author: Author,
-    val createdAt: LocalDateTime,
-    val content: Content,
-    val externalId: String?,
 )
 
 data class Author(
