@@ -1,6 +1,6 @@
 package dev.marcal.chatvault.domain.model
 
-import dev.marcal.chatvault.ioboundary.output.exceptions.MessageParserException
+import dev.marcal.chatvault.api.web.exception.MessageParserException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

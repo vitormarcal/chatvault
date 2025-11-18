@@ -1,13 +1,13 @@
 package dev.marcal.chatvault.domain.repository
 
+import dev.marcal.chatvault.api.dto.output.AttachmentInfoOutput
+import dev.marcal.chatvault.api.dto.output.MessageOutput
 import dev.marcal.chatvault.domain.model.ChatBucketInfo
 import dev.marcal.chatvault.domain.model.ChatLastMessage
 import dev.marcal.chatvault.domain.model.ChatPayload
 import dev.marcal.chatvault.domain.model.Message
 import dev.marcal.chatvault.domain.model.MessagePayload
 import dev.marcal.chatvault.domain.model.Page
-import dev.marcal.chatvault.ioboundary.output.AttachmentInfoOutput
-import dev.marcal.chatvault.ioboundary.output.MessageOutput
 import org.springframework.data.domain.Pageable
 
 interface ChatRepository {
