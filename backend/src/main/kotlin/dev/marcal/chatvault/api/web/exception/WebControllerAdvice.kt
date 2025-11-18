@@ -1,5 +1,6 @@
 package dev.marcal.chatvault.api.web.exception
 
+import dev.marcal.chatvault.domain.exception.MessageParserException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice

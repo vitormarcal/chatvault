@@ -2,17 +2,14 @@ package dev.marcal.chatvault.api.dto.mapper
 
 import dev.marcal.chatvault.api.dto.input.NewAttachmentInput
 import dev.marcal.chatvault.api.dto.input.NewMessageInput
+import dev.marcal.chatvault.api.dto.output.AttachmentInfoOutput
 import dev.marcal.chatvault.api.dto.output.ChatBucketInfoOutput
 import dev.marcal.chatvault.api.dto.output.ChatLastMessageOutput
 import dev.marcal.chatvault.api.dto.output.MessageOutput
-import dev.marcal.chatvault.domain.model.Attachment
-import dev.marcal.chatvault.domain.model.Author
-import dev.marcal.chatvault.domain.model.AuthorType
+import dev.marcal.chatvault.domain.model.AttachmentSummary
 import dev.marcal.chatvault.domain.model.ChatBucketInfo
 import dev.marcal.chatvault.domain.model.ChatLastMessage
-import dev.marcal.chatvault.domain.model.Content
 import dev.marcal.chatvault.domain.model.Message
-import java.time.LocalDateTime
 
 fun ChatBucketInfo.toOutput(): ChatBucketInfoOutput =
     ChatBucketInfoOutput(
@@ -51,23 +48,17 @@ fun MessageOutput.toNewMessageInput(chatId: Long): NewMessageInput =
     )
 
 fun NewMessageInput.toMessageDomain(chatBucketInfo: ChatBucketInfo): Message =
-    Message(
-        author =
-            Author(
-                name = this.authorName,
-                type = if (this.authorName.isEmpty()) AuthorType.SYSTEM else AuthorType.USER,
-            ),
-        createdAt = this.createdAt ?: LocalDateTime.now(),
+    Message.create(
+        chatBucketInfo = chatBucketInfo,
+        authorName = this.authorName,
+        content = this.content,
+        createdAt = this.createdAt,
         externalId = this.externalId,
-        content =
-            Content(
-                text = this.content,
-                attachment =
-                    this.attachment?.let {
-                        Attachment(
-                            name = it.name,
-                            bucket = chatBucketInfo.bucket.withPath("/"),
-                        )
-                    },
-            ),
+        attachmentName = this.attachment?.name,
+    )
+
+fun AttachmentSummary.toOutput(): AttachmentInfoOutput =
+    AttachmentInfoOutput(
+        id = this.id,
+        name = this.name,
     )

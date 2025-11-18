@@ -2,18 +2,12 @@ package dev.marcal.chatvault.application.message
 
 import dev.marcal.chatvault.api.dto.input.NewMessageInput
 import dev.marcal.chatvault.api.dto.input.NewMessagePayloadInput
+import dev.marcal.chatvault.api.dto.mapper.toMessageDomain
 import dev.marcal.chatvault.api.web.exception.ChatNotFoundException
-import dev.marcal.chatvault.domain.model.Attachment
-import dev.marcal.chatvault.domain.model.Author
-import dev.marcal.chatvault.domain.model.AuthorType
-import dev.marcal.chatvault.domain.model.ChatBucketInfo
-import dev.marcal.chatvault.domain.model.Content
-import dev.marcal.chatvault.domain.model.Message
 import dev.marcal.chatvault.domain.model.MessagePayload
 import dev.marcal.chatvault.domain.repository.ChatRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class MessageCreatorService(
@@ -37,47 +31,22 @@ class MessageCreatorService(
             chatRepository.findChatBucketInfoByChatId(input.chatId)
                 ?: throw ChatNotFoundException("Unable to create a message because the chat ${input.chatId} was not found")
 
-        val theMessagePayload =
-            MessagePayload(
-                chatId = chatBucketInfo.chatId,
-                messages =
-                    input.messages
-                        .let { messageDeduplicationService.execute(chatBucketInfo.chatId, it) }
-                        .map { buildNewMessage(it, chatBucketInfo) },
-            )
+        val messagesDomain =
+            input.messages
+                .let { messageDeduplicationService.execute(chatBucketInfo.chatId, it) }
+                .map { it.toMessageDomain(chatBucketInfo) }
 
-        if (theMessagePayload.messages.isEmpty()) {
-            throw IllegalStateException("there are no messages to create, message list is empty $theMessagePayload")
+        if (messagesDomain.isEmpty()) {
+            throw IllegalStateException("there are no messages to create, message list is empty for chatId=${chatBucketInfo.chatId}")
         }
 
-        logger.info("try to save ${theMessagePayload.messages.size} messages, chatInfo=$chatBucketInfo")
-        chatRepository.saveNewMessages(payload = theMessagePayload, eventSource = input.eventSource)
-    }
+        val payload =
+            MessagePayload(
+                chatId = chatBucketInfo.chatId,
+                messages = messagesDomain,
+            )
 
-    private fun buildNewMessage(
-        input: NewMessageInput,
-        chatBucketInfo: ChatBucketInfo,
-    ): Message {
-        require(input.chatId == chatBucketInfo.chatId)
-        return Message(
-            author =
-                Author(
-                    name = input.authorName,
-                    type = if (input.authorName.isEmpty()) AuthorType.SYSTEM else AuthorType.USER,
-                ),
-            createdAt = input.createdAt ?: LocalDateTime.now(),
-            externalId = input.externalId,
-            content =
-                Content(
-                    text = input.content,
-                    attachment =
-                        input.attachment?.let {
-                            Attachment(
-                                name = it.name,
-                                bucket = chatBucketInfo.bucket.withPath("/"),
-                            )
-                        },
-                ),
-        )
+        logger.info("try to save ${payload.messages.size} messages, chatInfo=$chatBucketInfo")
+        chatRepository.saveNewMessages(payload = payload, eventSource = input.eventSource)
     }
 }

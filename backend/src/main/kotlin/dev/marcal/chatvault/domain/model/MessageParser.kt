@@ -1,7 +1,7 @@
 package dev.marcal.chatvault.domain.model
 
-import dev.marcal.chatvault.api.web.exception.AmbiguousDateException
-import dev.marcal.chatvault.api.web.exception.MessageParserException
+import dev.marcal.chatvault.domain.exception.AmbiguousDateException
+import dev.marcal.chatvault.domain.exception.MessageParserException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder

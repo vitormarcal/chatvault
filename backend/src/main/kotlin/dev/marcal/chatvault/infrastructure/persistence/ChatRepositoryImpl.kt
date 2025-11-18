@@ -1,8 +1,7 @@
 package dev.marcal.chatvault.infrastructure.persistence
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import dev.marcal.chatvault.api.dto.output.AttachmentInfoOutput
-import dev.marcal.chatvault.api.dto.output.MessageOutput
+import dev.marcal.chatvault.domain.model.AttachmentSummary
 import dev.marcal.chatvault.domain.model.ChatBucketInfo
 import dev.marcal.chatvault.domain.model.ChatLastMessage
 import dev.marcal.chatvault.domain.model.ChatPayload
@@ -116,19 +115,19 @@ class ChatRepositoryImpl(
         chatId: Long,
         query: String?,
         pageable: Pageable,
-    ): org.springframework.data.domain.Page<MessageOutput> =
+    ): org.springframework.data.domain.Page<Message> =
         messageCrudRepository
             .findAllByChatIdIs(
                 chatId = chatId,
                 query = query ?: "",
                 pageable = pageable,
-            ).map { objectMapper.convertValue(it, MessageOutput::class.java) }
+            ).map { it.toMessageDomain() }
 
-    override fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentInfoOutput> =
+    override fun findAttachmentMessageIdsByChatId(chatId: Long): Sequence<AttachmentSummary> =
         messageCrudRepository
             .findMessageIdByChatIdAndAttachmentExists(chatId)
             .asSequence()
-            .map { AttachmentInfoOutput(id = it.messageId, name = it.name) }
+            .map { AttachmentSummary(id = it.messageId, name = it.name) }
 
     override fun findLastMessageByChatId(chatId: Long): Message? =
         messageCrudRepository.findTopByChatIdOrderByIdDesc(chatId)?.toMessageDomain()
