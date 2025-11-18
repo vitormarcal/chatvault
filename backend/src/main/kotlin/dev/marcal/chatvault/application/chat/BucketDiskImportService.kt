@@ -1,20 +1,16 @@
 package dev.marcal.chatvault.application.chat
 
 import dev.marcal.chatvault.api.dto.input.FileTypeInputEnum
-import dev.marcal.chatvault.api.dto.input.NewChatInput
 import dev.marcal.chatvault.api.dto.input.PendingChatFile
 import dev.marcal.chatvault.domain.bucket.BucketService
 import dev.marcal.chatvault.domain.model.Bucket
 import dev.marcal.chatvault.domain.model.BucketFile
-import dev.marcal.chatvault.domain.model.ChatBucketInfo
-import dev.marcal.chatvault.domain.repository.ChatRepository
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 
 @Service
 class BucketDiskImportService(
     private val bucketService: BucketService,
-    private val chatRepository: ChatRepository,
     private val chatFileImporter: ChatImportService,
     private val chatCreator: ChatCreatorService,
 ) {
@@ -47,17 +43,7 @@ class BucketDiskImportService(
 
     private fun identifyChat(resource: Resource): Pair<Long, Resource> {
         val chatName = requireNotNull(resource.filename).removeSuffix(".zip")
-        val chatBucketInfo = findOrCreateChatIfNotExists(chatName)
+        val chatBucketInfo = chatCreator.findOrCreateByName(chatName)
         return chatBucketInfo.chatId to resource
-    }
-
-    private fun findOrCreateChatIfNotExists(chatName: String): ChatBucketInfo {
-        val chatBucketInfo =
-            chatRepository.findChatBucketInfoByChatName(chatName) ?: run {
-                chatCreator.executeIfNotExists(NewChatInput(name = chatName))
-                chatRepository.findChatBucketInfoByChatName(chatName)
-            }
-
-        return requireNotNull(chatBucketInfo) { "error when finding and trying to create chat not existent $chatName" }
     }
 }
