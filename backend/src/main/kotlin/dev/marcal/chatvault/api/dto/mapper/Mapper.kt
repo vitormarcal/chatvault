@@ -3,19 +3,12 @@ package dev.marcal.chatvault.api.dto.mapper
 import dev.marcal.chatvault.api.dto.input.NewAttachmentInput
 import dev.marcal.chatvault.api.dto.input.NewMessageInput
 import dev.marcal.chatvault.api.dto.output.AttachmentInfoOutput
-import dev.marcal.chatvault.api.dto.output.ChatBucketInfoOutput
 import dev.marcal.chatvault.api.dto.output.ChatLastMessageOutput
 import dev.marcal.chatvault.api.dto.output.MessageOutput
 import dev.marcal.chatvault.domain.model.AttachmentSummary
 import dev.marcal.chatvault.domain.model.ChatBucketInfo
 import dev.marcal.chatvault.domain.model.ChatLastMessage
 import dev.marcal.chatvault.domain.model.Message
-
-fun ChatBucketInfo.toOutput(): ChatBucketInfoOutput =
-    ChatBucketInfoOutput(
-        chatId = this.chatId,
-        path = this.bucket.path,
-    )
 
 fun ChatLastMessage.toOutput(): ChatLastMessageOutput =
     ChatLastMessageOutput(

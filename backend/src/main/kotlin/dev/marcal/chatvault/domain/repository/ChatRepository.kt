@@ -6,14 +6,10 @@ import dev.marcal.chatvault.domain.model.ChatLastMessage
 import dev.marcal.chatvault.domain.model.ChatPayload
 import dev.marcal.chatvault.domain.model.Message
 import dev.marcal.chatvault.domain.model.MessagePayload
-import dev.marcal.chatvault.domain.model.Page
 import org.springframework.data.domain.Pageable
 
 interface ChatRepository {
-    fun saveNewMessages(
-        payload: MessagePayload,
-        eventSource: Boolean = false,
-    )
+    fun saveNewMessages(payload: MessagePayload)
 
     fun findChatBucketInfoByChatId(chatId: Long): ChatBucketInfo?
 
@@ -24,24 +20,6 @@ interface ChatRepository {
     fun existsByChatId(chatId: Long): Boolean
 
     fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo
-
-    fun findLegacyToImport(
-        chatId: Long,
-        page: Int,
-        size: Int,
-    ): Page<Message>
-
-    fun findAttachmentLegacyToImport(
-        chatId: Long,
-        page: Int,
-        size: Int,
-    ): Page<Message>
-
-    fun findAllEventSourceChatId(): List<Long>
-
-    fun saveLegacyMessage(messagePayload: MessagePayload)
-
-    fun setLegacyAttachmentImported(messageExternalId: String)
 
     fun findAllChatsWithLastMessage(): Sequence<ChatLastMessage>
 

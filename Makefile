@@ -16,6 +16,11 @@ build-latest:
 	@echo "Building Docker image with version: latest"
 	docker build -t $(IMAGE_NAME):latest .
 
+.PHONY: build-dev
+build-dev:
+	@echo "Building Docker image with version: dev"
+	docker build -t $(IMAGE_NAME):dev .
+
 # Tarefa para dar push nas imagens
 .PHONY: push
 push:
@@ -26,3 +31,6 @@ push:
 # Tarefa completa para buildar e dar push
 .PHONY: build-and-push
 build-and-push: build build-latest push
+
+.PHONY: build-dev-and-push
+build-dev-and-push: build build-dev push

@@ -1,28 +1,21 @@
 package dev.marcal.chatvault.infrastructure.persistence
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import dev.marcal.chatvault.domain.model.AttachmentSummary
 import dev.marcal.chatvault.domain.model.ChatBucketInfo
 import dev.marcal.chatvault.domain.model.ChatLastMessage
 import dev.marcal.chatvault.domain.model.ChatPayload
 import dev.marcal.chatvault.domain.model.Message
 import dev.marcal.chatvault.domain.model.MessagePayload
-import dev.marcal.chatvault.domain.model.Page
 import dev.marcal.chatvault.domain.repository.ChatRepository
 import dev.marcal.chatvault.infrastructure.persistence.dto.toChatLastMessage
 import dev.marcal.chatvault.infrastructure.persistence.entity.toChatBucketInfo
 import dev.marcal.chatvault.infrastructure.persistence.entity.toChatEntity
-import dev.marcal.chatvault.infrastructure.persistence.entity.toEventSourceEntity
-import dev.marcal.chatvault.infrastructure.persistence.entity.toMessage
 import dev.marcal.chatvault.infrastructure.persistence.entity.toMessageDomain
 import dev.marcal.chatvault.infrastructure.persistence.entity.toMessagesEntity
 import dev.marcal.chatvault.infrastructure.persistence.repository.ChatCrudRepository
-import dev.marcal.chatvault.infrastructure.persistence.repository.EventSourceCrudRepository
 import dev.marcal.chatvault.infrastructure.persistence.repository.MessageCrudRepository
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.jvm.optionals.getOrNull
@@ -31,79 +24,13 @@ import kotlin.jvm.optionals.getOrNull
 class ChatRepositoryImpl(
     private val chatCrudRepository: ChatCrudRepository,
     private val messageCrudRepository: MessageCrudRepository,
-    private val eventSourceCrudRepository: EventSourceCrudRepository,
-    private val objectMapper: ObjectMapper,
 ) : ChatRepository {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @Transactional
-    override fun saveNewMessages(
-        payload: MessagePayload,
-        eventSource: Boolean,
-    ) {
-        if (eventSource) {
-            saveNewMessageEventSource(payload)
-            return
-        }
+    override fun saveNewMessages(payload: MessagePayload) {
         val messagesToSave = payload.toMessagesEntity()
         messageCrudRepository.saveAll(messagesToSave)
-    }
-
-    private fun saveNewMessageEventSource(payload: MessagePayload) {
-        val messagesToSave = payload.toEventSourceEntity(objectMapper)
-        eventSourceCrudRepository.saveAll(messagesToSave)
-    }
-
-    override fun findLegacyToImport(
-        chatId: Long,
-        page: Int,
-        size: Int,
-    ): Page<Message> =
-        eventSourceCrudRepository
-            .findLegacyMessageNotImportedByChatId(
-                chatId,
-                PageRequest.of(page - 1, size, Sort.by(Sort.Order.asc("externalId"))),
-            ).let { pageRequest ->
-                Page(
-                    data = pageRequest.map { it.toMessage(objectMapper) }.toList(),
-                    page = page,
-                    totalPages = pageRequest.totalPages,
-                    items = size,
-                    totalItems = pageRequest.totalElements,
-                )
-            }
-
-    override fun findAttachmentLegacyToImport(
-        chatId: Long,
-        page: Int,
-        size: Int,
-    ): Page<Message> =
-        eventSourceCrudRepository
-            .findLegacyAttachmentNotImportedByChatId(
-                chatId,
-                PageRequest.of(page - 1, size, Sort.by(Sort.Order.asc("externalId"))),
-            ).let { pageRequest ->
-                Page(
-                    data = pageRequest.map { it.toMessage(objectMapper) }.toList(),
-                    page = page,
-                    totalPages = pageRequest.totalPages,
-                    items = size,
-                    totalItems = pageRequest.totalElements,
-                )
-            }
-
-    override fun findAllEventSourceChatId(): List<Long> = eventSourceCrudRepository.findAllChatId()
-
-    @Transactional
-    override fun saveLegacyMessage(messagePayload: MessagePayload) {
-        saveNewMessages(messagePayload, eventSource = false)
-        messagePayload.messages
-            .map { requireNotNull(it.externalId) }
-            .forEach { eventSourceCrudRepository.setImportedTrue(it) }
-    }
-
-    override fun setLegacyAttachmentImported(messageExternalId: String) {
-        eventSourceCrudRepository.setAttachmentImportedTrue(messageExternalId)
     }
 
     override fun findAllChatsWithLastMessage(): Sequence<ChatLastMessage> =
