@@ -23,7 +23,7 @@ fun ChatLastMessage.toOutput(): ChatLastMessageOutput =
 
 fun Message.toOutput(): MessageOutput =
     MessageOutput(
-        id = null,
+        id = this.id,
         content = this.content.text,
         createdAt = this.createdAt,
         attachmentName = this.content.attachment?.name,

@@ -3,6 +3,7 @@ package dev.marcal.chatvault.domain.model
 import java.time.LocalDateTime
 
 data class Message(
+    val id: Long? = null,
     val author: Author,
     val createdAt: LocalDateTime,
     val content: Content,

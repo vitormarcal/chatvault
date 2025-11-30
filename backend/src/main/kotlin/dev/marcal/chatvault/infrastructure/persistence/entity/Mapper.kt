@@ -36,6 +36,7 @@ fun ChatPayload.toChatEntity(): ChatEntity =
 
 fun MessageEntity.toMessageDomain() =
     Message(
+        id = this.id,
         author = this.toAuthorDomain(),
         createdAt = this.createdAt,
         externalId = this.externalId,
