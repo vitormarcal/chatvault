@@ -28,9 +28,15 @@ push:
 	docker push $(IMAGE_NAME):$(VERSION)
 	docker push $(IMAGE_NAME):latest
 
+# Push só da imagem dev
+.PHONY: push-dev
+push-dev:
+	@echo "Pushing dev image to the repository"
+	docker push $(IMAGE_NAME):dev
+
 # Tarefa completa para buildar e dar push
 .PHONY: build-and-push
 build-and-push: build build-latest push
 
 .PHONY: build-dev-and-push
-build-dev-and-push: build build-dev push
+build-dev-and-push: build-dev push-dev
