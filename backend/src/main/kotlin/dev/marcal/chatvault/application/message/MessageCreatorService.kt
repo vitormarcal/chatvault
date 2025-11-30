@@ -21,7 +21,6 @@ class MessageCreatorService(
             NewMessagePayloadInput(
                 chatId = input.chatId,
                 messages = listOf(input),
-                eventSource = false,
             )
         execute(payloadInput)
     }
@@ -47,6 +46,6 @@ class MessageCreatorService(
             )
 
         logger.info("try to save ${payload.messages.size} messages, chatInfo=$chatBucketInfo")
-        chatRepository.saveNewMessages(payload = payload, eventSource = input.eventSource)
+        chatRepository.saveNewMessages(payload = payload)
     }
 }

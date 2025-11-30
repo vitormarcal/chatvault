@@ -118,7 +118,6 @@ class ChatImportService(
         messageCreator.execute(
             NewMessagePayloadInput(
                 chatId = chatId,
-                eventSource = false,
                 messages = messages,
             ),
         )

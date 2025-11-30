@@ -1,6 +1,5 @@
 package dev.marcal.chatvault.infrastructure.persistence.entity
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import dev.marcal.chatvault.domain.model.Attachment
 import dev.marcal.chatvault.domain.model.Author
 import dev.marcal.chatvault.domain.model.AuthorType
@@ -27,22 +26,6 @@ fun MessagePayload.toMessagesEntity(): List<MessageEntity> =
             createdAt = it.createdAt,
         )
     }
-
-fun MessagePayload.toEventSourceEntity(objectMapper: ObjectMapper): List<EventSourceEntity> =
-    this.messages.map {
-        val hasAttachment = it.content.attachment != null
-        EventSourceEntity(
-            chatId = this.chatId,
-            externalId = it.externalId,
-            createdAt = it.createdAt,
-            messageImported = false,
-            attachmentImported = if (hasAttachment) false else null,
-            hasAttachment = hasAttachment,
-            payload = objectMapper.writeValueAsString(it),
-        )
-    }
-
-fun EventSourceEntity.toMessage(objectMapper: ObjectMapper): Message = objectMapper.readValue(this.payload, Message::class.java)
 
 fun ChatPayload.toChatEntity(): ChatEntity =
     ChatEntity(
