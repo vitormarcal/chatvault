@@ -26,7 +26,12 @@ import { useDateFormatting } from '~/composables/useDateFormatting';
 const store = useMainStore();
 const { formatDate } = useDateFormatting();
 
-const props = defineProps(['message']);
+const props = defineProps({
+  message: Object,
+  highlightUntilDate: [String, null],
+});
+
+const isHighlighted = ref(false);
 
 const formattedContent = computed(() =>
     props.message.content.replace(
@@ -47,7 +52,30 @@ const messageClasses = computed(() => ({
   'system-message w-50 align-self-center': isSystemMessage.value,
   'align-self-end': isAuthorSelf.value,
   'align-self-start': !isAuthorSelf.value,
+  'highlighted': isHighlighted.value,
 }));
+
+// Check if message should be highlighted
+watch(
+  () => props.highlightUntilDate,
+  (newDate) => {
+    if (newDate && props.message) {
+      const messageDate = new Date(props.message.createdAt).toDateString();
+      const highlightDate = new Date(newDate).toDateString();
+
+      if (messageDate === highlightDate) {
+        isHighlighted.value = true;
+
+        // Fade out highlight after 3 seconds
+        setTimeout(() => {
+          isHighlighted.value = false;
+          store.clearHighlight();
+        }, 3000);
+      }
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
@@ -102,5 +130,21 @@ const messageClasses = computed(() => ({
 
 .message-item:hover .blur-sensitive {
   filter: none;
+}
+
+.message-item.highlighted {
+  background: linear-gradient(90deg, #1e4620 0%, #000000 100%);
+  animation: fadeHighlight 3s ease-out forwards;
+}
+
+@keyframes fadeHighlight {
+  0% {
+    background: linear-gradient(90deg, #4CAF50 0%, #000000 100%);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  }
+  100% {
+    background: linear-gradient(90deg, #1e4620 0%, #000000 100%);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  }
 }
 </style>

@@ -10,7 +10,11 @@
       <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
       </button>
       <template v-for="(message, index) in messages" :key="index">
-        <message-item :message="message"/>
+        <message-item
+          :message="message"
+          :highlight-until-date="store.highlightUntilDate"
+          :ref="index === 0 ? 'firstMessageRef' : null"
+        />
       </template>
     </div>
 
@@ -60,6 +64,24 @@ function scrollBottom() {
   }
 }
 
+function scrollToFirstMessage() {
+  if (messagesAreaElement.value && messages.value.length > 0) {
+    nextTick(() => {
+      const firstElement = messagesAreaElement.value.querySelector('.message-item');
+      if (firstElement) {
+        const elementTop = firstElement.offsetTop;
+        const containerHeight = messagesAreaElement.value.clientHeight;
+        const scrollPosition = elementTop - containerHeight / 3;
+
+        messagesAreaElement.value.scrollTo({
+          top: Math.max(0, scrollPosition),
+          behavior: 'smooth'
+        });
+      }
+    });
+  }
+}
+
 function loadMoreMessages() {
   store.toNextPage()
 }
@@ -83,7 +105,12 @@ watch(
 watch(content, async (newContent, oldContent) => {
   store.updateMessages([...newContent.reverse().map((it: any) => store.toChatMessage(it)), ...messages.value])
   await nextTick()
-  scrollBottom()
+
+  if (store.highlightUntilDate) {
+    scrollToFirstMessage()
+  } else {
+    scrollBottom()
+  }
 })
 
 </script>

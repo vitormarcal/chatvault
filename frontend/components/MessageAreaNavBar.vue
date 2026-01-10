@@ -40,8 +40,14 @@ function toggleOpenChatConfig() {
 }
 
 function handleSearch({ query, chatId }: { query: string; chatId: string | null }) {
-  console.log("Search query:", query, "Chat ID:", chatId);
-  // todo: post search
+  if (!chatId) return;
+
+  if (query.trim()) {
+    store.performSearch(query, Number(chatId));
+    store.searchOpen = true;
+  } else {
+    store.closeSearch();
+  }
 }
 
 </script>

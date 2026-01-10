@@ -13,6 +13,9 @@ export const useMainStore = defineStore('main', () => {
         nextPage: 0,
         pageSize: localStorage.getItem("pageSize") || 20,
         searchQuery: undefined,
+        searchResults: [] as ChatMessage[],
+        searchOpen: false,
+        highlightUntilDate: null as string | null,
         reloadImageProfile: false,
         blurEnabled: localStorage.getItem("blurEnabled") === 'true',
         userLocale: (localStorage.getItem("userLocale") || 'auto') as SupportedLocale | 'auto',
@@ -101,6 +104,57 @@ export const useMainStore = defineStore('main', () => {
         return false;
     }
 
+    async function performSearch(query: string, chatId: number) {
+        if (!query.trim()) {
+            state.searchResults = [];
+            return;
+        }
+
+        state.loading = true;
+        try {
+            const url = useRuntimeConfig().public.api.getMessagesByIdAndPage
+                .replace(":chatId", chatId.toString())
+                .replace(":page", "0")
+                .replace(":size", "50")
+                .replace(":query", query);
+            const response = await $fetch<any>(url);
+            state.searchResults = response.content.map((item: any) => toChatMessage(item));
+        } catch (error) {
+            console.error("Search error:", error);
+            state.searchResults = [];
+        } finally {
+            state.loading = false;
+        }
+    }
+
+    function closeSearch() {
+        state.searchOpen = false;
+        state.searchResults = [];
+    }
+
+    async function jumpToDate(chatId: number, targetDate: string) {
+        state.loading = true;
+        state.highlightUntilDate = targetDate;
+        try {
+            const url = useRuntimeConfig().public.api.getMessagesByDate
+                .replace(":chatId", chatId.toString())
+                .replace(":date", targetDate)
+                .replace(":pageSize", state.pageSize.toString());
+            const response = await $fetch<any>(url);
+            state.messages = response.content.map((item: any) => toChatMessage(item));
+            state.nextPage = 1; // Mark that we've loaded from a specific date
+            state.searchOpen = false;
+        } catch (error) {
+            console.error("Jump to date error:", error);
+        } finally {
+            state.loading = false;
+        }
+    }
+
+    function clearHighlight() {
+        state.highlightUntilDate = null;
+    }
+
     return {
         ...toRefs(state),
         authors,
@@ -115,6 +169,10 @@ export const useMainStore = defineStore('main', () => {
         chatExited,
         openChat,
         toChatMessage,
+        performSearch,
+        closeSearch,
+        jumpToDate,
+        clearHighlight,
     };
 });
 
