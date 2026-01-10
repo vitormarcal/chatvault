@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import {useMainStore} from "~/store";
 import {computed, reactive, watch} from "vue";
+import { LOCALE_DISPLAY_NAMES, SUPPORTED_LOCALES } from "~/types/localization";
+import { useDateFormatting } from "~/composables/useDateFormatting";
 
 const emit = defineEmits(["refresh:page"]);
 
 const store = useMainStore();
+const { systemLocale } = useDateFormatting();
 
 const chatConfig = reactive({
   chatName: store.chatActive.chatName,
@@ -108,6 +111,19 @@ const validatedPageSize = (event: Event) => {
         <div class="invalid-feedback" :class="invalidPageSizeClass">
           Page size must be a value between 1 and 2000
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="locale-select">Date Format & Locale</label>
+        <select class="form-control" v-model="store.userLocale" id="locale-select">
+          <option v-for="locale in SUPPORTED_LOCALES" :key="locale" :value="locale">
+            {{ LOCALE_DISPLAY_NAMES[locale] }}
+            <span v-if="locale === 'auto'"> ({{ systemLocale }})</span>
+          </option>
+        </select>
+        <small class="form-text text-muted d-block mt-2">
+          Changes how dates and times are displayed throughout the application.
+        </small>
       </div>
 
       <div class="d-flex btn-group">

@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia';
 import {type Attachment, AttachmentConstructor, type Chat, ChatMessage} from "~/types";
+import type { SupportedLocale } from '~/types/localization';
 
 export const useMainStore = defineStore('main', () => {
     const state = reactive({
@@ -14,6 +15,7 @@ export const useMainStore = defineStore('main', () => {
         searchQuery: undefined,
         reloadImageProfile: false,
         blurEnabled: localStorage.getItem("blurEnabled") === 'true',
+        userLocale: (localStorage.getItem("userLocale") || 'auto') as SupportedLocale | 'auto',
     });
 
     watch(() => state.authorActive, (newValue) => {
@@ -22,6 +24,10 @@ export const useMainStore = defineStore('main', () => {
 
     watch(() => state.blurEnabled, (newValue) => {
         localStorage.setItem("blurEnabled", newValue.toString());
+    });
+
+    watch(() => state.userLocale, (newValue) => {
+        localStorage.setItem("userLocale", newValue);
     });
 
     const authors = computed(() => {
@@ -44,6 +50,10 @@ export const useMainStore = defineStore('main', () => {
 
     function toggleBlur() {
         state.blurEnabled = !state.blurEnabled;
+    }
+
+    function updateLocale(newLocale: SupportedLocale | 'auto') {
+        state.userLocale = newLocale;
     }
 
     function updateMessages(items: ChatMessage[]) {
@@ -96,6 +106,7 @@ export const useMainStore = defineStore('main', () => {
         authors,
         attachments,
         toggleBlur,
+        updateLocale,
         moreMessagesPath,
         updateMessages,
         clearMessages,
