@@ -40,4 +40,18 @@ interface MessageCrudRepository : JpaRepository<MessageEntity, Long> {
     fun findMessageIdByChatIdAndAttachmentExists(chatId: Long): List<AttachmentInfoDTO>
 
     fun deleteAllByChatId(chatId: Long)
+
+    @Query(
+        """
+        SELECT m FROM MessageEntity m
+        WHERE m.chatId = :chatId
+            AND m.createdAt >= :targetDate
+        ORDER BY m.createdAt ASC, m.id ASC
+        """,
+    )
+    fun findFirstMessageAtOrAfterDate(
+        @Param("chatId") chatId: Long,
+        @Param("targetDate") targetDate: java.time.LocalDateTime,
+        pageable: Pageable,
+    ): Page<MessageEntity>
 }

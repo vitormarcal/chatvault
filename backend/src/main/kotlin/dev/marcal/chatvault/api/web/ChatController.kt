@@ -10,6 +10,7 @@ import dev.marcal.chatvault.application.chat.ChatDeletionService
 import dev.marcal.chatvault.application.chat.ChatListerService
 import dev.marcal.chatvault.application.chat.ChatRenameService
 import dev.marcal.chatvault.application.chat.ProfileImageService
+import dev.marcal.chatvault.application.message.MessageDateFinderService
 import dev.marcal.chatvault.application.message.MessageFinderService
 import org.springframework.core.io.Resource
 import org.springframework.data.domain.Page
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit
 class ChatController(
     private val chatLister: ChatListerService,
     private val messageFinderByChatId: MessageFinderService,
+    private val messageDateFinder: MessageDateFinderService,
     private val attachmentFinder: ChatAttachmentService,
     private val chatNameUpdater: ChatRenameService,
     private val attachmentInfoFinderByChatId: ChatAttachmentInfoService,
@@ -60,6 +62,20 @@ class ChatController(
             query = query,
             pageable = pageable,
         )
+
+    @GetMapping("{chatId}/messages-around-date")
+    fun findMessagesAroundDate(
+        @PathVariable("chatId") chatId: Long,
+        @RequestParam("date") date: String,
+        @RequestParam("pageSize", required = false, defaultValue = "20") pageSize: Int,
+    ): Page<MessageOutput> {
+        val targetDate = java.time.LocalDateTime.parse(date)
+        return messageDateFinder.execute(
+            chatId = chatId,
+            targetDate = targetDate,
+            pageSize = pageSize,
+        )
+    }
 
     @DeleteMapping("{chatId}")
     fun deleteChatAndAssets(

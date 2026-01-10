@@ -96,4 +96,16 @@ class ChatRepositoryImpl(
 
     override fun findChatBucketInfoByExternalId(externalId: String): ChatBucketInfo =
         chatCrudRepository.findByExternalId(externalId).toChatBucketInfo()
+
+    override fun findMessagesAroundDate(
+        chatId: Long,
+        targetDate: java.time.LocalDateTime,
+        pageable: Pageable,
+    ): org.springframework.data.domain.Page<Message> =
+        messageCrudRepository
+            .findFirstMessageAtOrAfterDate(
+                chatId = chatId,
+                targetDate = targetDate,
+                pageable = pageable,
+            ).map { it.toMessageDomain() }
 }
