@@ -22,10 +22,22 @@
     <search-bar :chatId="store.chatActive.chatId" @search="handleSearch" />
     <icon-three-dots class="self" role="button" @click="() => toggleOpenChatConfig()"/>
 
+    <!-- Date Picker Modal -->
+    <date-picker-modal
+      :is-open="store.calendarOpen"
+      :message-statistics="store.messageStatistics"
+      :current-calendar-month="store.currentCalendarMonth"
+      :statistics-loading="store.statisticsLoading"
+      :user-locale="store.userLocale"
+      @close="handleCalendarClose"
+      @select-date="handleCalendarDateSelect"
+      @month-changed="handleCalendarMonthChange"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import {useMainStore} from '~/store';
 
 const store = useMainStore();
@@ -48,6 +60,19 @@ function handleSearch({ query, chatId }: { query: string; chatId: string | null 
   } else {
     store.closeSearch();
   }
+}
+
+function handleCalendarClose() {
+  store.closeCalendar();
+}
+
+function handleCalendarDateSelect(dateStr: string) {
+  store.jumpToDate(store.chatActive.chatId, dateStr);
+}
+
+function handleCalendarMonthChange(date: Date) {
+  store.setCalendarMonth(date);
+  store.fetchMessageStatistics(store.chatActive.chatId, date);
 }
 
 </script>

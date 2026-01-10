@@ -6,7 +6,6 @@ import dev.marcal.chatvault.domain.repository.ChatRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort.Direction
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -21,11 +20,12 @@ class MessageDateFinderService(
         pageSize: Int = 20,
     ): Page<MessageOutput> {
         val pageable = PageRequest.of(0, pageSize, Direction.ASC, "createdAt", "id")
-        val page = chatRepository.findMessagesAroundDate(
-            chatId = chatId,
-            targetDate = targetDate,
-            pageable = pageable,
-        )
+        val page =
+            chatRepository.findMessagesAroundDate(
+                chatId = chatId,
+                targetDate = targetDate,
+                pageable = pageable,
+            )
         val outputs = page.content.map { it.toOutput() }
         return PageImpl(outputs, pageable, page.totalElements)
     }

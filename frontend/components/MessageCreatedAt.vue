@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { useDateFormatting } from '~/composables/useDateFormatting'
-import { isToday, formatDate as utilFormatDate } from '~/utils/dateFormatter'
+import { isToday as isTodayUtil, formatDate as utilFormatDate } from '~/utils/dateFormatter'
 
 const props = defineProps(['date'])
 
@@ -20,7 +20,7 @@ const formattedDate = computed(() => {
 const isToday = computed(() => {
   if (!props.date) return false
   const date = new Date(props.date)
-  return isToday(date)
+  return isTodayUtil(date)
 })
 
 </script>

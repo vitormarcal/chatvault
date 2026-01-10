@@ -12,6 +12,7 @@ export default defineNuxtConfig({
               listChats: `${host}/chats`,
               getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page&size=:size&query=:query`,
               getMessagesByDate: `${host}/chats/:chatId/messages-around-date?date=:date&pageSize=:pageSize`,
+              getMessageStatistics: `${host}/chats/:chatId/message-statistics?year=:year&month=:month`,
               getAttachmentByChatIdAndMessageId: `${host}/chats/:chatId/messages/:messageId/attachment`,
               getAttachmentsInfoByChatId: `${host}/chats/:chatId/attachments`,
               importChatById: `${host}/chats/:chatId/messages/import`,

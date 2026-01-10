@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.infrastructure.persistence.repository
 
 import dev.marcal.chatvault.infrastructure.persistence.dto.AttachmentInfoDTO
+import dev.marcal.chatvault.infrastructure.persistence.dto.MessageCountDTO
 import dev.marcal.chatvault.infrastructure.persistence.entity.MessageEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -54,4 +55,24 @@ interface MessageCrudRepository : JpaRepository<MessageEntity, Long> {
         @Param("targetDate") targetDate: java.time.LocalDateTime,
         pageable: Pageable,
     ): Page<MessageEntity>
+
+    @Query(
+        """
+        SELECT new dev.marcal.chatvault.infrastructure.persistence.dto.MessageCountDTO(
+            CAST(m.createdAt AS java.time.LocalDate),
+            COUNT(m.id)
+        )
+        FROM MessageEntity m
+        WHERE m.chatId = :chatId
+            AND YEAR(m.createdAt) = :year
+            AND MONTH(m.createdAt) = :month
+        GROUP BY CAST(m.createdAt AS java.time.LocalDate)
+        ORDER BY CAST(m.createdAt AS java.time.LocalDate) ASC
+        """,
+    )
+    fun findMessageCountsByChatIdAndMonth(
+        @Param("chatId") chatId: Long,
+        @Param("year") year: Int,
+        @Param("month") month: Int,
+    ): List<MessageCountDTO>
 }

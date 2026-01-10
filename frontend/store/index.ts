@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia';
 import {type Attachment, AttachmentConstructor, type Chat, ChatMessage} from "~/types";
 import type { SupportedLocale } from '~/types/localization';
+import type { MessageStatistics } from '~/types/calendar';
 
 export const useMainStore = defineStore('main', () => {
     const state = reactive({
@@ -19,6 +20,10 @@ export const useMainStore = defineStore('main', () => {
         reloadImageProfile: false,
         blurEnabled: localStorage.getItem("blurEnabled") === 'true',
         userLocale: (localStorage.getItem("userLocale") || 'auto') as SupportedLocale | 'auto',
+        messageStatistics: null as MessageStatistics | null,
+        currentCalendarMonth: new Date(),
+        statisticsLoading: false,
+        calendarOpen: false,
     });
 
     watch(() => state.authorActive, (newValue) => {
@@ -155,6 +160,37 @@ export const useMainStore = defineStore('main', () => {
         state.highlightUntilDate = null;
     }
 
+    async function fetchMessageStatistics(chatId: number, date: Date) {
+        state.statisticsLoading = true;
+        try {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const url = useRuntimeConfig().public.api.getMessageStatistics
+                .replace(":chatId", chatId.toString())
+                .replace(":year", year.toString())
+                .replace(":month", month.toString());
+            const response = await $fetch<MessageStatistics>(url);
+            state.messageStatistics = response;
+        } catch (error) {
+            console.error("Fetch message statistics error:", error);
+            state.messageStatistics = null;
+        } finally {
+            state.statisticsLoading = false;
+        }
+    }
+
+    function setCalendarMonth(date: Date) {
+        state.currentCalendarMonth = new Date(date);
+    }
+
+    function openCalendar() {
+        state.calendarOpen = true;
+    }
+
+    function closeCalendar() {
+        state.calendarOpen = false;
+    }
+
     return {
         ...toRefs(state),
         authors,
@@ -173,6 +209,10 @@ export const useMainStore = defineStore('main', () => {
         closeSearch,
         jumpToDate,
         clearHighlight,
+        fetchMessageStatistics,
+        setCalendarMonth,
+        openCalendar,
+        closeCalendar,
     };
 });
 
