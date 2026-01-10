@@ -15,14 +15,16 @@
         :attachment="message.attachment"
         :class="{ 'blur-sensitive': store.blurEnabled }"
     />
-    <div class="message-createdAt">{{ message.createdAt }}</div>
+    <div class="message-createdAt">{{ formattedDate }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useMainStore } from '~/store';
+import { useDateFormatting } from '~/composables/useDateFormatting';
 
 const store = useMainStore();
+const { formatDate } = useDateFormatting();
 
 const props = defineProps(['message']);
 
@@ -32,6 +34,8 @@ const formattedContent = computed(() =>
         '<a href="$&" target="_blank" rel="noopener noreferrer">$&</a>'
     )
 );
+
+const formattedDate = computed(() => formatDate(props.message.createdAt));
 
 const hasAttachment = computed(() => Boolean(props.message.attachment));
 
