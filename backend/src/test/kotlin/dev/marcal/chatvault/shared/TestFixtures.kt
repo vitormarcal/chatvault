@@ -7,6 +7,7 @@ import dev.marcal.chatvault.api.dto.output.ChatLastMessageOutput
 import dev.marcal.chatvault.api.dto.output.MessageOutput
 import dev.marcal.chatvault.domain.bucket.BucketService
 import dev.marcal.chatvault.domain.model.Attachment
+import dev.marcal.chatvault.domain.model.AttachmentSummary
 import dev.marcal.chatvault.domain.model.Author
 import dev.marcal.chatvault.domain.model.AuthorType
 import dev.marcal.chatvault.domain.model.Bucket
@@ -112,6 +113,14 @@ fun attachmentWith(
     name: String = "test.pdf",
     bucket: Bucket = bucketWith(),
 ): Attachment = Attachment(name = name, bucket = bucket)
+
+/**
+ * Create an AttachmentSummary domain object with default values
+ */
+fun attachmentSummaryWith(
+    id: Long = 1L,
+    name: String = "test.pdf",
+): AttachmentSummary = AttachmentSummary(id = id, name = name)
 
 /**
  * Create a Page<T> object for pagination tests (domain model)
