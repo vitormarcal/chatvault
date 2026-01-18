@@ -7,7 +7,9 @@ import dev.marcal.chatvault.application.chat.ChatDeletionService
 import dev.marcal.chatvault.application.chat.ChatListerService
 import dev.marcal.chatvault.application.chat.ChatRenameService
 import dev.marcal.chatvault.application.chat.ProfileImageService
+import dev.marcal.chatvault.application.message.MessageDateFinderService
 import dev.marcal.chatvault.application.message.MessageFinderService
+import dev.marcal.chatvault.application.message.MessageStatisticsService
 import dev.marcal.chatvault.shared.attachmentInfoOutputWith
 import dev.marcal.chatvault.shared.chatLastMessageWith
 import dev.marcal.chatvault.shared.messageOutputWith
@@ -75,6 +77,12 @@ class ChatControllerTest {
 
         @Bean
         fun chatDeletionService() = mockk<ChatDeletionService>()
+
+        @Bean
+        fun messageDateFinder() = mockk<MessageDateFinderService>()
+
+        @Bean
+        fun messageStatistics() = mockk<MessageStatisticsService>()
     }
 
     @Test
