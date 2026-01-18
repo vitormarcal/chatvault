@@ -16,10 +16,11 @@ class ChatAttachmentInfoServiceTest {
     fun `should return attachment info for chat`() {
         // Arrange
         val chatId = 1L
-        val attachmentSummaries = sequenceOf(
-            AttachmentSummary(id = 1L, name = "document.pdf"),
-            AttachmentSummary(id = 2L, name = "image.jpg"),
-        )
+        val attachmentSummaries =
+            sequenceOf(
+                AttachmentSummary(id = 1L, name = "document.pdf"),
+                AttachmentSummary(id = 2L, name = "image.jpg"),
+            )
 
         every { chatRepository.findAttachmentMessageIdsByChatId(chatId) } returns attachmentSummaries
 
@@ -52,11 +53,12 @@ class ChatAttachmentInfoServiceTest {
     fun `should map attachment summaries to output correctly`() {
         // Arrange
         val chatId = 3L
-        val attachmentSummaries = sequenceOf(
-            AttachmentSummary(id = 10L, name = "report.docx"),
-            AttachmentSummary(id = 11L, name = "data.xlsx"),
-            AttachmentSummary(id = 12L, name = "presentation.pptx"),
-        )
+        val attachmentSummaries =
+            sequenceOf(
+                AttachmentSummary(id = 10L, name = "report.docx"),
+                AttachmentSummary(id = 11L, name = "data.xlsx"),
+                AttachmentSummary(id = 12L, name = "presentation.pptx"),
+            )
 
         every { chatRepository.findAttachmentMessageIdsByChatId(chatId) } returns attachmentSummaries
 
@@ -74,10 +76,11 @@ class ChatAttachmentInfoServiceTest {
     fun `should handle attachments with special characters in names`() {
         // Arrange
         val chatId = 4L
-        val attachmentSummaries = sequenceOf(
-            AttachmentSummary(id = 20L, name = "file_with-special!@#.pdf"),
-            AttachmentSummary(id = 21L, name = "document (copy).docx"),
-        )
+        val attachmentSummaries =
+            sequenceOf(
+                AttachmentSummary(id = 20L, name = "file_with-special!@#.pdf"),
+                AttachmentSummary(id = 21L, name = "document (copy).docx"),
+            )
 
         every { chatRepository.findAttachmentMessageIdsByChatId(chatId) } returns attachmentSummaries
 
@@ -94,9 +97,11 @@ class ChatAttachmentInfoServiceTest {
     fun `should return sequence that can be used for lazy evaluation`() {
         // Arrange
         val chatId = 5L
-        val attachmentSummaries = (1..10).map { index ->
-            AttachmentSummary(id = index.toLong(), name = "attachment_$index.zip")
-        }.asSequence()
+        val attachmentSummaries =
+            (1..10)
+                .map { index ->
+                    AttachmentSummary(id = index.toLong(), name = "attachment_$index.zip")
+                }.asSequence()
 
         every { chatRepository.findAttachmentMessageIdsByChatId(chatId) } returns attachmentSummaries
 
@@ -112,9 +117,11 @@ class ChatAttachmentInfoServiceTest {
     fun `should handle large number of attachments`() {
         // Arrange
         val chatId = 6L
-        val largeAttachmentList = (1..100).map { index ->
-            AttachmentSummary(id = index.toLong(), name = "file_$index.bin")
-        }.asSequence()
+        val largeAttachmentList =
+            (1..100)
+                .map { index ->
+                    AttachmentSummary(id = index.toLong(), name = "file_$index.bin")
+                }.asSequence()
 
         every { chatRepository.findAttachmentMessageIdsByChatId(chatId) } returns largeAttachmentList
 

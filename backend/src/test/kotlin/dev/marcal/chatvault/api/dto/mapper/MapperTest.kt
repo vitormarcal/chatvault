@@ -15,12 +15,13 @@ class MapperTest {
     @Test
     fun `should map ChatLastMessage to ChatLastMessageOutput`() {
         // Arrange
-        val chatLastMessage = chatLastMessageWith(
-            chatId = 1L,
-            chatName = "Test Chat",
-            author = authorWith(name = "John"),
-            msgCount = 10,
-        )
+        val chatLastMessage =
+            chatLastMessageWith(
+                chatId = 1L,
+                chatName = "Test Chat",
+                author = authorWith(name = "John"),
+                msgCount = 10,
+            )
 
         // Act
         val result = chatLastMessage.toOutput()
@@ -35,11 +36,12 @@ class MapperTest {
     @Test
     fun `should map Message to MessageOutput`() {
         // Arrange
-        val message = messageWith(
-            id = 1L,
-            author = "Alice",
-            content = "Hello",
-        )
+        val message =
+            messageWith(
+                id = 1L,
+                author = "Alice",
+                content = "Hello",
+            )
 
         // Act
         val result = message.toOutput()
@@ -54,12 +56,13 @@ class MapperTest {
     @Test
     fun `should map Message with attachment to MessageOutput`() {
         // Arrange
-        val message = messageWith(
-            id = 2L,
-            author = "Bob",
-            content = "Message with file",
-            attachment = attachmentWith(name = "document.pdf"),
-        )
+        val message =
+            messageWith(
+                id = 2L,
+                author = "Bob",
+                content = "Message with file",
+                attachment = attachmentWith(name = "document.pdf"),
+            )
 
         // Act
         val result = message.toOutput()
@@ -71,10 +74,11 @@ class MapperTest {
     @Test
     fun `should map MessageOutput to NewMessageInput`() {
         // Arrange
-        val messageOutput = messageOutputWith(
-            author = "Charlie",
-            content = "Test message",
-        )
+        val messageOutput =
+            messageOutputWith(
+                author = "Charlie",
+                content = "Test message",
+            )
         val chatId = 5L
 
         // Act
@@ -89,11 +93,12 @@ class MapperTest {
     @Test
     fun `should map MessageOutput with attachment to NewMessageInput`() {
         // Arrange
-        val messageOutput = messageOutputWith(
-            author = "Dave",
-            content = "Message",
-            attachmentName = "image.jpg",
-        )
+        val messageOutput =
+            messageOutputWith(
+                author = "Dave",
+                content = "Message",
+                attachmentName = "image.jpg",
+            )
 
         // Act
         val result = messageOutput.toNewMessageInput(10L)
@@ -106,10 +111,11 @@ class MapperTest {
     @Test
     fun `should map AttachmentSummary to AttachmentInfoOutput`() {
         // Arrange
-        val attachment = attachmentSummaryWith(
-            id = 1L,
-            name = "photo.png",
-        )
+        val attachment =
+            attachmentSummaryWith(
+                id = 1L,
+                name = "photo.png",
+            )
 
         // Act
         val result = attachment.toOutput()
@@ -122,10 +128,11 @@ class MapperTest {
     @Test
     fun `should handle null author in MessageOutput mapping`() {
         // Arrange
-        val messageOutput = messageOutputWith(
-            author = null,
-            content = "Anonymous message",
-        )
+        val messageOutput =
+            messageOutputWith(
+                author = null,
+                content = "Anonymous message",
+            )
 
         // Act
         val result = messageOutput.toNewMessageInput(3L)
@@ -138,11 +145,12 @@ class MapperTest {
     @Test
     fun `should handle null attachment in MessageOutput mapping`() {
         // Arrange
-        val messageOutput = messageOutputWith(
-            author = "Eve",
-            content = "No attachment",
-            attachmentName = null,
-        )
+        val messageOutput =
+            messageOutputWith(
+                author = "Eve",
+                content = "No attachment",
+                attachmentName = null,
+            )
 
         // Act
         val result = messageOutput.toNewMessageInput(7L)

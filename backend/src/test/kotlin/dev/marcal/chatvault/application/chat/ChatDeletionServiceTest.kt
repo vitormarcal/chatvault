@@ -74,10 +74,11 @@ class ChatDeletionServiceTest {
         // Arrange
         val chatId = 10L
         val customBucketPath = "/custom/bucket/path/chat-10"
-        val chatBucketInfo = ChatBucketInfo(
-            chatId = chatId,
-            bucket = Bucket(path = customBucketPath),
-        )
+        val chatBucketInfo =
+            ChatBucketInfo(
+                chatId = chatId,
+                bucket = Bucket(path = customBucketPath),
+            )
 
         every { chatRepository.findChatBucketInfoByChatId(chatId) } returns chatBucketInfo
         every { bucketService.delete(any()) } just Runs

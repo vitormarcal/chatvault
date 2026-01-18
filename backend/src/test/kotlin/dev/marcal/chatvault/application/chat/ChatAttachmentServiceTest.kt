@@ -66,9 +66,10 @@ class ChatAttachmentServiceTest {
         every { chatRepository.findMessageBy(chatId, messageId) } returns messageWithoutAttachment
 
         // Act & Assert
-        val exception = assertThrows<AttachmentNotFoundException> {
-            chatAttachmentService.execute(criteria)
-        }
+        val exception =
+            assertThrows<AttachmentNotFoundException> {
+                chatAttachmentService.execute(criteria)
+            }
         assertEquals(
             "the message exists but there are no attachments linked to it",
             exception.message,

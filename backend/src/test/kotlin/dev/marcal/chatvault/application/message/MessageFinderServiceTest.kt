@@ -11,7 +11,6 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -26,22 +25,23 @@ class MessageFinderServiceTest {
         val chatId = 1L
         val query = "test"
         val pageable = PageRequest.of(0, 10)
-        val messages = listOf(
-            Message(
-                id = 1L,
-                author = Author(name = "John", type = AuthorType.USER),
-                content = Content(text = "This is a test message"),
-                createdAt = LocalDateTime.of(2023, 1, 1, 12, 0),
-                externalId = "ext-1",
-            ),
-            Message(
-                id = 2L,
-                author = Author(name = "Jane", type = AuthorType.USER),
-                content = Content(text = "Another test"),
-                createdAt = LocalDateTime.of(2023, 1, 1, 13, 0),
-                externalId = "ext-2",
-            ),
-        )
+        val messages =
+            listOf(
+                Message(
+                    id = 1L,
+                    author = Author(name = "John", type = AuthorType.USER),
+                    content = Content(text = "This is a test message"),
+                    createdAt = LocalDateTime.of(2023, 1, 1, 12, 0),
+                    externalId = "ext-1",
+                ),
+                Message(
+                    id = 2L,
+                    author = Author(name = "Jane", type = AuthorType.USER),
+                    content = Content(text = "Another test"),
+                    createdAt = LocalDateTime.of(2023, 1, 1, 13, 0),
+                    externalId = "ext-2",
+                ),
+            )
         val page = PageImpl(messages, pageable, 2L)
 
         every { chatRepository.findMessagesBy(chatId, query, pageable) } returns page
@@ -62,15 +62,16 @@ class MessageFinderServiceTest {
         // Arrange
         val chatId = 5L
         val pageable = PageRequest.of(0, 20)
-        val messages = listOf(
-            Message(
-                id = 1L,
-                author = Author(name = "Alice", type = AuthorType.USER),
-                content = Content(text = "Message 1"),
-                createdAt = LocalDateTime.of(2023, 2, 1, 10, 0),
-                externalId = "ext-1",
-            ),
-        )
+        val messages =
+            listOf(
+                Message(
+                    id = 1L,
+                    author = Author(name = "Alice", type = AuthorType.USER),
+                    content = Content(text = "Message 1"),
+                    createdAt = LocalDateTime.of(2023, 2, 1, 10, 0),
+                    externalId = "ext-1",
+                ),
+            )
         val page = PageImpl(messages, pageable, 1L)
 
         every { chatRepository.findMessagesBy(chatId, null, pageable) } returns page
@@ -107,15 +108,16 @@ class MessageFinderServiceTest {
         // Arrange
         val chatId = 1L
         val pageable = PageRequest.of(1, 5) // Page 1, size 5
-        val messages = (11..15).map {
-            Message(
-                id = it.toLong(),
-                author = Author(name = "User", type = AuthorType.USER),
-                content = Content(text = "Message $it"),
-                createdAt = LocalDateTime.of(2023, 1, it, 12, 0),
-                externalId = "ext-$it",
-            )
-        }
+        val messages =
+            (11..15).map {
+                Message(
+                    id = it.toLong(),
+                    author = Author(name = "User", type = AuthorType.USER),
+                    content = Content(text = "Message $it"),
+                    createdAt = LocalDateTime.of(2023, 1, it, 12, 0),
+                    externalId = "ext-$it",
+                )
+            }
         val page = PageImpl(messages, pageable, 100L) // Total 100 messages
 
         every { chatRepository.findMessagesBy(chatId, null, pageable) } returns page
@@ -134,15 +136,16 @@ class MessageFinderServiceTest {
     fun `should return all messages as sequence without pagination`() {
         // Arrange
         val chatId = 1L
-        val messages = (1..50).map {
-            Message(
-                id = it.toLong(),
-                author = Author(name = "User", type = AuthorType.USER),
-                content = Content(text = "Message $it"),
-                createdAt = LocalDateTime.of(2023, 1, 1, (it % 24), 0),
-                externalId = "ext-$it",
-            )
-        }
+        val messages =
+            (1..50).map {
+                Message(
+                    id = it.toLong(),
+                    author = Author(name = "User", type = AuthorType.USER),
+                    content = Content(text = "Message $it"),
+                    createdAt = LocalDateTime.of(2023, 1, 1, (it % 24), 0),
+                    externalId = "ext-$it",
+                )
+            }
 
         // Mock to return messages on first page, empty on next pages (to stop iteration)
         every { chatRepository.findMessagesBy(chatId, null, any()) } answers {
@@ -167,15 +170,16 @@ class MessageFinderServiceTest {
         // Arrange
         val chatId = 1L
         val pageable = PageRequest.of(0, 10)
-        val messages = listOf(
-            Message(
-                id = 42L,
-                author = Author(name = "TestUser", type = AuthorType.SYSTEM),
-                content = Content(text = "System message", attachment = null),
-                createdAt = LocalDateTime.of(2023, 12, 25, 15, 30, 45),
-                externalId = "external-42",
-            ),
-        )
+        val messages =
+            listOf(
+                Message(
+                    id = 42L,
+                    author = Author(name = "TestUser", type = AuthorType.SYSTEM),
+                    content = Content(text = "System message", attachment = null),
+                    createdAt = LocalDateTime.of(2023, 12, 25, 15, 30, 45),
+                    externalId = "external-42",
+                ),
+            )
         val page = PageImpl(messages, pageable, 1L)
 
         every { chatRepository.findMessagesBy(chatId, null, pageable) } returns page

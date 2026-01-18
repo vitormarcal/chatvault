@@ -48,12 +48,13 @@ class ChatExportServiceTest {
         val chatId = 2L
         val chatBucketInfo = chatBucketInfoWith(chatId = chatId)
         val createdAt = LocalDateTime.of(2023, 8, 15, 18, 30)
-        val messageOutput = messageOutputWith(
-            author = "John",
-            authorType = "USER",
-            content = "Hello world",
-            createdAt = createdAt,
-        )
+        val messageOutput =
+            messageOutputWith(
+                author = "John",
+                authorType = "USER",
+                content = "Hello world",
+                createdAt = createdAt,
+            )
         val mockResource = mockk<Resource>()
 
         every { chatRepository.findChatBucketInfoByChatId(chatId) } returns chatBucketInfo
@@ -73,12 +74,13 @@ class ChatExportServiceTest {
         // Arrange
         val chatId = 3L
         val chatBucketInfo = chatBucketInfoWith(chatId = chatId)
-        val systemMessage = messageOutputWith(
-            author = "",
-            authorType = "SYSTEM",
-            content = "System notification",
-            createdAt = LocalDateTime.of(2023, 1, 1, 12, 0),
-        )
+        val systemMessage =
+            messageOutputWith(
+                author = "",
+                authorType = "SYSTEM",
+                content = "System notification",
+                createdAt = LocalDateTime.of(2023, 1, 1, 12, 0),
+            )
         val mockResource = mockk<Resource>()
 
         every { chatRepository.findChatBucketInfoByChatId(chatId) } returns chatBucketInfo
@@ -101,9 +103,10 @@ class ChatExportServiceTest {
         every { chatRepository.findChatBucketInfoByChatId(nonExistentChatId) } returns null
 
         // Act & Assert
-        val exception = assertThrows<ChatNotFoundException> {
-            chatExportService.execute(nonExistentChatId)
-        }
+        val exception =
+            assertThrows<ChatNotFoundException> {
+                chatExportService.execute(nonExistentChatId)
+            }
         assertEquals(
             "The export failed. Chat with id $nonExistentChatId was not found.",
             exception.message,
@@ -140,13 +143,14 @@ class ChatExportServiceTest {
         // Arrange
         val chatId = 5L
         val chatBucketInfo = chatBucketInfoWith(chatId = chatId)
-        val messages = (1..5).map { index ->
-            messageOutputWith(
-                author = "User",
-                content = "Message $index",
-                createdAt = LocalDateTime.of(2023, 1, 1, index, 0),
-            )
-        }
+        val messages =
+            (1..5).map { index ->
+                messageOutputWith(
+                    author = "User",
+                    content = "Message $index",
+                    createdAt = LocalDateTime.of(2023, 1, 1, index, 0),
+                )
+            }
         val mockResource = mockk<Resource>()
 
         every { chatRepository.findChatBucketInfoByChatId(chatId) } returns chatBucketInfo

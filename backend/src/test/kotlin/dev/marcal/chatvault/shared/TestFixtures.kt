@@ -22,15 +22,7 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import org.springframework.core.io.Resource
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import java.time.LocalDateTime
-
-/**
- * Shared test fixtures for all test classes.
- * Provides factory functions for creating domain objects and DTOs with sensible defaults.
- */
 
 // ============================================================================
 // DOMAIN MODEL FACTORIES
@@ -45,20 +37,19 @@ fun chatWith(
     name: String = "Test Chat",
     messages: List<Message> = emptyList(),
     bucket: Bucket = bucketWith(),
-): Chat = Chat(
-    id = id,
-    externalId = externalId,
-    name = name,
-    messages = messages,
-    bucket = bucket,
-)
+): Chat =
+    Chat(
+        id = id,
+        externalId = externalId,
+        name = name,
+        messages = messages,
+        bucket = bucket,
+    )
 
 /**
  * Create a Bucket domain object with default values
  */
-fun bucketWith(
-    path: String = "/chat-1",
-): Bucket = Bucket(path = path)
+fun bucketWith(path: String = "/chat-1"): Bucket = Bucket(path = path)
 
 /**
  * Create a ChatBucketInfo domain object with default values
@@ -66,10 +57,11 @@ fun bucketWith(
 fun chatBucketInfoWith(
     chatId: Long = 1L,
     bucket: Bucket = bucketWith(path = "/chat-$chatId"),
-): ChatBucketInfo = ChatBucketInfo(
-    chatId = chatId,
-    bucket = bucket,
-)
+): ChatBucketInfo =
+    ChatBucketInfo(
+        chatId = chatId,
+        bucket = bucket,
+    )
 
 /**
  * Create a Message domain object with default values
@@ -82,13 +74,14 @@ fun messageWith(
     attachment: Attachment? = null,
     createdAt: LocalDateTime = LocalDateTime.of(2023, 1, 1, 12, 0),
     externalId: String? = null,
-): Message = Message(
-    id = id,
-    author = Author(name = author, type = authorType),
-    content = Content(text = content, attachment = attachment),
-    createdAt = createdAt,
-    externalId = externalId,
-)
+): Message =
+    Message(
+        id = id,
+        author = Author(name = author, type = authorType),
+        content = Content(text = content, attachment = attachment),
+        createdAt = createdAt,
+        externalId = externalId,
+    )
 
 /**
  * Create an Author domain object with default values
@@ -131,13 +124,14 @@ fun <T> pageWith(
     items: Int = 10,
     totalItems: Long = data.size.toLong(),
     totalPages: Int = if (totalItems == 0L) 0 else (totalItems.toInt() + items - 1) / items,
-): Page<T> = Page(
-    page = page,
-    totalPages = totalPages,
-    totalItems = totalItems,
-    items = items,
-    data = data,
-)
+): Page<T> =
+    Page(
+        page = page,
+        totalPages = totalPages,
+        totalItems = totalItems,
+        items = items,
+        data = data,
+    )
 
 /**
  * Create ChatLastMessage for conversa listing
@@ -149,14 +143,15 @@ fun chatLastMessageWith(
     content: String = "Last message",
     msgCreatedAt: LocalDateTime = LocalDateTime.of(2023, 1, 1, 12, 0),
     msgCount: Long = 10L,
-): ChatLastMessage = ChatLastMessage(
-    chatId = chatId,
-    chatName = chatName,
-    author = author,
-    content = content,
-    msgCreatedAt = msgCreatedAt,
-    msgCount = msgCount,
-)
+): ChatLastMessage =
+    ChatLastMessage(
+        chatId = chatId,
+        chatName = chatName,
+        author = author,
+        content = content,
+        msgCreatedAt = msgCreatedAt,
+        msgCount = msgCount,
+    )
 
 // ============================================================================
 // DTO FACTORIES (Input)
@@ -172,14 +167,15 @@ fun newMessageInputWith(
     createdAt: LocalDateTime? = LocalDateTime.of(2023, 1, 1, 12, 0),
     externalId: String? = null,
     attachment: NewAttachmentInput? = null,
-): NewMessageInput = NewMessageInput(
-    chatId = chatId,
-    authorName = authorName,
-    content = content,
-    createdAt = createdAt,
-    externalId = externalId,
-    attachment = attachment,
-)
+): NewMessageInput =
+    NewMessageInput(
+        chatId = chatId,
+        authorName = authorName,
+        content = content,
+        createdAt = createdAt,
+        externalId = externalId,
+        attachment = attachment,
+    )
 
 /**
  * Create a NewAttachmentInput DTO with default values
@@ -187,10 +183,11 @@ fun newMessageInputWith(
 fun newAttachmentInputWith(
     name: String = "test.pdf",
     content: String = "file content",
-): NewAttachmentInput = NewAttachmentInput(
-    name = name,
-    content = content,
-)
+): NewAttachmentInput =
+    NewAttachmentInput(
+        name = name,
+        content = content,
+    )
 
 // ============================================================================
 // DTO FACTORIES (Output)
@@ -206,15 +203,15 @@ fun messageOutputWith(
     content: String = "Test message content",
     attachmentName: String? = null,
     createdAt: LocalDateTime = LocalDateTime.of(2023, 1, 1, 12, 0),
-): MessageOutput = MessageOutput(
-    id = id,
-    author = author,
-    authorType = authorType,
-    content = content,
-    attachmentName = attachmentName,
-    createdAt = createdAt,
-)
-
+): MessageOutput =
+    MessageOutput(
+        id = id,
+        author = author,
+        authorType = authorType,
+        content = content,
+        attachmentName = attachmentName,
+        createdAt = createdAt,
+    )
 
 /**
  * Create a ChatLastMessageOutput DTO with default values
@@ -227,15 +224,16 @@ fun chatLastMessageOutputWith(
     content: String = "Last message",
     msgCreatedAt: LocalDateTime = LocalDateTime.of(2023, 1, 1, 12, 0),
     msgCount: Long = 10L,
-): ChatLastMessageOutput = ChatLastMessageOutput(
-    chatId = chatId,
-    chatName = chatName,
-    authorName = authorName,
-    authorType = authorType,
-    content = content,
-    msgCreatedAt = msgCreatedAt,
-    msgCount = msgCount,
-)
+): ChatLastMessageOutput =
+    ChatLastMessageOutput(
+        chatId = chatId,
+        chatName = chatName,
+        authorName = authorName,
+        authorType = authorType,
+        content = content,
+        msgCreatedAt = msgCreatedAt,
+        msgCount = msgCount,
+    )
 
 /**
  * Create an AttachmentInfoOutput DTO with default values
@@ -243,10 +241,11 @@ fun chatLastMessageOutputWith(
 fun attachmentInfoOutputWith(
     id: Long = 1L,
     name: String = "test.pdf",
-): AttachmentInfoOutput = AttachmentInfoOutput(
-    id = id,
-    name = name,
-)
+): AttachmentInfoOutput =
+    AttachmentInfoOutput(
+        id = id,
+        name = name,
+    )
 
 // ============================================================================
 // MOCK FACTORIES
@@ -260,38 +259,41 @@ fun mockChatRepository(
     lastMessage: ChatLastMessage? = chatLastMessageWith(),
     allChats: Sequence<ChatLastMessage> = sequenceOf(lastMessage).filterNotNull(),
     messageCount: Long = 5L,
-): ChatRepository = mockk {
-    every { findChatBucketInfoByChatId(any()) } returns chatBucketInfo
-    every { findLastMessageByChatId(any()) } returns lastMessage?.let {
-        messageWith(
-            author = it.author.name,
-            content = it.content,
-            createdAt = it.msgCreatedAt,
-        )
+): ChatRepository =
+    mockk {
+        every { findChatBucketInfoByChatId(any()) } returns chatBucketInfo
+        every { findLastMessageByChatId(any()) } returns
+            lastMessage?.let {
+                messageWith(
+                    author = it.author.name,
+                    content = it.content,
+                    createdAt = it.msgCreatedAt,
+                )
+            }
+        every { findAllChatsWithLastMessage() } returns allChats
+        every { countChatMessages(any()) } returns messageCount
+        every { saveNewMessages(any()) } just Runs
+        every { deleteChat(any()) } just Runs
+        every { setChatNameByChatId(any(), any()) } just Runs
+        every { existsByChatId(any()) } returns (chatBucketInfo != null)
+        every { existsByExternalId(any()) } returns false
     }
-    every { findAllChatsWithLastMessage() } returns allChats
-    every { countChatMessages(any()) } returns messageCount
-    every { saveNewMessages(any()) } just Runs
-    every { deleteChat(any()) } just Runs
-    every { setChatNameByChatId(any(), any()) } just Runs
-    every { existsByChatId(any()) } returns (chatBucketInfo != null)
-    every { existsByExternalId(any()) } returns false
-}
 
 /**
  * Create a mocked BucketService with sensible defaults
  */
-fun mockBucketService(): BucketService = mockk {
-    every { save(any()) } just Runs
-    every { delete(any()) } just Runs
-    every { loadFileAsResource(any()) } returns mockk()
-    every { loadBucketAsZip(any()) } returns mockk()
-    every { saveToImportDir(any()) } just Runs
-    every { saveTextToBucket(any(), any()) } just Runs
-    every { zipPendingImports(any()) } returns emptySequence()
-    every { deleteZipImported(any()) } just Runs
-    every { loadBucketListAsZip() } returns mockk()
-}
+fun mockBucketService(): BucketService =
+    mockk {
+        every { save(any()) } just Runs
+        every { delete(any()) } just Runs
+        every { loadFileAsResource(any()) } returns mockk()
+        every { loadBucketAsZip(any()) } returns mockk()
+        every { saveToImportDir(any()) } just Runs
+        every { saveTextToBucket(any(), any()) } just Runs
+        every { zipPendingImports(any()) } returns emptySequence()
+        every { deleteZipImported(any()) } just Runs
+        every { loadBucketListAsZip() } returns mockk()
+    }
 
 /**
  * Create lists of test messages for bulk operations
@@ -300,15 +302,16 @@ fun messageListWith(
     count: Int = 5,
     author: String = "Test User",
     startId: Long = 1L,
-): List<Message> = (0 until count).map { index ->
-    messageWith(
-        id = startId + index,
-        author = author,
-        content = "Message $index",
-        createdAt = LocalDateTime.of(2023, 1, 1, 12, index),
-        externalId = "external-$index",
-    )
-}
+): List<Message> =
+    (0 until count).map { index ->
+        messageWith(
+            id = startId + index,
+            author = author,
+            content = "Message $index",
+            createdAt = LocalDateTime.of(2023, 1, 1, 12, index),
+            externalId = "external-$index",
+        )
+    }
 
 /**
  * Create lists of test message outputs for API responses
@@ -317,14 +320,15 @@ fun messageOutputListWith(
     count: Int = 5,
     author: String = "Test User",
     startId: Long = 1L,
-): List<MessageOutput> = (0 until count).map { index ->
-    messageOutputWith(
-        id = startId + index,
-        author = author,
-        content = "Message $index",
-        createdAt = LocalDateTime.of(2023, 1, 1, 12, index),
-    )
-}
+): List<MessageOutput> =
+    (0 until count).map { index ->
+        messageOutputWith(
+            id = startId + index,
+            author = author,
+            content = "Message $index",
+            createdAt = LocalDateTime.of(2023, 1, 1, 12, index),
+        )
+    }
 
 /**
  * Create lists of test chats for bulk operations
@@ -332,12 +336,13 @@ fun messageOutputListWith(
 fun chatListWith(
     count: Int = 5,
     startId: Long = 1L,
-): List<Chat> = (0 until count).map { index ->
-    val chatId = startId + index
-    chatWith(
-        id = chatId,
-        externalId = "external-$index",
-        name = "Chat $index",
-        bucket = bucketWith(path = "/chat-$chatId"),
-    )
-}
+): List<Chat> =
+    (0 until count).map { index ->
+        val chatId = startId + index
+        chatWith(
+            id = chatId,
+            externalId = "external-$index",
+            name = "Chat $index",
+            bucket = bucketWith(path = "/chat-$chatId"),
+        )
+    }

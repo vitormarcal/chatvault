@@ -1,6 +1,5 @@
 package dev.marcal.chatvault.application.chat
 
-import dev.marcal.chatvault.api.dto.input.FileTypeInputEnum
 import dev.marcal.chatvault.api.dto.input.PendingChatFile
 import dev.marcal.chatvault.domain.bucket.BucketService
 import dev.marcal.chatvault.shared.chatBucketInfoWith
@@ -8,35 +7,35 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
-import org.springframework.core.io.FileSystemResource
 import java.io.ByteArrayInputStream
-import kotlin.test.assertEquals
 
 class BucketDiskImportServiceTest {
     private val bucketService: BucketService = mockk()
     private val chatImportService: ChatImportService = mockk()
     private val chatCreatorService: ChatCreatorService = mockk()
-    private val bucketDiskImportService = BucketDiskImportService(
-        bucketService = bucketService,
-        chatFileImporter = chatImportService,
-        chatCreator = chatCreatorService,
-    )
+    private val bucketDiskImportService =
+        BucketDiskImportService(
+            bucketService = bucketService,
+            chatFileImporter = chatImportService,
+            chatCreator = chatCreatorService,
+        )
 
     @Test
     fun `should save pending files to import directory`() {
         // Arrange
-        val pendingFiles = listOf(
-            PendingChatFile(
-                fileName = "chat1.zip",
-                chatName = "Chat 1",
-                stream = ByteArrayInputStream("test1".toByteArray()),
-            ),
-            PendingChatFile(
-                fileName = "chat2.zip",
-                chatName = "Chat 2",
-                stream = ByteArrayInputStream("test2".toByteArray()),
-            ),
-        )
+        val pendingFiles =
+            listOf(
+                PendingChatFile(
+                    fileName = "chat1.zip",
+                    chatName = "Chat 1",
+                    stream = ByteArrayInputStream("test1".toByteArray()),
+                ),
+                PendingChatFile(
+                    fileName = "chat2.zip",
+                    chatName = "Chat 2",
+                    stream = ByteArrayInputStream("test2".toByteArray()),
+                ),
+            )
 
         every { bucketService.saveToImportDir(any()) } returns Unit
 
@@ -127,13 +126,14 @@ class BucketDiskImportServiceTest {
     @Test
     fun `should save single pending file correctly`() {
         // Arrange
-        val pendingFile = listOf(
-            PendingChatFile(
-                fileName = "single.zip",
-                chatName = "Single Chat",
-                stream = ByteArrayInputStream("content".toByteArray()),
-            ),
-        )
+        val pendingFile =
+            listOf(
+                PendingChatFile(
+                    fileName = "single.zip",
+                    chatName = "Single Chat",
+                    stream = ByteArrayInputStream("content".toByteArray()),
+                ),
+            )
 
         every { bucketService.saveToImportDir(any()) } returns Unit
 

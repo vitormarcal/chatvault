@@ -38,9 +38,10 @@ class ChatRenameServiceTest {
         val blankName = "   "
 
         // Act & Assert
-        val exception = assertThrows<IllegalArgumentException> {
-            chatRenameService.execute(chatId, blankName)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                chatRenameService.execute(chatId, blankName)
+            }
         assertEquals("chatName must not be empty", exception.message)
     }
 
@@ -51,9 +52,10 @@ class ChatRenameServiceTest {
         val emptyName = ""
 
         // Act & Assert
-        val exception = assertThrows<IllegalArgumentException> {
-            chatRenameService.execute(chatId, emptyName)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                chatRenameService.execute(chatId, emptyName)
+            }
         assertEquals("chatName must not be empty", exception.message)
     }
 
@@ -66,9 +68,10 @@ class ChatRenameServiceTest {
         every { chatRepository.existsByChatId(nonExistentChatId) } returns false
 
         // Act & Assert
-        val exception = assertThrows<IllegalArgumentException> {
-            chatRenameService.execute(nonExistentChatId, newName)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                chatRenameService.execute(nonExistentChatId, newName)
+            }
         assertEquals("chat not found", exception.message)
     }
 

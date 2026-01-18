@@ -17,12 +17,12 @@ class VersionControllerTest {
     @Test
     fun `should return application version`() {
         // Act & Assert
-        mvc.get("/api/version")
+        mvc
+            .get("/api/version")
             .andExpect {
                 status { isOk() }
                 content { contentType("application/json") }
-            }
-            .andReturn()
+            }.andReturn()
             .response
             .contentAsString
             .let { content ->
@@ -34,7 +34,8 @@ class VersionControllerTest {
     @Test
     fun `should return version in correct JSON format`() {
         // Act & Assert
-        mvc.get("/api/version")
+        mvc
+            .get("/api/version")
             .andExpect {
                 status { isOk() }
                 jsonPath("$.version") { value("1.0.0") }

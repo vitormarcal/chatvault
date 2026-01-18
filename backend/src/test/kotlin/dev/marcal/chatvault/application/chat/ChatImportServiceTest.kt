@@ -14,7 +14,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 class ChatImportServiceTest {
     private val chatMessageParser = ChatMessageParserService(MessageParser())
@@ -22,13 +21,14 @@ class ChatImportServiceTest {
     private val bucketService: BucketService = mockk()
     private val messageCreator: MessageCreatorService = mockk()
     private val chatCreator: ChatCreatorService = mockk()
-    private val chatImportService = ChatImportService(
-        chatMessageParser = chatMessageParser,
-        chatRepository = chatRepository,
-        bucketService = bucketService,
-        messageCreator = messageCreator,
-        chatCreator = chatCreator,
-    )
+    private val chatImportService =
+        ChatImportService(
+            chatMessageParser = chatMessageParser,
+            chatRepository = chatRepository,
+            bucketService = bucketService,
+            messageCreator = messageCreator,
+            chatCreator = chatCreator,
+        )
 
     @BeforeEach
     fun setup() {
@@ -118,9 +118,10 @@ class ChatImportServiceTest {
     fun `should process multiple files in zip correctly`() {
         // Arrange
         val chatId = 5L
-        val zipResource = requireNotNull(
-            this.javaClass.classLoader.getResourceAsStream("test_chat.zip"),
-        ) { "test_chat.zip resource not found" }
+        val zipResource =
+            requireNotNull(
+                this.javaClass.classLoader.getResourceAsStream("test_chat.zip"),
+            ) { "test_chat.zip resource not found" }
 
         // Act
         chatImportService.execute(chatId = chatId, inputStream = zipResource, fileType = FileTypeInputEnum.ZIP)

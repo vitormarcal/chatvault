@@ -1,7 +1,6 @@
 package dev.marcal.chatvault.application.chat
 
 import dev.marcal.chatvault.api.dto.input.NewChatInput
-import dev.marcal.chatvault.domain.model.ChatPayload
 import dev.marcal.chatvault.domain.repository.ChatRepository
 import dev.marcal.chatvault.shared.chatBucketInfoWith
 import io.mockk.every

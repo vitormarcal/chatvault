@@ -34,18 +34,19 @@ class MessageControllerTest {
         every { messageCreator.execute(input = any<NewMessageInput>()) } returns Unit
 
         // Act & Assert
-        mvc.post("/api/messages") {
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "chatId": 1,
-                    "authorName": "John",
-                    "content": "Test message",
-                    "createdAt": "2023-01-01T10:00:00"
-                }
-            """.trimIndent()
-        }
-            .andExpect {
+        mvc
+            .post("/api/messages") {
+                contentType = MediaType.APPLICATION_JSON
+                content =
+                    """
+                    {
+                        "chatId": 1,
+                        "authorName": "John",
+                        "content": "Test message",
+                        "createdAt": "2023-01-01T10:00:00"
+                    }
+                    """.trimIndent()
+            }.andExpect {
                 status { isNoContent() }
             }
 
@@ -58,21 +59,22 @@ class MessageControllerTest {
         every { messageCreator.execute(input = any<NewMessageInput>()) } returns Unit
 
         // Act & Assert
-        mvc.post("/api/messages") {
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "chatId": 2,
-                    "authorName": "Alice",
-                    "content": "Message with file",
-                    "attachment": {
-                        "name": "document.pdf",
-                        "content": ""
+        mvc
+            .post("/api/messages") {
+                contentType = MediaType.APPLICATION_JSON
+                content =
+                    """
+                    {
+                        "chatId": 2,
+                        "authorName": "Alice",
+                        "content": "Message with file",
+                        "attachment": {
+                            "name": "document.pdf",
+                            "content": ""
+                        }
                     }
-                }
-            """.trimIndent()
-        }
-            .andExpect {
+                    """.trimIndent()
+            }.andExpect {
                 status { isNoContent() }
             }
 
@@ -85,17 +87,18 @@ class MessageControllerTest {
         every { messageCreator.execute(input = any<NewMessageInput>()) } returns Unit
 
         // Act & Assert
-        mvc.post("/api/messages") {
-            contentType = MediaType.APPLICATION_JSON
-            content = """
-                {
-                    "chatId": 3,
-                    "authorName": "Bob",
-                    "content": "Simple message"
-                }
-            """.trimIndent()
-        }
-            .andExpect {
+        mvc
+            .post("/api/messages") {
+                contentType = MediaType.APPLICATION_JSON
+                content =
+                    """
+                    {
+                        "chatId": 3,
+                        "authorName": "Bob",
+                        "content": "Simple message"
+                    }
+                    """.trimIndent()
+            }.andExpect {
                 status { isNoContent() }
             }
 

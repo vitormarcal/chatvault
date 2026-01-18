@@ -52,9 +52,10 @@ class ProfileImageServiceTest {
         every { chatRepository.findChatBucketInfoByChatId(nonExistentChatId) } returns null
 
         // Act & Assert
-        val exception = assertThrows<ChatNotFoundException> {
-            profileImageService.updateImage(inputStream, nonExistentChatId)
-        }
+        val exception =
+            assertThrows<ChatNotFoundException> {
+                profileImageService.updateImage(inputStream, nonExistentChatId)
+            }
         assertEquals(
             "Unable to update chat image because chat $nonExistentChatId was not found",
             exception.message,
@@ -106,9 +107,10 @@ class ProfileImageServiceTest {
         every { chatRepository.findChatBucketInfoByChatId(nonExistentChatId) } returns null
 
         // Act & Assert
-        val exception = assertThrows<ChatNotFoundException> {
-            profileImageService.getImage(nonExistentChatId)
-        }
+        val exception =
+            assertThrows<ChatNotFoundException> {
+                profileImageService.getImage(nonExistentChatId)
+            }
         assertEquals(
             "Unable to retrieve chat image because chat $nonExistentChatId was not found",
             exception.message,

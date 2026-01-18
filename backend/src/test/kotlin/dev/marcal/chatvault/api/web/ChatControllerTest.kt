@@ -26,8 +26,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.patch
-import org.springframework.test.web.servlet.post
-import java.io.ByteArrayInputStream
 
 @WebMvcTest(ChatController::class)
 class ChatControllerTest {
@@ -82,14 +80,16 @@ class ChatControllerTest {
     @Test
     fun `should list all chats with last message`() {
         // Arrange
-        val chats = listOf(
-            chatLastMessageWith(chatId = 1L, chatName = "Chat 1").toOutput(),
-            chatLastMessageWith(chatId = 2L, chatName = "Chat 2").toOutput(),
-        )
+        val chats =
+            listOf(
+                chatLastMessageWith(chatId = 1L, chatName = "Chat 1").toOutput(),
+                chatLastMessageWith(chatId = 2L, chatName = "Chat 2").toOutput(),
+            )
         every { chatLister.execute() } returns chats
 
         // Act & Assert
-        mvc.get("/api/chats")
+        mvc
+            .get("/api/chats")
             .andExpect {
                 status { isOk() }
                 content { contentType("application/json") }
@@ -104,7 +104,8 @@ class ChatControllerTest {
         every { chatLister.execute() } returns emptyList()
 
         // Act & Assert
-        mvc.get("/api/chats")
+        mvc
+            .get("/api/chats")
             .andExpect {
                 status { isOk() }
                 jsonPath("$") { isArray() }
@@ -116,14 +117,15 @@ class ChatControllerTest {
     @Test
     fun `should get paginated chat messages`() {
         // Arrange
-        val messages = PageImpl(
-            listOf(
-                messageOutputWith(id = 1L, content = "Message 1"),
-                messageOutputWith(id = 2L, content = "Message 2"),
-            ),
-            PageRequest.of(0, 10),
-            2L,
-        )
+        val messages =
+            PageImpl(
+                listOf(
+                    messageOutputWith(id = 1L, content = "Message 1"),
+                    messageOutputWith(id = 2L, content = "Message 2"),
+                ),
+                PageRequest.of(0, 10),
+                2L,
+            )
         every {
             messageFinderByChatId.execute(
                 chatId = 1L,
@@ -133,7 +135,8 @@ class ChatControllerTest {
         } returns messages
 
         // Act & Assert
-        mvc.get("/api/chats/1")
+        mvc
+            .get("/api/chats/1")
             .andExpect {
                 status { isOk() }
             }
@@ -150,13 +153,14 @@ class ChatControllerTest {
     @Test
     fun `should search messages in chat`() {
         // Arrange
-        val searchResults = PageImpl(
-            listOf(
-                messageOutputWith(id = 1L, content = "Search result"),
-            ),
-            PageRequest.of(0, 10),
-            1L,
-        )
+        val searchResults =
+            PageImpl(
+                listOf(
+                    messageOutputWith(id = 1L, content = "Search result"),
+                ),
+                PageRequest.of(0, 10),
+                1L,
+            )
         every {
             messageFinderByChatId.execute(
                 chatId = 1L,
@@ -166,7 +170,8 @@ class ChatControllerTest {
         } returns searchResults
 
         // Act & Assert
-        mvc.get("/api/chats/1?query=search")
+        mvc
+            .get("/api/chats/1?query=search")
             .andExpect {
                 status { isOk() }
             }
@@ -186,7 +191,8 @@ class ChatControllerTest {
         every { chatDeleter.execute(1L) } returns Unit
 
         // Act & Assert
-        mvc.delete("/api/chats/1")
+        mvc
+            .delete("/api/chats/1")
             .andExpect {
                 status { isOk() }
             }
@@ -200,7 +206,8 @@ class ChatControllerTest {
         every { chatNameUpdater.execute(1L, "New Name") } returns Unit
 
         // Act & Assert
-        mvc.patch("/api/chats/1/chatName/New Name")
+        mvc
+            .patch("/api/chats/1/chatName/New Name")
             .andExpect {
                 status { isNoContent() }
             }
@@ -217,7 +224,8 @@ class ChatControllerTest {
         } returns mockResource
 
         // Act & Assert
-        mvc.get("/api/chats/1/messages/100/attachment")
+        mvc
+            .get("/api/chats/1/messages/100/attachment")
             .andExpect {
                 status { isOk() }
             }
@@ -228,14 +236,16 @@ class ChatControllerTest {
     @Test
     fun `should list chat attachments`() {
         // Arrange
-        val attachments = sequenceOf(
-            attachmentInfoOutputWith(id = 1L, name = "file1.pdf"),
-            attachmentInfoOutputWith(id = 2L, name = "file2.jpg"),
-        )
+        val attachments =
+            sequenceOf(
+                attachmentInfoOutputWith(id = 1L, name = "file1.pdf"),
+                attachmentInfoOutputWith(id = 2L, name = "file2.jpg"),
+            )
         every { attachmentInfoFinderByChatId.execute(1L) } returns attachments
 
         // Act & Assert
-        mvc.get("/api/chats/1/attachments")
+        mvc
+            .get("/api/chats/1/attachments")
             .andExpect {
                 status { isOk() }
             }
@@ -250,7 +260,8 @@ class ChatControllerTest {
         every { profileImageManager.getImage(1L) } returns mockImage
 
         // Act & Assert
-        mvc.get("/api/chats/1/profile-image")
+        mvc
+            .get("/api/chats/1/profile-image")
             .andExpect {
                 status { isOk() }
             }
