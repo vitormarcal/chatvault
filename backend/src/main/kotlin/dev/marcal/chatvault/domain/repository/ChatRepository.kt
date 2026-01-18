@@ -48,4 +48,10 @@ interface ChatRepository {
     fun findLastMessageByChatId(chatId: Long): Message?
 
     fun deleteChat(chatId: Long)
+
+    fun findMessagesAroundDate(
+        chatId: Long,
+        targetDate: java.time.LocalDateTime,
+        pageable: Pageable,
+    ): org.springframework.data.domain.Page<Message>
 }

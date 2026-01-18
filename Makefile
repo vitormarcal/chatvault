@@ -28,6 +28,11 @@ push:
 	docker push $(IMAGE_NAME):$(VERSION)
 	docker push $(IMAGE_NAME):latest
 
+.PHONY: push
+push-version:
+	@echo "Pushing Docker images to the repository"
+	docker push $(IMAGE_NAME):$(VERSION)
+
 # Push só da imagem dev
 .PHONY: push-dev
 push-dev:

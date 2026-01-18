@@ -4,13 +4,16 @@ import dev.marcal.chatvault.api.dto.input.AttachmentCriteriaInput
 import dev.marcal.chatvault.api.dto.output.AttachmentInfoOutput
 import dev.marcal.chatvault.api.dto.output.ChatLastMessageOutput
 import dev.marcal.chatvault.api.dto.output.MessageOutput
+import dev.marcal.chatvault.api.dto.output.MessageStatisticsOutput
 import dev.marcal.chatvault.application.chat.ChatAttachmentInfoService
 import dev.marcal.chatvault.application.chat.ChatAttachmentService
 import dev.marcal.chatvault.application.chat.ChatDeletionService
 import dev.marcal.chatvault.application.chat.ChatListerService
 import dev.marcal.chatvault.application.chat.ChatRenameService
 import dev.marcal.chatvault.application.chat.ProfileImageService
+import dev.marcal.chatvault.application.message.MessageDateFinderService
 import dev.marcal.chatvault.application.message.MessageFinderService
+import dev.marcal.chatvault.application.message.MessageStatisticsService
 import org.springframework.core.io.Resource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -30,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 
 @RestController
@@ -37,6 +42,8 @@ import java.util.concurrent.TimeUnit
 class ChatController(
     private val chatLister: ChatListerService,
     private val messageFinderByChatId: MessageFinderService,
+    private val messageDateFinder: MessageDateFinderService,
+    private val messageStatistics: MessageStatisticsService,
     private val attachmentFinder: ChatAttachmentService,
     private val chatNameUpdater: ChatRenameService,
     private val attachmentInfoFinderByChatId: ChatAttachmentInfoService,
@@ -59,6 +66,32 @@ class ChatController(
             chatId = chatId,
             query = query,
             pageable = pageable,
+        )
+
+    @GetMapping("{chatId}/messages-around-date")
+    fun findMessagesAroundDate(
+        @PathVariable("chatId") chatId: Long,
+        @RequestParam("date") date: LocalDate,
+        @RequestParam("pageSize", required = false, defaultValue = "20") pageSize: Int,
+    ): Page<MessageOutput> {
+        val targetDate = java.time.LocalDateTime.of(date, LocalTime.MIDNIGHT)
+        return messageDateFinder.execute(
+            chatId = chatId,
+            targetDate = targetDate,
+            pageSize = pageSize,
+        )
+    }
+
+    @GetMapping("{chatId}/message-statistics")
+    fun getMessageStatistics(
+        @PathVariable("chatId") chatId: Long,
+        @RequestParam("year") year: Int,
+        @RequestParam("month") month: Int,
+    ): MessageStatisticsOutput =
+        messageStatistics.getMonthlyStatistics(
+            chatId = chatId,
+            year = year,
+            month = month,
         )
 
     @DeleteMapping("{chatId}")

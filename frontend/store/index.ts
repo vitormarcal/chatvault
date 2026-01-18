@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia';
 import {type Attachment, AttachmentConstructor, type Chat, ChatMessage} from "~/types";
 import type { SupportedLocale } from '~/types/localization';
+import type { MessageStatistics } from '~/types/calendar';
 
 export const useMainStore = defineStore('main', () => {
     const state = reactive({
@@ -13,9 +14,16 @@ export const useMainStore = defineStore('main', () => {
         nextPage: 0,
         pageSize: localStorage.getItem("pageSize") || 20,
         searchQuery: undefined,
+        searchResults: [] as ChatMessage[],
+        searchOpen: false,
+        highlightUntilDate: null as string | null,
         reloadImageProfile: false,
         blurEnabled: localStorage.getItem("blurEnabled") === 'true',
         userLocale: (localStorage.getItem("userLocale") || 'auto') as SupportedLocale | 'auto',
+        messageStatistics: null as MessageStatistics | null,
+        currentCalendarMonth: new Date(),
+        statisticsLoading: false,
+        calendarOpen: false,
     });
 
     watch(() => state.authorActive, (newValue) => {
@@ -101,6 +109,88 @@ export const useMainStore = defineStore('main', () => {
         return false;
     }
 
+    async function performSearch(query: string, chatId: number) {
+        if (!query.trim()) {
+            state.searchResults = [];
+            return;
+        }
+
+        state.loading = true;
+        try {
+            const url = useRuntimeConfig().public.api.getMessagesByIdAndPage
+                .replace(":chatId", chatId.toString())
+                .replace(":page", "0")
+                .replace(":size", "50")
+                .replace(":query", query);
+            const response = await $fetch<any>(url);
+            state.searchResults = response.content.map((item: any) => toChatMessage(item));
+        } catch (error) {
+            console.error("Search error:", error);
+            state.searchResults = [];
+        } finally {
+            state.loading = false;
+        }
+    }
+
+    function closeSearch() {
+        state.searchOpen = false;
+        state.searchResults = [];
+    }
+
+    async function jumpToDate(chatId: number, targetDate: string) {
+        state.loading = true;
+        state.highlightUntilDate = targetDate;
+        try {
+            const url = useRuntimeConfig().public.api.getMessagesByDate
+                .replace(":chatId", chatId.toString())
+                .replace(":date", targetDate)
+                .replace(":pageSize", state.pageSize.toString());
+            const response = await $fetch<any>(url);
+            state.messages = response.content.map((item: any) => toChatMessage(item));
+            state.nextPage = 1; // Mark that we've loaded from a specific date
+            state.searchOpen = false;
+        } catch (error) {
+            console.error("Jump to date error:", error);
+        } finally {
+            state.loading = false;
+        }
+    }
+
+    function clearHighlight() {
+        state.highlightUntilDate = null;
+    }
+
+    async function fetchMessageStatistics(chatId: number, date: Date) {
+        state.statisticsLoading = true;
+        try {
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const url = useRuntimeConfig().public.api.getMessageStatistics
+                .replace(":chatId", chatId.toString())
+                .replace(":year", year.toString())
+                .replace(":month", month.toString());
+            const response = await $fetch<MessageStatistics>(url);
+            state.messageStatistics = response;
+        } catch (error) {
+            console.error("Fetch message statistics error:", error);
+            state.messageStatistics = null;
+        } finally {
+            state.statisticsLoading = false;
+        }
+    }
+
+    function setCalendarMonth(date: Date) {
+        state.currentCalendarMonth = new Date(date);
+    }
+
+    function openCalendar() {
+        state.calendarOpen = true;
+    }
+
+    function closeCalendar() {
+        state.calendarOpen = false;
+    }
+
     return {
         ...toRefs(state),
         authors,
@@ -115,6 +205,14 @@ export const useMainStore = defineStore('main', () => {
         chatExited,
         openChat,
         toChatMessage,
+        performSearch,
+        closeSearch,
+        jumpToDate,
+        clearHighlight,
+        fetchMessageStatistics,
+        setCalendarMonth,
+        openCalendar,
+        closeCalendar,
     };
 });
 

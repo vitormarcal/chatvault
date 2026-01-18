@@ -32,6 +32,7 @@
           <chat-config v-if="store.chatConfigOpen"
                        @refresh:page="() => refresh()"
           />
+          <search-results-modal/>
         </template>
         <p class="app-version">ChatVault - v{{ appVersion }} </p>
 
@@ -45,6 +46,7 @@
 import ChatList from "~/components/ChatList.vue";
 import MessageArea from "~/components/MessageArea.vue";
 import ChatConfig from "~/components/ChatConfig.vue";
+import SearchResultsModal from "~/components/SearchResultsModal.vue";
 import {useMainStore} from "~/store";
 
 const store = useMainStore()
