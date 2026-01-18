@@ -10,6 +10,8 @@ EXTRA_TAGS ?=
 DOCKERFILE ?= Dockerfile
 CONTEXT ?= .
 
+.DEFAULT_GOAL := help
+
 # ---------- Helpers ----------
 define tag_image
 	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):$(1)
@@ -47,7 +49,7 @@ help:
 	@echo "    Push VERSION and also push extra tags."
 	@echo ""
 	@echo "  make check-release VERSION=1.2.3"
-	@echo "    Validate that VERSION is not a pre-release (alpha/beta/rc/snapshot/dev) and not 'latest'."
+	@echo "    Validate that VERSION is not a pre-release (alpha/beta/rc/snapshot) and not 'latest'."
 	@echo ""
 	@echo "Variables (optional):"
 	@echo "  IMAGE_NAME=ghcr.io/vitormarcal/chatvault"
@@ -93,8 +95,12 @@ check-release:
 		echo "ERROR: VERSION must not be 'latest'. Use a semantic version like 1.2.3."; \
 		exit 1; \
 	fi
-	@if echo "$(VERSION)" | grep -Eiq '(^|[-+.])(alpha|beta|rc|snapshot|dev)'; then \
-		echo "ERROR: Release tag must not be a pre-release (alpha/beta/rc/snapshot/dev)."; \
+	@if [ "$(VERSION)" = "dev" ]; then \
+		echo "ERROR: VERSION must not be 'dev' for a release. Provide a release version like 1.2.3."; \
+		exit 1; \
+	fi
+	@if echo "$(VERSION)" | grep -Eiq '(^|[-+.])(alpha|beta|rc|snapshot)'; then \
+		echo "ERROR: Release tag must not be a pre-release (alpha/beta/rc/snapshot)."; \
 		echo "ERROR: Provided VERSION='$(VERSION)'"; \
 		exit 1; \
 	fi
