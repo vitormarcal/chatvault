@@ -1,4 +1,4 @@
-FROM node:25-alpine as frontend_builder
+FROM node:25-alpine AS frontend_builder
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY --link ./frontend .
 RUN npm run generate
 RUN npm prune
 
-FROM amazoncorretto:21-alpine as backend_builder
+FROM amazoncorretto:21-alpine AS backend_builder
 
 WORKDIR /app
 
