@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.marcal.chatvault"
-version = "1.19.0-beta-1"
+version = "1.19.0"
 
 java {
     toolchain {
