@@ -4,7 +4,7 @@ Chat Vault is a Kotlin Spring Boot application designed to store backups of What
 
 This project is still in development, and some features may not be fully implemented.
 
-![A screenshot of the ChatVault interface displays a blur effect applied to the message text. On the left, there is an area with the list of chats, each accompanied by its corresponding profile picture. In the center, the open chat shows the visible content of the messages. On the right, the chat's image gallery is visible, showing the thumbnails of the images available in the gallery.](doc/chatvault-blur-enabled.png)
+![A screenshot of the ChatVault interface displays a blur effect applied to the message text. On the left, there is an area with the list of chats, each accompanied by its corresponding profile picture. In the center, the open chat shows the visible content of the messages. On the right, the chat's image gallery is visible, showing the thumbnails of the images available in the gallery.](doc/chatvault-blur-enabled-v1.20.0.png)
 
 ## Key Features
 * Directory importing: Place files exported from whatsapp in specific directories to be imported into the application.
