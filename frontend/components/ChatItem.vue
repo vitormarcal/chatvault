@@ -1,6 +1,6 @@
 <template>
   <div class="chat-item d-flex flex-row p-2 w-100" @click="emitThisChatActive()">
-    <profile-image :id="item.chatId"/>
+    <profile-image :id="item.chatId" :class="{ 'blur-sensitive': store.blurEnabled }" />
     <div
         class="w-50 chat-preview"
         :class="{ 'blur-sensitive': store.blurEnabled }"
