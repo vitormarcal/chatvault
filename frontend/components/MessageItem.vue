@@ -6,7 +6,7 @@
   >
     <div v-if="enableJump" class="jump-hint">Clique para abrir contexto</div>
     <div class="message-id">{{ message.id }}</div>
-    <div class="author font-weight-bold">{{ message.author }}</div>
+    <div class="author font-weight-bold" :class="{ 'blur-sensitive': store.blurEnabled }">{{ message.author }}</div>
     <div
         class="message-content"
         v-html="formattedContent"

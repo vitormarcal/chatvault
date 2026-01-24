@@ -57,7 +57,10 @@ function setGalleryFilter(type: string) {
           v-memo="galleryFileType"
       >
         <div class="card gallery-card">
-          <focusable-attachment :attachment="item" />
+          <focusable-attachment
+              :attachment="item"
+              :class="{ 'blur-sensitive': store.blurEnabled }"
+          />
         </div>
       </div>
     </div>
@@ -113,5 +116,15 @@ function setGalleryFilter(type: string) {
   border: 1px solid var(--color-border);
   background: rgba(15, 23, 42, 0.3);
   box-shadow: var(--shadow-sm);
+}
+
+.blur-sensitive {
+  filter: blur(6px);
+  transition: filter 0.3s ease-in-out;
+}
+
+.gallery-card:hover .blur-sensitive,
+.gallery-card:focus-within .blur-sensitive {
+  filter: none;
 }
 </style>
