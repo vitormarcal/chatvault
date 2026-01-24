@@ -58,7 +58,7 @@ function handleSearch({ query, chatId }: { query: string; chatId: string | null 
 
   if (query.trim()) {
     store.performSearch(query, Number(chatId));
-    store.searchOpen = true;
+    store.searchOpen = false;
   } else {
     store.closeSearch();
   }
