@@ -33,7 +33,10 @@
         <message-item
           :message="message"
           :highlight-until-date="store.highlightUntilDate"
+          :highlight-message-id="store.highlightMessageId"
+          :enable-jump="isSearchMode"
           :ref="index === 0 ? 'firstMessageRef' : null"
+          @jump="handleMessageJump"
         />
       </template>
       <div class="message-controls">
@@ -84,7 +87,13 @@ const content = computed(() => {
   return response?.value?.content ?? []
 })
 
-const messages = computed(() => store.messages)
+const messageViewMode = computed(() => store.messageViewMode)
+const messages = computed(() => {
+  if (messageViewMode.value === 'context') return store.contextMessages
+  if (messageViewMode.value === 'search') return store.searchResults
+  return store.messages
+})
+const isSearchMode = computed(() => messageViewMode.value === 'search')
 const isJumpMode = computed(() => store.paginationMode === 'jump')
 const jumpModeDate = computed(() => {
   if (!store.highlightUntilDate) return ''
@@ -94,6 +103,10 @@ const jumpModeDate = computed(() => {
 })
 
 const hasOlderMessages = computed(() => {
+  if (isSearchMode.value) {
+    return false
+  }
+
   if (isJumpMode.value) {
     return store.jumpHasMoreOlder
   }
@@ -178,6 +191,12 @@ function returnToLatest() {
   refresh()
 }
 
+function handleMessageJump(message: { id: number; createdAt: string }) {
+  if (!isSearchMode.value) return
+  if (!store.chatActive.chatId) return
+  store.jumpToDate(store.chatActive.chatId, message.createdAt, message.id)
+}
+
 watch(
     () => store.chatActive.chatId,
     (chatId) => {
@@ -189,6 +208,8 @@ watch(
 watch(
     () => messages.value.length,
     (sizeOfMessages) => {
+      if (messageViewMode.value === 'context') return
+      if (messageViewMode.value === 'search') return
       if (isJumpMode.value) return
       if (sizeOfMessages === 0) {
         refresh()
@@ -197,6 +218,8 @@ watch(
 )
 
 watch(content, async (newContent, oldContent) => {
+  if (messageViewMode.value === 'context') return
+  if (messageViewMode.value === 'search') return
   if (isJumpMode.value) return
   store.updateMessages([...newContent.reverse().map((it: any) => store.toChatMessage(it)), ...messages.value])
   await nextTick()

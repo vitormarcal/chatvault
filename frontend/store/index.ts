@@ -7,6 +7,7 @@ export const useMainStore = defineStore('main', () => {
     const state = reactive({
         loading: false,
         messages: [] as ChatMessage[],
+        contextMessages: [] as ChatMessage[],
         attachmentsInfo: [] as any[],
         chatActive: {} as Chat,
         authorActive: localStorage.getItem("authorActive") || '',
@@ -17,6 +18,8 @@ export const useMainStore = defineStore('main', () => {
         searchResults: [] as ChatMessage[],
         searchOpen: false,
         highlightUntilDate: null as string | null,
+        highlightMessageId: null as number | null,
+        messageViewMode: 'default' as 'default' | 'search' | 'context',
         reloadImageProfile: false,
         blurEnabled: localStorage.getItem("blurEnabled") === 'true',
         userLocale: (localStorage.getItem("userLocale") || 'auto') as SupportedLocale | 'auto',
@@ -41,6 +44,17 @@ export const useMainStore = defineStore('main', () => {
 
     watch(() => state.userLocale, (newValue) => {
         localStorage.setItem("userLocale", newValue);
+    });
+
+    watch(() => state.searchQuery, (newQuery) => {
+        if (newQuery && newQuery.trim()) {
+            if (state.messageViewMode === 'context') {
+                resetPaginationState();
+            }
+            state.messageViewMode = 'search';
+        } else if (state.messageViewMode === 'search') {
+            state.messageViewMode = 'default';
+        }
     });
 
     const authors = computed(() => {
@@ -73,6 +87,10 @@ export const useMainStore = defineStore('main', () => {
         state.messages = items;
     }
 
+    function updateContextMessages(items: ChatMessage[]) {
+        state.contextMessages = items;
+    }
+
     function toChatMessage(item: any): ChatMessage {
         return new ChatMessage(item, state.chatActive.chatId);
     }
@@ -82,11 +100,16 @@ export const useMainStore = defineStore('main', () => {
         state.nextPage = 0;
     }
 
+    function clearContextMessages() {
+        state.contextMessages = [];
+    }
+
     function chatExited() {
         state.chatActive = {} as Chat;
         state.chatConfigOpen = false;
         state.attachmentsInfo = [];
         clearMessages();
+        clearContextMessages();
     }
 
     async function openChat(chat: Chat) {
@@ -117,9 +140,15 @@ export const useMainStore = defineStore('main', () => {
     async function performSearch(query: string, chatId: number) {
         if (!query.trim()) {
             state.searchResults = [];
+            if (state.messageViewMode !== 'context') {
+                state.messageViewMode = 'default';
+            }
             return;
         }
 
+        if (state.messageViewMode !== 'context') {
+            state.messageViewMode = 'search';
+        }
         state.loading = true;
         try {
             const url = useRuntimeConfig().public.api.getMessagesByIdAndPage
@@ -142,26 +171,35 @@ export const useMainStore = defineStore('main', () => {
         state.searchResults = [];
     }
 
-    async function jumpToDate(chatId: number, targetDate: string) {
+    function clearSearchState() {
+        state.searchQuery = '';
+        state.searchResults = [];
+        state.searchOpen = false;
+    }
+
+    async function jumpToDate(chatId: number, targetDate: string, messageId?: number) {
         state.loading = true;
-        state.highlightUntilDate = targetDate;
+        const dateOnly = normalizeDateOnly(targetDate);
+        state.highlightUntilDate = dateOnly;
+        state.highlightMessageId = messageId ?? null;
         state.paginationMode = 'jump';
         state.jumpHasMoreOlder = true;
         state.jumpHasMoreNewer = true;
+        state.messageViewMode = 'context';
         try {
             const url = useRuntimeConfig().public.api.getMessagesByDate
                 .replace(":chatId", chatId.toString())
-                .replace(":date", targetDate)
+                .replace(":date", dateOnly)
                 .replace(":pageSize", state.pageSize.toString());
             const response = await $fetch<any>(url);
             const mapped = response.content.map((item: any) => toChatMessage(item));
             const sorted = sortMessagesAsc(mapped);
-            state.messages = sorted;
-            const earliestDate = getEarliestDateOnly(sorted);
-            const latestDate = getLatestDateOnly(sorted);
+            state.contextMessages = sorted;
+            const earliestDate = getEarliestDateOnly(state.contextMessages);
+            const latestDate = getLatestDateOnly(state.contextMessages);
             state.jumpNextDate = earliestDate ? getPreviousDate(earliestDate) : null;
             state.jumpPrevDate = latestDate ? getNextDate(latestDate) : null;
-            state.searchOpen = false;
+            clearSearchState();
         } catch (error) {
             console.error("Jump to date error:", error);
         } finally {
@@ -180,7 +218,8 @@ export const useMainStore = defineStore('main', () => {
             return;
         }
 
-        const earliestTimestamp = getEarliestTimestamp(state.messages);
+        const currentMessages = state.messageViewMode === 'context' ? state.contextMessages : state.messages;
+        const earliestTimestamp = getEarliestTimestamp(currentMessages);
         if (earliestTimestamp == null) {
             state.jumpHasMoreOlder = false;
             return;
@@ -219,8 +258,13 @@ export const useMainStore = defineStore('main', () => {
             }
 
             if (olderMessages.length > 0) {
-                state.messages = mergeAndSortMessages(olderMessages, state.messages);
-                const earliestDate = getEarliestDateOnly(state.messages);
+                const merged = mergeAndSortMessages(olderMessages, currentMessages);
+                if (state.messageViewMode === 'context') {
+                    state.contextMessages = merged;
+                } else {
+                    state.messages = merged;
+                }
+                const earliestDate = getEarliestDateOnly(merged);
                 state.jumpNextDate = earliestDate ? getPreviousDate(earliestDate) : null;
             } else if (state.jumpHasMoreOlder) {
                 state.jumpNextDate = nextDate;
@@ -243,7 +287,8 @@ export const useMainStore = defineStore('main', () => {
             return;
         }
 
-        const latestTimestamp = getLatestTimestamp(state.messages);
+        const currentMessages = state.messageViewMode === 'context' ? state.contextMessages : state.messages;
+        const latestTimestamp = getLatestTimestamp(currentMessages);
         if (latestTimestamp == null) {
             state.jumpHasMoreNewer = false;
             return;
@@ -282,8 +327,13 @@ export const useMainStore = defineStore('main', () => {
             }
 
             if (newerMessages.length > 0) {
-                state.messages = mergeAndSortMessages(newerMessages, state.messages);
-                const latestDate = getLatestDateOnly(state.messages);
+                const merged = mergeAndSortMessages(newerMessages, currentMessages);
+                if (state.messageViewMode === 'context') {
+                    state.contextMessages = merged;
+                } else {
+                    state.messages = merged;
+                }
+                const latestDate = getLatestDateOnly(merged);
                 state.jumpPrevDate = latestDate ? getNextDate(latestDate) : null;
             } else if (state.jumpHasMoreNewer) {
                 state.jumpPrevDate = nextDate;
@@ -319,10 +369,17 @@ export const useMainStore = defineStore('main', () => {
         state.jumpHasMoreOlder = true;
         state.jumpHasMoreNewer = true;
         state.nextPage = 0;
+        state.messageViewMode = 'default';
+        state.highlightMessageId = null;
+        clearContextMessages();
     }
 
     function clearHighlight() {
         state.highlightUntilDate = null;
+    }
+
+    function clearHighlightMessage() {
+        state.highlightMessageId = null;
     }
 
     async function fetchMessageStatistics(chatId: number, date: Date) {
@@ -364,7 +421,9 @@ export const useMainStore = defineStore('main', () => {
         updateLocale,
         moreMessagesPath,
         updateMessages,
+        updateContextMessages,
         clearMessages,
+        clearContextMessages,
         toNextPage,
         updatePageSize,
         chatExited,
@@ -372,8 +431,10 @@ export const useMainStore = defineStore('main', () => {
         toChatMessage,
         performSearch,
         closeSearch,
+        clearSearchState,
         jumpToDate,
         clearHighlight,
+        clearHighlightMessage,
         loadOlderMessages,
         loadNewerMessages,
         resetPaginationState,
@@ -433,6 +494,17 @@ function toDateOnlyString(date: Date): string {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+}
+
+function normalizeDateOnly(dateStr: string): string {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+    }
+    const parsed = new Date(dateStr);
+    if (Number.isNaN(parsed.getTime())) {
+        return dateStr;
+    }
+    return toDateOnlyString(parsed);
 }
 
 function getPreviousDate(dateStr: string): string {

@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch } from "vue";
 import {useMainStore} from "~/store";
 import { useUiText } from "~/composables/useUiText";
 const store = useMainStore()
@@ -35,11 +35,9 @@ const props = defineProps({
 });
 const emit = defineEmits(["search"]);
 
-const searchQuery = ref("");
-
 function onSearch() {
   store.clearMessages();
-  emit("search", { query: searchQuery.value, chatId: props.chatId });
+  emit("search", { query: store.searchQuery || "", chatId: props.chatId });
 }
 
 function toggleCalendar() {
@@ -53,7 +51,7 @@ function toggleCalendar() {
   }
 }
 
-watch(() => props.chatId, () => (searchQuery.value = ""));
+watch(() => props.chatId, () => (store.searchQuery = ""));
 </script>
 
 <style scoped>

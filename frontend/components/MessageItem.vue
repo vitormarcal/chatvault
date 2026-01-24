@@ -2,7 +2,9 @@
   <div
       class="message-item rounded d-flex flex-column mt-3"
       :class="messageClasses"
+      @click="handleClick"
   >
+    <div v-if="enableJump" class="jump-hint">Clique para abrir contexto</div>
     <div class="message-id">{{ message.id }}</div>
     <div class="author font-weight-bold">{{ message.author }}</div>
     <div
@@ -29,9 +31,13 @@ const { formatDate } = useDateFormatting();
 const props = defineProps({
   message: Object,
   highlightUntilDate: [String, null],
+  highlightMessageId: [Number, null],
+  enableJump: { type: Boolean, default: false },
 });
+const emit = defineEmits(['jump']);
 
-const isHighlighted = ref(false);
+const isHighlightedByDate = ref(false);
+const isHighlightedByMessage = ref(false);
 
 const formattedContent = computed(() =>
     props.message.content.replace(
@@ -52,10 +58,10 @@ const messageClasses = computed(() => ({
   'system-message w-50 align-self-center': isSystemMessage.value,
   'align-self-end': isAuthorSelf.value,
   'align-self-start': !isAuthorSelf.value,
-  'highlighted': isHighlighted.value,
+  'highlighted': isHighlightedByDate.value || isHighlightedByMessage.value,
+  'clickable-jump': props.enableJump,
 }));
 
-// Check if message should be highlighted
 watch(
   () => props.highlightUntilDate,
   (newDate) => {
@@ -64,11 +70,11 @@ watch(
       const highlightDate = new Date(newDate).toDateString();
 
       if (messageDate === highlightDate) {
-        isHighlighted.value = true;
+        isHighlightedByDate.value = true;
 
         // Fade out highlight after 3 seconds
         setTimeout(() => {
-          isHighlighted.value = false;
+          isHighlightedByDate.value = false;
           store.clearHighlight();
         }, 3000);
       }
@@ -76,6 +82,27 @@ watch(
   },
   { immediate: true }
 );
+
+watch(
+  () => props.highlightMessageId,
+  (newId) => {
+    if (!newId || !props.message) return;
+    if (props.message.id === newId) {
+      isHighlightedByMessage.value = true;
+
+      setTimeout(() => {
+        isHighlightedByMessage.value = false;
+        store.clearHighlightMessage();
+      }, 3000);
+    }
+  },
+  { immediate: true }
+);
+
+function handleClick() {
+  if (!props.enableJump || !props.message) return;
+  emit('jump', { id: props.message.id, createdAt: props.message.createdAt });
+}
 </script>
 
 <style scoped>
@@ -87,6 +114,39 @@ watch(
   text-align: left;
   position: relative;
   background: linear-gradient(180deg, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0.9));
+}
+
+.message-item.clickable-jump {
+  cursor: pointer;
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3), var(--shadow-sm);
+}
+
+.message-item.clickable-jump:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+}
+
+.jump-hint {
+  position: absolute;
+  top: -0.6rem;
+  left: 0.65rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.message-item.clickable-jump:hover .jump-hint {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .message-id {
