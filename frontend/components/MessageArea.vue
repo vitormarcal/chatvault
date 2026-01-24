@@ -6,9 +6,29 @@
   >
 
     <message-area-nav-bar/>
-    <div id="infinite-list" class="message-list d-flex flex-column">
-      <button v-if="hasNextPages" type="button" class="btn btn-light load-more" @click="loadMoreMessages">{{ t('loadMoreMessages') }}
+    <div id="infinite-list" class="message-list d-flex flex-column" :class="{ 'has-jump-footer': isJumpMode }">
+      <button
+        v-if="!isJumpMode && hasOlderMessages"
+        type="button"
+        class="btn btn-light load-more load-more-top load-more-contrast"
+        @click="loadOlderMessages"
+      >
+        {{ t('loadMoreMessages') }}
       </button>
+      <div v-if="isJumpMode" class="jump-header">
+        <div class="jump-indicator">
+          <span class="badge-pill">{{ t('jumpModeActive') }}</span>
+          <span v-if="jumpModeDate" class="jump-date">{{ jumpModeDate }}</span>
+        </div>
+        <button
+          v-if="hasOlderMessages"
+          type="button"
+          class="btn btn-light load-more load-more-contrast"
+          @click="loadOlderMessages"
+        >
+          {{ t('loadOlderMessages') }}
+        </button>
+      </div>
       <template v-for="(message, index) in messages" :key="index">
         <message-item
           :message="message"
@@ -16,6 +36,29 @@
           :ref="index === 0 ? 'firstMessageRef' : null"
         />
       </template>
+      <div class="message-controls">
+        <template v-if="isJumpMode">
+          <button
+            v-if="hasNewerMessages"
+            type="button"
+            class="btn btn-light load-more load-more-contrast"
+            @click="loadNewerMessages"
+          >
+            {{ t('loadNewerMessages') }}
+          </button>
+        </template>
+      </div>
+      <div class="message-controls" :class="{ 'jump-footer': isJumpMode }">
+        <template v-if="isJumpMode">
+          <button
+            type="button"
+            class="btn btn-outline-light load-more back-to-latest"
+            @click="returnToLatest"
+          >
+            {{ t('backToLatest') }}
+          </button>
+        </template>
+      </div>
     </div>
 
   </div>
@@ -25,9 +68,11 @@
 import MessageItem from "~/components/MessageItem.vue";
 import {useMainStore} from "~/store";
 import { useUiText } from "~/composables/useUiText";
+import { useDateFormatting } from "~/composables/useDateFormatting";
 
 const store = useMainStore()
 const { t } = useUiText()
+const { formatDateFull } = useDateFormatting()
 const props = defineProps(['mobile'])
 const messagesAreaElement = ref(null)
 
@@ -40,13 +85,32 @@ const content = computed(() => {
 })
 
 const messages = computed(() => store.messages)
+const isJumpMode = computed(() => store.paginationMode === 'jump')
+const jumpModeDate = computed(() => {
+  if (!store.highlightUntilDate) return ''
+  const date = new Date(store.highlightUntilDate)
+  if (Number.isNaN(date.getTime())) return store.highlightUntilDate
+  return formatDateFull(date)
+})
 
-const hasNextPages = computed(() => {
+const hasOlderMessages = computed(() => {
+  if (isJumpMode.value) {
+    return store.jumpHasMoreOlder
+  }
+
   if (response?.value) {
     return !response.value.last
   } else {
     return false
   }
+})
+
+const hasNewerMessages = computed(() => {
+  if (!isJumpMode.value) {
+    return false
+  }
+
+  return store.jumpHasMoreNewer
 })
 
 const dynamicClass = computed(() => {
@@ -84,13 +148,40 @@ function scrollToFirstMessage() {
   }
 }
 
-function loadMoreMessages() {
-  store.toNextPage()
+function loadOlderMessages() {
+  store.loadOlderMessages()
+}
+
+function loadNewerMessages() {
+  if (!messagesAreaElement.value) {
+    store.loadNewerMessages()
+    return
+  }
+
+  const previousScrollTop = messagesAreaElement.value.scrollTop
+  const previousScrollHeight = messagesAreaElement.value.scrollHeight
+
+  store.loadNewerMessages().then(async () => {
+    await nextTick()
+    const newScrollHeight = messagesAreaElement.value?.scrollHeight ?? previousScrollHeight
+    const delta = newScrollHeight - previousScrollHeight
+    messagesAreaElement.value?.scrollTo({
+      top: previousScrollTop + delta,
+      behavior: 'auto',
+    })
+  })
+}
+
+function returnToLatest() {
+  store.resetPaginationState()
+  store.clearMessages()
+  refresh()
 }
 
 watch(
     () => store.chatActive.chatId,
     (chatId) => {
+      store.resetPaginationState()
       store.clearMessages()
     }
 )
@@ -98,6 +189,7 @@ watch(
 watch(
     () => messages.value.length,
     (sizeOfMessages) => {
+      if (isJumpMode.value) return
       if (sizeOfMessages === 0) {
         refresh()
       }
@@ -105,6 +197,7 @@ watch(
 )
 
 watch(content, async (newContent, oldContent) => {
+  if (isJumpMode.value) return
   store.updateMessages([...newContent.reverse().map((it: any) => store.toChatMessage(it)), ...messages.value])
   await nextTick()
 
@@ -114,6 +207,15 @@ watch(content, async (newContent, oldContent) => {
     scrollBottom()
   }
 })
+
+watch(
+  () => store.highlightUntilDate,
+  async (highlightUntilDate) => {
+    if (!highlightUntilDate || messages.value.length === 0) return
+    await nextTick()
+    scrollToFirstMessage()
+  }
+)
 
 </script>
 
@@ -125,6 +227,94 @@ watch(content, async (newContent, oldContent) => {
 .message-list {
   padding: 1rem 1.25rem 1.5rem;
   gap: 0.75rem;
+}
+
+.message-list.has-jump-footer {
+  padding-bottom: 6rem;
+}
+
+.message-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.load-more-top {
+  align-self: center;
+  margin-bottom: 0.5rem;
+}
+
+.jump-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+  position: sticky;
+  top: 0.5rem;
+  z-index: 2;
+  padding: 0.25rem 0;
+  width: fit-content;
+  align-self: center;
+}
+
+.jump-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.85rem;
+}
+
+.jump-indicator .badge-pill {
+  background: rgba(125, 211, 252, 0.18);
+  border: 1px solid rgba(125, 211, 252, 0.5);
+  color: #bae6fd;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.jump-indicator .jump-date {
+  opacity: 0.75;
+}
+
+.jump-footer {
+  position: sticky;
+  bottom: 0.5rem;
+  z-index: 2;
+  padding: 0.35rem 0;
+  width: fit-content;
+  align-self: center;
+}
+
+.back-to-latest {
+  background: rgba(248, 250, 252, 0.96);
+  border-color: rgba(148, 163, 184, 0.6);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.back-to-latest:hover {
+  border-color: rgba(148, 163, 184, 0.85);
+  background: rgba(255, 255, 255, 1);
+  color: #0f172a;
+}
+
+.load-more-contrast {
+  background: rgba(248, 250, 252, 0.96);
+  border-color: rgba(148, 163, 184, 0.6);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.load-more-contrast:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(148, 163, 184, 0.85);
+  color: #0f172a;
 }
 
 .load-more {

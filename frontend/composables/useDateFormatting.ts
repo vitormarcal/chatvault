@@ -4,7 +4,7 @@
  */
 
 import { computed } from 'vue'
-import { formatDate as utilFormatDate, getSystemLocale } from '~/utils/dateFormatter'
+import { formatDate as utilFormatDate, formatDateFull as utilFormatDateFull, getSystemLocale } from '~/utils/dateFormatter'
 import { useMainStore } from '~/store'
 import type { SupportedLocale } from '~/types/localization'
 
@@ -39,9 +39,14 @@ export function useDateFormatting() {
     return result.formattedDate
   }
 
+  const formatDateFull = (isoString: string | null | undefined): string => {
+    return utilFormatDateFull(isoString, locale.value)
+  }
+
   return {
     locale,
     systemLocale,
     formatDate,
+    formatDateFull,
   }
 }
