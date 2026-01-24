@@ -8,12 +8,15 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header d-flex justify-content-between align-items-center">
-            <h5 class="modal-title">Jump to Date</h5>
+            <div>
+              <h5 class="modal-title">{{ t('jumpToDateTitle') }}</h5>
+              <p class="modal-subtitle mb-0">{{ t('jumpToDateSubtitle') }}</p>
+            </div>
             <button
               type="button"
               class="btn-close"
               @click="closeModal"
-              aria-label="Close"
+              :aria-label="t('close')"
             />
           </div>
 
@@ -21,38 +24,44 @@
             <!-- Loading state -->
             <div v-if="statisticsLoading" class="text-center py-5">
               <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading calendar...</span>
+                <span class="visually-hidden">{{ t('loading') }}</span>
               </div>
+              <div class="text-muted mt-2 small">{{ t('preparingTimeline') }}</div>
             </div>
 
             <!-- Error state -->
             <div v-else-if="!messageStatistics" class="alert alert-warning mb-0">
-              Failed to load calendar data. Please try again.
+              {{ t('calendarLoadError') }}
             </div>
 
             <!-- Smart view: Calendar or List -->
             <template v-else>
               <!-- Calendar view for dense data -->
-              <date-picker-calendar
-                v-if="messageStatistics.isDataDense"
-                :statistics="messageStatistics"
-                :current-month="currentCalendarMonth"
-                :is-loading="statisticsLoading"
-                :user-locale="userLocale"
-                @select-date="handleDateSelect"
-                @month-changed="handleMonthChange"
-              />
+              <div class="picker-surface">
+                <date-picker-calendar
+                  v-if="messageStatistics.isDataDense"
+                  :statistics="messageStatistics"
+                  :current-month="currentCalendarMonth"
+                  :is-loading="statisticsLoading"
+                  :user-locale="userLocale"
+                  @select-date="handleDateSelect"
+                  @month-changed="handleMonthChange"
+                />
 
               <!-- List view for sparse data -->
-              <date-picker-list
-                v-else
-                :statistics="messageStatistics"
-                :current-month="currentCalendarMonth"
-                :is-loading="statisticsLoading"
-                :user-locale="userLocale"
-                @select-date="handleDateSelect"
-                @month-changed="handleMonthChange"
-              />
+                <date-picker-list
+                  v-else
+                  :statistics="messageStatistics"
+                  :current-month="currentCalendarMonth"
+                  :is-loading="statisticsLoading"
+                  :user-locale="userLocale"
+                  @select-date="handleDateSelect"
+                  @month-changed="handleMonthChange"
+                />
+              </div>
+              <div class="modal-hint text-muted small">
+                {{ t('monthNavTip') }}
+              </div>
             </template>
           </div>
         </div>
@@ -65,6 +74,7 @@
 import { computed } from 'vue'
 import type { MessageStatistics } from '~/types/calendar'
 import type { SupportedLocale } from '~/types/localization'
+import { useUiText } from '~/composables/useUiText'
 
 const props = defineProps<{
   isOpen: boolean
@@ -79,6 +89,7 @@ const emit = defineEmits<{
   'select-date': [date: string]
   'month-changed': [date: Date]
 }>()
+const { t } = useUiText()
 
 const closeModal = () => {
   emit('close')
@@ -105,11 +116,14 @@ const handleMonthChange = (date: Date) => {
   z-index: 1050;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18), transparent 45%),
+    rgba(15, 23, 42, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.2s ease-in-out;
+  backdrop-filter: blur(2px);
 }
 
 @keyframes fadeIn {
@@ -126,8 +140,8 @@ const handleMonthChange = (date: Date) => {
   width: auto;
   margin: 1rem;
   pointer-events: none;
-  max-width: 500px;
-  animation: slideUp 0.3s ease-out;
+  max-width: 620px;
+  animation: slideUp 0.35s ease-out;
 }
 
 @keyframes slideUp {
@@ -147,32 +161,43 @@ const handleMonthChange = (date: Date) => {
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
-  background-color: white;
+  background-color: var(--color-surface);
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.375rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   outline: 0;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .modal-header {
-  padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
-  border-top-left-radius: calc(0.375rem - 1px);
-  border-top-right-radius: calc(0.375rem - 1px);
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--color-border-soft);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(248, 249, 251, 0.9), rgba(248, 249, 251, 0.6));
 }
 
 .modal-title {
   margin-bottom: 0;
   line-height: 1.5;
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.modal-subtitle {
+  font-size: 0.92rem;
+  color: var(--color-text-muted-dark);
 }
 
 .modal-body {
   position: relative;
   flex: 1 1 auto;
-  padding: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
 }
 
 .btn-close {
@@ -183,11 +208,63 @@ const handleMonthChange = (date: Date) => {
   height: 1.5rem;
   cursor: pointer;
   color: #000;
-  opacity: 0.5;
+  opacity: 0.55;
+  border-radius: 999px;
 }
 
 .btn-close:hover {
-  opacity: 0.75;
+  opacity: 0.8;
+  background-color: rgba(15, 23, 42, 0.06);
+}
+
+.btn-close:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-pill);
+}
+
+.picker-surface {
+  background: #ffffff;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.picker-surface :deep(.calendar-picker),
+.picker-surface :deep(.date-picker-list) {
+  background: transparent;
+  padding: 1.1rem;
+}
+
+.picker-surface :deep(.calendar-header),
+.picker-surface :deep(.list-header),
+.picker-surface :deep(.calendar-weekdays) {
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.picker-surface :deep(.calendar-day) {
+  border-color: var(--color-border-soft);
+  border-radius: 10px;
+}
+
+.picker-surface :deep(.calendar-day.has-messages:hover:not(:disabled)) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+.picker-surface :deep(.list-item) {
+  border-radius: 10px;
+  border-color: var(--color-border-soft);
+}
+
+.picker-surface :deep(.list-item:hover:not(:disabled)) {
+  border-color: var(--color-accent-strong);
+  background-color: rgba(13, 110, 253, 0.06);
+}
+
+.modal-hint {
+  border-top: 1px solid var(--color-border-soft);
+  padding-top: 0.65rem;
 }
 
 @media (max-width: 576px) {

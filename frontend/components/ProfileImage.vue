@@ -1,12 +1,14 @@
 <template>
-  <img :src="cachedUrl" alt="Profile Photo" class="img-fluid rounded-circle"
+  <img :src="cachedUrl" :alt="t('profilePhotoAlt')" class="img-fluid rounded-circle"
        style="height:50px; width: 50px" id="pic">
 </template>
 
 <script setup lang="ts">
 import {useMainStore} from "~/store";
+import { useUiText } from "~/composables/useUiText";
 
 const store = useMainStore()
+const { t } = useUiText()
 const props = defineProps(['id', 'urlProvided', 'cacheUrl'])
 const key = ref(0)
 

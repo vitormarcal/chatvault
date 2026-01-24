@@ -80,16 +80,18 @@ watch(
 
 <style scoped>
 .message-item {
-  padding: 8px 10px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
   text-align: left;
   position: relative;
-  background: #000000;
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0.9));
 }
 
 .message-id {
   color: rgb(241, 241, 242);
-  background-color: rgb(14, 97, 98);
+  background-color: rgba(14, 97, 98, 0.9);
   position: absolute;
   font-size: 10px;
   padding-inline: 7px;
@@ -105,22 +107,43 @@ watch(
   opacity: 1;
 }
 
+.author {
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
 .message-content {
   overflow-wrap: break-word;
   word-break: break-word;
   white-space: pre-wrap;
+  color: rgba(226, 232, 240, 0.9);
+  line-height: 1.45;
+  margin-top: 0.15rem;
 }
 
 .system-message .message-content {
   text-align: center;
 }
 
+.message-content :deep(a) {
+  color: #7dd3fc;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(125, 211, 252, 0.4);
+}
+
+.message-content :deep(a:hover) {
+  color: #bae6fd;
+  border-bottom-color: rgba(186, 230, 253, 0.8);
+}
+
 .message-createdAt {
   margin-left: 1rem;
   white-space: nowrap;
   font-size: 75%;
-  opacity: 0.6;
+  opacity: 0.7;
   align-self: flex-end;
+  color: var(--color-text-muted);
 }
 
 .blur-sensitive {
@@ -133,18 +156,22 @@ watch(
 }
 
 .message-item.highlighted {
-  background: linear-gradient(90deg, #1e4620 0%, #000000 100%);
+  background: linear-gradient(90deg, rgba(30, 70, 32, 0.95) 0%, rgba(2, 6, 23, 0.98) 100%);
   animation: fadeHighlight 3s ease-out forwards;
 }
 
 @keyframes fadeHighlight {
   0% {
-    background: linear-gradient(90deg, #4CAF50 0%, #000000 100%);
+    background: linear-gradient(90deg, rgba(76, 175, 80, 0.95) 0%, rgba(2, 6, 23, 0.98) 100%);
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
   }
   100% {
-    background: linear-gradient(90deg, #1e4620 0%, #000000 100%);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(90deg, rgba(30, 70, 32, 0.95) 0%, rgba(2, 6, 23, 0.98) 100%);
+    box-shadow: var(--shadow-sm);
   }
+}
+
+.message-item :deep(.attachment) {
+  margin-top: 0.65rem;
 }
 </style>

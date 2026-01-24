@@ -3,19 +3,19 @@
     <!-- Header with month/year and navigation -->
     <div class="list-header d-flex justify-content-between align-items-center mb-3">
       <button
-        class="btn btn-sm btn-outline-secondary"
+        class="btn btn-sm btn-outline-secondary nav-btn"
         @click="previousMonth"
         :disabled="isLoading"
-        aria-label="Previous month"
+        :aria-label="t('previousMonth')"
       >
         ‹
       </button>
-      <h5 class="mb-0">{{ monthYearLabel }}</h5>
+      <h5 class="month-label mb-0">{{ monthYearLabel }}</h5>
       <button
-        class="btn btn-sm btn-outline-secondary"
+        class="btn btn-sm btn-outline-secondary nav-btn"
         @click="nextMonth"
         :disabled="isLoading"
-        aria-label="Next month"
+        :aria-label="t('nextMonth')"
       >
         ›
       </button>
@@ -23,8 +23,9 @@
 
     <!-- Date list -->
     <div class="dates-list">
-      <div v-if="datesWithMessages.length === 0" class="alert alert-info mb-0">
-        No messages this month
+      <div v-if="datesWithMessages.length === 0" class="empty-state mb-0">
+        <div class="empty-title">{{ t('noMessagesMonth') }}</div>
+        <small class="text-muted">{{ t('noMessagesHint') }}</small>
       </div>
       <button
         v-for="item in datesWithMessages"
@@ -44,18 +45,18 @@
     <!-- Today button -->
     <div class="mt-3 text-center">
       <button
-        class="btn btn-sm btn-primary"
+        class="btn btn-sm btn-primary today-btn"
         @click="goToToday"
         :disabled="isLoading"
       >
-        Today
+        {{ t('today') }}
       </button>
     </div>
 
     <!-- Loading state -->
     <div v-if="isLoading" class="mt-3 text-center">
       <div class="spinner-border spinner-border-sm text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">{{ t('loading') }}</span>
       </div>
     </div>
   </div>
@@ -66,6 +67,7 @@ import { computed, ref, watch } from 'vue'
 import type { MessageStatistics } from '~/types/calendar'
 import { useCalendarLogic } from '~/composables/useCalendarLogic'
 import type { SupportedLocale } from '~/types/localization'
+import { useUiText } from '~/composables/useUiText'
 
 const props = defineProps<{
   statistics: MessageStatistics | null
@@ -78,6 +80,7 @@ const emit = defineEmits<{
   'select-date': [day: number]
   'month-changed': [date: Date]
 }>()
+const { t } = useUiText()
 
 const { formatMonthYear } = useCalendarLogic()
 
@@ -147,13 +150,33 @@ watch(() => props.currentMonth, (newMonth) => {
 <style scoped>
 .date-picker-list {
   padding: 1rem;
-  background: white;
-  border-radius: 0.375rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.92));
+  border-radius: 0.75rem;
 }
 
 .list-header {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--color-border-soft);
   padding-bottom: 0.75rem;
+}
+
+.month-label {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-dark);
+}
+
+.nav-btn {
+  border-radius: var(--radius-pill);
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border-color: var(--color-border-strong);
+  color: var(--color-text-dark);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .dates-list {
@@ -167,19 +190,22 @@ watch(() => props.currentMonth, (newMonth) => {
 .list-item {
   width: 100%;
   text-align: left;
-  padding: 0.75rem;
-  border-radius: 0.375rem;
-  border: 1px solid #dee2e6;
-  transition: all 0.2s ease;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--color-border-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .list-item:hover:not(:disabled) {
-  border-color: #0d6efd;
-  background-color: #f0f6ff;
+  border-color: var(--color-accent-strong);
+  background-color: rgba(13, 110, 253, 0.06);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
 }
 
 .list-item:active {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
 .list-item:disabled {
@@ -188,11 +214,36 @@ watch(() => props.currentMonth, (newMonth) => {
 
 .list-item strong {
   display: block;
-  color: #212529;
-  margin-bottom: 0.25rem;
+  color: var(--color-text-dark);
+  margin-bottom: 0.2rem;
 }
 
 .list-item small {
   font-size: 0.75rem;
+}
+
+.list-item .badge {
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.55rem;
+}
+
+.empty-state {
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  text-align: center;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.empty-title {
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin-bottom: 0.2rem;
+}
+
+.today-btn {
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.9rem;
+  box-shadow: 0 6px 18px rgba(13, 110, 253, 0.2);
 }
 </style>
