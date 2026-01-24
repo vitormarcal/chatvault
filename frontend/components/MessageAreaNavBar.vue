@@ -69,6 +69,7 @@ function handleCalendarClose() {
 }
 
 function handleCalendarDateSelect(dateStr: string) {
+  store.closeCalendar();
   store.jumpToDate(store.chatActive.chatId, dateStr);
 }
 

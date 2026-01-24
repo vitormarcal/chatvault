@@ -24,6 +24,11 @@ export const useMainStore = defineStore('main', () => {
         currentCalendarMonth: new Date(),
         statisticsLoading: false,
         calendarOpen: false,
+        paginationMode: 'latest' as 'latest' | 'jump',
+        jumpNextDate: null as string | null,
+        jumpPrevDate: null as string | null,
+        jumpHasMoreOlder: true,
+        jumpHasMoreNewer: true,
     });
 
     watch(() => state.authorActive, (newValue) => {
@@ -140,20 +145,180 @@ export const useMainStore = defineStore('main', () => {
     async function jumpToDate(chatId: number, targetDate: string) {
         state.loading = true;
         state.highlightUntilDate = targetDate;
+        state.paginationMode = 'jump';
+        state.jumpHasMoreOlder = true;
+        state.jumpHasMoreNewer = true;
         try {
             const url = useRuntimeConfig().public.api.getMessagesByDate
                 .replace(":chatId", chatId.toString())
                 .replace(":date", targetDate)
                 .replace(":pageSize", state.pageSize.toString());
             const response = await $fetch<any>(url);
-            state.messages = response.content.map((item: any) => toChatMessage(item));
-            state.nextPage = 1; // Mark that we've loaded from a specific date
+            const mapped = response.content.map((item: any) => toChatMessage(item));
+            const sorted = sortMessagesAsc(mapped);
+            state.messages = sorted;
+            const earliestDate = getEarliestDateOnly(sorted);
+            const latestDate = getLatestDateOnly(sorted);
+            state.jumpNextDate = earliestDate ? getPreviousDate(earliestDate) : null;
+            state.jumpPrevDate = latestDate ? getNextDate(latestDate) : null;
             state.searchOpen = false;
         } catch (error) {
             console.error("Jump to date error:", error);
         } finally {
             state.loading = false;
         }
+    }
+
+    async function loadMoreJumpMessages() {
+        if (!state.jumpNextDate) {
+            state.jumpHasMoreOlder = false;
+            return;
+        }
+
+        if (!state.chatActive.chatId) {
+            state.jumpHasMoreOlder = false;
+            return;
+        }
+
+        const earliestTimestamp = getEarliestTimestamp(state.messages);
+        if (earliestTimestamp == null) {
+            state.jumpHasMoreOlder = false;
+            return;
+        }
+
+        state.loading = true;
+        try {
+            let nextDate = state.jumpNextDate;
+            let attempts = 0;
+            let olderMessages: ChatMessage[] = [];
+
+            while (attempts < 3) {
+                const url = useRuntimeConfig().public.api.getMessagesByDate
+                    .replace(":chatId", state.chatActive.chatId.toString())
+                    .replace(":date", nextDate)
+                    .replace(":pageSize", state.pageSize.toString());
+                const response = await $fetch<any>(url);
+                const fetched = response.content.map((item: any) => toChatMessage(item));
+
+                if (fetched.length === 0) {
+                    state.jumpHasMoreOlder = false;
+                    break;
+                }
+
+                const older = fetched.filter((message) => {
+                    return new Date(message.createdAt).getTime() < earliestTimestamp;
+                });
+
+                if (older.length > 0) {
+                    olderMessages = older;
+                    break;
+                }
+
+                nextDate = getPreviousDate(nextDate);
+                attempts += 1;
+            }
+
+            if (olderMessages.length > 0) {
+                state.messages = mergeAndSortMessages(olderMessages, state.messages);
+                const earliestDate = getEarliestDateOnly(state.messages);
+                state.jumpNextDate = earliestDate ? getPreviousDate(earliestDate) : null;
+            } else if (state.jumpHasMoreOlder) {
+                state.jumpNextDate = nextDate;
+            }
+        } catch (error) {
+            console.error("Load more (jump) error:", error);
+        } finally {
+            state.loading = false;
+        }
+    }
+
+    async function loadMoreJumpMessagesNewer() {
+        if (!state.jumpPrevDate) {
+            state.jumpHasMoreNewer = false;
+            return;
+        }
+
+        if (!state.chatActive.chatId) {
+            state.jumpHasMoreNewer = false;
+            return;
+        }
+
+        const latestTimestamp = getLatestTimestamp(state.messages);
+        if (latestTimestamp == null) {
+            state.jumpHasMoreNewer = false;
+            return;
+        }
+
+        state.loading = true;
+        try {
+            let nextDate = state.jumpPrevDate;
+            let attempts = 0;
+            let newerMessages: ChatMessage[] = [];
+
+            while (attempts < 3) {
+                const url = useRuntimeConfig().public.api.getMessagesByDate
+                    .replace(":chatId", state.chatActive.chatId.toString())
+                    .replace(":date", nextDate)
+                    .replace(":pageSize", state.pageSize.toString());
+                const response = await $fetch<any>(url);
+                const fetched = response.content.map((item: any) => toChatMessage(item));
+
+                if (fetched.length === 0) {
+                    state.jumpHasMoreNewer = false;
+                    break;
+                }
+
+                const newer = fetched.filter((message) => {
+                    return new Date(message.createdAt).getTime() > latestTimestamp;
+                });
+
+                if (newer.length > 0) {
+                    newerMessages = newer;
+                    break;
+                }
+
+                nextDate = getNextDate(nextDate);
+                attempts += 1;
+            }
+
+            if (newerMessages.length > 0) {
+                state.messages = mergeAndSortMessages(newerMessages, state.messages);
+                const latestDate = getLatestDateOnly(state.messages);
+                state.jumpPrevDate = latestDate ? getNextDate(latestDate) : null;
+            } else if (state.jumpHasMoreNewer) {
+                state.jumpPrevDate = nextDate;
+            }
+        } catch (error) {
+            console.error("Load newer (jump) error:", error);
+        } finally {
+            state.loading = false;
+        }
+    }
+
+    async function loadOlderMessages() {
+        if (state.paginationMode === 'jump') {
+            await loadMoreJumpMessages();
+            return;
+        }
+
+        toNextPage();
+    }
+
+    async function loadNewerMessages() {
+        if (state.paginationMode !== 'jump') {
+            return;
+        }
+
+        await loadMoreJumpMessagesNewer();
+    }
+
+    function resetPaginationState() {
+        state.paginationMode = 'latest';
+        state.jumpNextDate = null;
+        state.jumpPrevDate = null;
+        state.jumpHasMoreOlder = true;
+        state.jumpHasMoreNewer = true;
+        state.nextPage = 0;
     }
 
     function clearHighlight() {
@@ -209,6 +374,9 @@ export const useMainStore = defineStore('main', () => {
         closeSearch,
         jumpToDate,
         clearHighlight,
+        loadOlderMessages,
+        loadNewerMessages,
+        resetPaginationState,
         fetchMessageStatistics,
         setCalendarMonth,
         openCalendar,
@@ -220,4 +388,61 @@ function attachmentUrl(chatId: number, messageId: number): string {
     return useRuntimeConfig().public.api.getAttachmentByChatIdAndMessageId
         .replace(':chatId', chatId.toString())
         .replace(':messageId', messageId.toString());
+}
+
+function sortMessagesAsc(messages: ChatMessage[]): ChatMessage[] {
+    return [...messages].sort((a, b) => {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+}
+
+function mergeAndSortMessages(olderMessages: ChatMessage[], existingMessages: ChatMessage[]): ChatMessage[] {
+    const merged = new Map<number, ChatMessage>();
+    for (const message of [...olderMessages, ...existingMessages]) {
+        if (!merged.has(message.id)) {
+            merged.set(message.id, message);
+        }
+    }
+    return sortMessagesAsc(Array.from(merged.values()));
+}
+
+function getEarliestTimestamp(messages: ChatMessage[]): number | null {
+    if (messages.length === 0) return null;
+    return Math.min(...messages.map((message) => new Date(message.createdAt).getTime()));
+}
+
+function getLatestTimestamp(messages: ChatMessage[]): number | null {
+    if (messages.length === 0) return null;
+    return Math.max(...messages.map((message) => new Date(message.createdAt).getTime()));
+}
+
+function getEarliestDateOnly(messages: ChatMessage[]): string | null {
+    const earliestTimestamp = getEarliestTimestamp(messages);
+    if (earliestTimestamp == null) return null;
+    return toDateOnlyString(new Date(earliestTimestamp));
+}
+
+function getLatestDateOnly(messages: ChatMessage[]): string | null {
+    const latestTimestamp = getLatestTimestamp(messages);
+    if (latestTimestamp == null) return null;
+    return toDateOnlyString(new Date(latestTimestamp));
+}
+
+function toDateOnlyString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getPreviousDate(dateStr: string): string {
+    const date = new Date(`${dateStr}T00:00:00`);
+    date.setDate(date.getDate() - 1);
+    return toDateOnlyString(date);
+}
+
+function getNextDate(dateStr: string): string {
+    const date = new Date(`${dateStr}T00:00:00`);
+    date.setDate(date.getDate() + 1);
+    return toDateOnlyString(date);
 }
