@@ -3,19 +3,19 @@
     <!-- Header with month/year and navigation -->
     <div class="calendar-header d-flex justify-content-between align-items-center mb-3">
       <button
-        class="btn btn-sm btn-outline-secondary"
+        class="btn btn-sm btn-outline-secondary nav-btn"
         @click="previousMonth"
         :disabled="isLoading"
-        aria-label="Previous month"
+        :aria-label="t('previousMonth')"
       >
         ‹
       </button>
-      <h5 class="mb-0">{{ monthYearLabel }}</h5>
+      <h5 class="month-label mb-0">{{ monthYearLabel }}</h5>
       <button
-        class="btn btn-sm btn-outline-secondary"
+        class="btn btn-sm btn-outline-secondary nav-btn"
         @click="nextMonth"
         :disabled="isLoading"
-        aria-label="Next month"
+        :aria-label="t('nextMonth')"
       >
         ›
       </button>
@@ -26,8 +26,7 @@
       <div
         v-for="(dayLabel, index) in dayLabels"
         :key="`day-${index}`"
-        class="text-center small text-muted"
-        style="padding: 0.5rem 0;"
+        class="weekday text-center small text-muted"
       >
         {{ dayLabel }}
       </div>
@@ -60,18 +59,18 @@
     <!-- Today button -->
     <div class="mt-3 text-center">
       <button
-        class="btn btn-sm btn-primary"
+        class="btn btn-sm btn-primary today-btn"
         @click="goToToday"
         :disabled="isLoading"
       >
-        Today
+        {{ t('today') }}
       </button>
     </div>
 
     <!-- Loading state -->
     <div v-if="isLoading" class="mt-3 text-center">
       <div class="spinner-border spinner-border-sm text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">{{ t('loading') }}</span>
       </div>
     </div>
   </div>
@@ -82,6 +81,7 @@ import { computed, ref, watch } from 'vue'
 import type { MessageStatistics } from '~/types/calendar'
 import { useCalendarLogic } from '~/composables/useCalendarLogic'
 import type { SupportedLocale } from '~/types/localization'
+import { useUiText } from '~/composables/useUiText'
 
 const props = defineProps<{
   statistics: MessageStatistics | null
@@ -94,6 +94,7 @@ const emit = defineEmits<{
   'select-date': [day: number]
   'month-changed': [date: Date]
 }>()
+const { t } = useUiText()
 
 const { getMonthDays, calculateHeatmapColor, getDayOfWeekLabels, formatMonthYear, getMessageCountForDate, hasMessages: hasMessagesLogic } = useCalendarLogic()
 
@@ -159,51 +160,78 @@ watch(() => props.currentMonth, (newMonth) => {
 <style scoped>
 .calendar-picker {
   padding: 1rem;
-  background: white;
-  border-radius: 0.375rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.92));
+  border-radius: 0.75rem;
 }
 
 .calendar-header {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--color-border-soft);
   padding-bottom: 0.75rem;
+}
+
+.month-label {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text-dark);
+}
+
+.nav-btn {
+  border-radius: var(--radius-pill);
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border-color: var(--color-border-strong);
+  color: var(--color-text-dark);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.weekday {
+  padding: 0.4rem 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
 }
 
 .calendar-day {
   aspect-ratio: 1;
-  border: 1px solid #dee2e6;
-  border-radius: 0.25rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.6rem;
   padding: 0.25rem;
   font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: white;
-  color: #212529;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: var(--color-text-dark);
 }
 
 .calendar-day.empty {
-  background-color: #f8f9fa;
+  background-color: #f8fafc;
   border: none;
   cursor: default;
 }
 
 .calendar-day.no-messages {
-  background-color: #f8f9fa;
-  color: #6c757d;
+  background-color: #f3f4f6;
+  color: #9ca3af;
   cursor: default;
 }
 
 .calendar-day.has-messages {
-  border-color: #0d6efd;
+  border-color: var(--color-accent-strong);
   font-weight: 500;
 }
 
 .calendar-day.has-messages:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
 }
 
 .calendar-day:disabled {
@@ -217,10 +245,16 @@ watch(() => props.currentMonth, (newMonth) => {
 
 .message-count {
   font-size: 0.75rem;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .calendar-weekdays {
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.today-btn {
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.9rem;
+  box-shadow: 0 6px 18px rgba(13, 110, 253, 0.2);
 }
 </style>

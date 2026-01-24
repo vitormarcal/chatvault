@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useMainStore } from "~/store";
+import { useUiText } from "~/composables/useUiText";
 
 const store = useMainStore();
 
-const galleryOptions = ref([
-  { type: "ALL", label: "All" },
-  { type: "VIDEO", label: "Video Files" },
-  { type: "IMAGE", label: "Image Files" },
-  { type: "PDF", label: "Documents" },
-  { type: "AUDIO", label: "Audio Files" },
+const { t } = useUiText();
+
+const galleryOptions = computed(() => [
+  { type: "ALL", label: t('filterAll') },
+  { type: "VIDEO", label: t('filterVideo') },
+  { type: "IMAGE", label: t('filterImage') },
+  { type: "PDF", label: t('filterDocuments') },
+  { type: "AUDIO", label: t('filterAudio') },
 ]);
 
 const galleryFileType = ref("ALL");
@@ -25,10 +28,11 @@ function setGalleryFilter(type: string) {
 </script>
 
 <template>
-  <div>
+  <div class="gallery-panel">
     <slot></slot>
-    <div class="title">Gallery</div>
-    <ul class="nav justify-content-end">
+    <div class="gallery-header">
+    <div class="title">{{ t('galleryTitle') }}</div>
+      <ul class="nav filter-tabs justify-content-end">
       <li
           v-for="item in galleryOptions"
           :key="item.type"
@@ -42,16 +46,17 @@ function setGalleryFilter(type: string) {
           {{ item.label }}
         </button>
       </li>
-    </ul>
+      </ul>
+    </div>
 
-    <div class="row">
+    <div class="row gallery-grid">
       <div
           class="col-md-4"
           v-for="item in attachments"
           :key="item.url"
           v-memo="galleryFileType"
       >
-        <div class="card">
+        <div class="card gallery-card">
           <focusable-attachment :attachment="item" />
         </div>
       </div>
@@ -60,7 +65,53 @@ function setGalleryFilter(type: string) {
 </template>
 
 <style scoped>
-.nav-link.active {
-  font-weight: bold;
+.gallery-panel {
+  color: var(--color-text);
+}
+
+.gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.filter-tabs {
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.filter-tabs .nav-link {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  padding: 0.25rem 0.7rem;
+  background: rgba(15, 23, 42, 0.2);
+  font-size: 0.85rem;
+}
+
+.filter-tabs .nav-link.active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: var(--color-accent-strong);
+  font-weight: 600;
+}
+
+.gallery-grid {
+  margin-top: 0.5rem;
+  row-gap: 0.75rem;
+}
+
+.gallery-card {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(15, 23, 42, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 </style>

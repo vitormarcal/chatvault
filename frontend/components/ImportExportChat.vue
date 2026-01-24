@@ -1,7 +1,9 @@
 <script setup lang="ts" xmlns="http://www.w3.org/1999/html">
 import {useMainStore} from "~/store";
+import { useUiText } from "~/composables/useUiText";
 const props = defineProps(['allowDownloadAll'])
 const store = useMainStore()
+const { t } = useUiText()
 const clickModal = ref(false)
 const chatImportRef = ref(null)
 const errorMessage = ref(undefined)
@@ -75,24 +77,24 @@ watch(
 </script>
 
 <template>
-  <div class="chat-option mt-3 ">
+  <div class="chat-option mt-3">
 
-    <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal">
-      Import/Export
+    <button type="button" @click="toggleModal" class="btn btn-outline-primary btn-sm import-trigger" data-bs-toggle="modal">
+      {{ t('importExport') }}
     </button>
 
-    <div class="modal" :class="modalClass" tabindex="-1">
+    <div class="modal import-modal" :class="modalClass" tabindex="-1" v-if="clickModal">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title text-black">File importer/exporter</h5>
+            <h5 class="modal-title">{{ t('importExportTitle') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" @click="toggleModal"
-                    aria-label="Close"></button>
+                    :aria-label="t('close')"></button>
           </div>
           <div class="modal-body">
-            <div class="form-control">
+            <div class="content-surface">
               <div class="alert alert-warning" v-if="errorMessage" role="alert">
-                Failed to import<br/>
+                {{ t('failedToImport') }}<br/>
                 {{ errorMessage }}
               </div>
 
@@ -101,13 +103,13 @@ watch(
                    :href="linkDownload"
                    :download="chatName"
                 >
-                  Get the entire chat
+                  {{ t('getEntireChat') }}
                 </a>
               </div>
 
               <div class="form-group mb-3 pt-4 border-top border-2" v-if="!allowDownloadAll">
-                <p class="text-black">Attention, these actions are related to the selected chat! </p>
-                <label for="formFileSm" class="form-label text-black">Import messages to this chat</label>
+                <p class="helper">{{ t('actionsApplyCurrentChat') }}</p>
+                <label for="formFileSm" class="form-label">{{ t('importMessagesToChat') }}</label>
                 <input class="form-control form-control-sm"
                        @change="onFilePicked"
                        accept=".zip,.txt"
@@ -117,7 +119,7 @@ watch(
               </div>
               <div class="btn-group" role="group" v-if="!allowDownloadAll">
                 <button type="button" :disabled="disableUpload" @click="uploadFile"
-                        class="btn btn-outline-secondary ml-2">Upload
+                        class="btn btn-outline-secondary ml-2">{{ t('upload') }}
                 </button>
               </div>
             </div>
@@ -125,7 +127,7 @@ watch(
 
           </div>
           <div class="modal-footer">
-            <button type="button" @click="toggleModal" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" @click="toggleModal" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('close') }}</button>
           </div>
         </div>
       </div>
@@ -135,5 +137,75 @@ watch(
 </template>
 
 <style scoped>
+.import-trigger {
+  border-radius: var(--radius-pill);
+}
 
+.import-modal {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.14), transparent 45%),
+    rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(2px);
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-dialog {
+  max-width: 520px;
+  width: calc(100% - 2rem);
+}
+
+.modal-content {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--color-border-soft);
+  background: linear-gradient(180deg, rgba(248, 249, 251, 0.9), rgba(248, 249, 251, 0.6));
+  padding: 1.1rem 1.2rem 0.85rem;
+}
+
+.btn-close:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-pill);
+}
+
+.modal-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.modal-body {
+  padding: 1rem 1.2rem 0.8rem;
+}
+
+.content-surface {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-soft);
+  background: #fff;
+  padding: 1rem;
+}
+
+.helper {
+  color: var(--color-text-muted-dark);
+  margin-bottom: 0.75rem;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--color-border-soft);
+  padding: 0.8rem 1.2rem 1.1rem;
+}
+
+.modal-footer .btn {
+  border-radius: var(--radius-pill);
+}
 </style>

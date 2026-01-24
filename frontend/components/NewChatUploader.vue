@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {useMainStore} from "~/store";
+import { useUiText } from "~/composables/useUiText";
 
 const store = useMainStore()
+const { t } = useUiText()
 const emit = defineEmits(['update:chats', 'exit:dialog'])
 const chatImportRef = ref(null)
 const importChatResult = ref({data: null, errorMessage: null})
@@ -55,17 +57,17 @@ function cancel() {
   <div class="m-auto col-md-3">
     <div class="form-control">
       <div class="alert alert-warning" v-if="importChatResult.errorMessage" role="alert">
-        Failed to import.<br/>
+        {{ t('failedToImport') }}.<br/>
         {{ importChatResult.errorMessage }}
       </div>
 
       <div class="form-group">
-        <label for="formGroupExampleInput">Give this chat a name</label>
-        <input type="text" class="form-control" id="formGroupExampleInput" v-model="chatName" placeholder="Chat name">
+        <label for="formGroupExampleInput">{{ t('newChatNameLabel') }}</label>
+        <input type="text" class="form-control" id="formGroupExampleInput" v-model="chatName" :placeholder="t('newChatNamePlaceholder')">
       </div>
 
       <div class="form-group mb-3 pt-4 border-top border-2">
-        <label for="formFileSm" class="form-label text-black">Import a new chat</label>
+        <label for="formFileSm" class="form-label text-black">{{ t('importNewChatLabel') }}</label>
         <input class="form-control form-control-sm"
                @change="onFilePicked"
                accept=".zip,.txt"
@@ -75,10 +77,10 @@ function cancel() {
       </div>
       <div class="btn-group" role="group">
         <button type="button" :disabled="disableUpload" @click="uploadFile"
-                class="btn btn-outline-secondary ml-2">Upload
+                class="btn btn-outline-secondary ml-2">{{ t('uploadButton') }}
         </button>
         <button type="button" @click="cancel"
-                class="btn btn-outline-secondary ml-2">Cancel
+                class="btn btn-outline-secondary ml-2">{{ t('cancelButton') }}
         </button>
       </div>
     </div>

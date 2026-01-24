@@ -2,9 +2,8 @@
   <div class="chat-item d-flex flex-row p-2 w-100" @click="emitThisChatActive()">
     <profile-image :id="item.chatId"/>
     <div
-        class="w-50"
+        class="w-50 chat-preview"
         :class="{ 'blur-sensitive': store.blurEnabled }"
-        style="padding-left: .5rem"
     >
       <div class="name">{{ item.chatName }}</div>
       <div class="small text-truncate">
@@ -31,12 +30,29 @@ function emitThisChatActive() {
 <style>
 .chat-item {
   cursor: pointer;
-  background: #000000;
-  border-bottom: 1px solid #360d3c;
+  background: rgba(2, 6, 23, 0.95);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  align-items: center;
 }
 
 .chat-item:hover {
-  background: #360d3c;
+  background: var(--color-accent-soft);
+  transform: translateY(-1px);
+}
+
+.chat-preview {
+  padding-left: 0.6rem;
+}
+
+.name {
+  color: var(--color-text);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.chat-item .small {
+  color: var(--color-text-muted);
 }
 
 .blur-sensitive {

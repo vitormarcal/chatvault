@@ -1,16 +1,16 @@
 <template>
   <div id="chat-list-area"
-       class="col-12  col-md-3 flex-column overflow-auto h-100 p-0"
+       class="col-12 col-md-3 flex-column overflow-auto h-100 p-0"
        :class="dynamicClass">
     <div class="action-bar d-flex flex-row p-2 sticky-top">
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitCreateNewChat">Create new chat</button>
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitDiskImport">Execute Disk Import
+        <button type="button" class="btn btn-outline-primary btn-sm action-btn" @click="emitCreateNewChat">{{ t('createNewChat') }}</button>
+        <button type="button" class="btn btn-outline-primary btn-sm action-btn" @click="emitDiskImport">{{ t('executeDiskImport') }}
         </button>
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="emitChatExport">Execute chat export
+        <button type="button" class="btn btn-outline-primary btn-sm action-btn" @click="emitChatExport">{{ t('executeChatExport') }}
         </button>
-        <button type="button" class="btn btn-outline-primary btn-sm" @click="store.toggleBlur">
-          {{ store.blurEnabled ? "Disable Blur" : "Enable Blur" }}
+        <button type="button" class="btn btn-outline-primary btn-sm action-btn" @click="store.toggleBlur">
+          {{ store.blurEnabled ? t('disableBlur') : t('enableBlur') }}
         </button>
       </div>
 
@@ -26,8 +26,10 @@
 <script setup lang="ts">
 
 import {useMainStore} from "~/store";
+import { useUiText } from "~/composables/useUiText";
 
 const store = useMainStore()
+const { t } = useUiText()
 
 const props = defineProps(['chats', 'mobile'])
 const emit = defineEmits(['update:chat-active', 'create:chat', 'update:disk-import', 'export:chat'])
@@ -68,7 +70,31 @@ function exitThisChat() {
 
 
 <style>
+#chat-list-area {
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.98));
+  border-right: 1px solid var(--color-border);
+}
+
 .action-bar {
-  background: #000000;
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.98));
+  border-bottom: 1px solid var(--color-border);
+  gap: 0.4rem;
+}
+
+.action-bar .btn-group {
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.action-btn {
+  border-radius: var(--radius-pill);
+  background: rgba(15, 23, 42, 0.2);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.action-btn:hover:not(:disabled) {
+  border-color: var(--color-accent-strong);
+  background: rgba(59, 130, 246, 0.12);
 }
 </style>

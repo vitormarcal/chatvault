@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {useMainStore} from "~/store";
+import { useUiText } from "~/composables/useUiText";
 const props = defineProps(['allowDownloadAll'])
 const store = useMainStore()
+const { t } = useUiText()
 const emit = defineEmits(['exit:dialog'])
 
 const linkDownload = computed(() => {
@@ -35,13 +37,13 @@ function cancel() {
            :href="linkDownload"
            :download="chatName"
         >
-          Get the entire chat
+          {{ t('getEntireChat') }}
         </a>
       </div>
 
       <div class="btn-group" role="group">
         <button type="button" @click="cancel"
-                class="btn btn-outline-secondary ml-2">Cancel
+                class="btn btn-outline-secondary ml-2">{{ t('cancel') }}
         </button>
       </div>
     </div>

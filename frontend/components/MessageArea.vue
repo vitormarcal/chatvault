@@ -7,7 +7,7 @@
 
     <message-area-nav-bar/>
     <div id="infinite-list" class="message-list d-flex flex-column">
-      <button v-if="hasNextPages" type="button" class="btn btn-light" @click="loadMoreMessages">Load more messages
+      <button v-if="hasNextPages" type="button" class="btn btn-light load-more" @click="loadMoreMessages">{{ t('loadMoreMessages') }}
       </button>
       <template v-for="(message, index) in messages" :key="index">
         <message-item
@@ -24,8 +24,10 @@
 <script setup lang="ts">
 import MessageItem from "~/components/MessageItem.vue";
 import {useMainStore} from "~/store";
+import { useUiText } from "~/composables/useUiText";
 
 const store = useMainStore()
+const { t } = useUiText()
 const props = defineProps(['mobile'])
 const messagesAreaElement = ref(null)
 
@@ -117,6 +119,20 @@ watch(content, async (newContent, oldContent) => {
 
 <style scoped>
 .message-area {
-  background: #000000;
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.95));
+}
+
+.message-list {
+  padding: 1rem 1.25rem 1.5rem;
+  gap: 0.75rem;
+}
+
+.load-more {
+  align-self: center;
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 1rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
 }
 </style>
