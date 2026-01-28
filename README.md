@@ -4,7 +4,7 @@ Chat Vault is a Kotlin Spring Boot application designed to store backups of What
 
 This project is still in development, and some features may not be fully implemented.
 
-![A screenshot of the ChatVault interface displays a blur effect applied to the message text. On the left, there is an area with the list of chats, each accompanied by its corresponding profile picture. In the center, the open chat shows the visible content of the messages. On the right, the chat's image gallery is visible, showing the thumbnails of the images available in the gallery.](doc/chatvault-blur-enabled-v1.20.0.png)
+![A screenshot of the ChatVault interface displays a blur effect applied to the message text. On the left, there is an area with the list of chats, each accompanied by its corresponding profile picture. In the center, the open chat shows the visible content of the messages. On the right, the chat's image gallery is visible, showing the thumbnails of the images available in the gallery.](docs/layout/chatvault-blur-enabled-v1.20.0.png)
 
 ## Key Features
 * Directory importing: Place files exported from whatsapp in specific directories to be imported into the application.
@@ -13,13 +13,7 @@ This project is still in development, and some features may not be fully impleme
 
 ## How to export via the Whatsapp app
 
-Please read the [official Whatsapp FAQ](https://faq.whatsapp.com/1180414079177245/?cms_platform=android).
-
-With the imported file, to ingest it into ChatVault you can:
-
-* map a shared folder between the ChatVault import directory and your cell phone;
-* send by email for automatic import into ChatVault;
-* zip the imported file and upload it to the ChatVault interface.
+See [docs/whatsapp-export.md](docs/whatsapp-export.md) for the official FAQ link and import options.
 
 ## Repository structure
 
@@ -55,123 +49,12 @@ There are docker image packages on github. You can download the latest image wit
 
 `docker pull ghcr.io/vitormarcal/chatvault:latest`
 
-#### Docker image build and release workflow
-
-This project uses a Makefile-based workflow to build and publish Docker images in a safe and explicit way.
-
-The goal is to clearly separate **dev/test images** from **stable release images**, and to avoid accidentally publishing unstable versions as `latest`.
-
-##### Dev / test images
-
-Dev and test images must always use an explicit version tag, such as:
-
-```
-1.2.3-beta.1
-```
-
-To build and publish a dev/test image:
-
-```bash
-make dev VERSION=1.2.3-beta.1
-```
-
-What this does:
-- Builds `ghcr.io/vitormarcal/chatvault:1.2.3-beta.1`
-- Pushes only that tag
-- Does **not** update `latest`
-
-Dev images are never published as `latest`.
-
----
-
-##### Release images
-
-Stable releases must use a clean semantic version, such as:
-
-```
-1.2.3
-```
-
-To build and publish a release image:
-
-```bash
-make release VERSION=1.2.3
-```
-
-What this does:
-- Validates the version string
-- Builds `ghcr.io/vitormarcal/chatvault:1.2.3`
-- Tags the same image as `latest`
-- Pushes both `1.2.3` and `latest`
-
-This is the **only** supported way to update the `latest` tag.
-
----
-
-##### Safety checks
-
-The release process includes built-in safety checks and will fail if:
-
-- `VERSION=latest`
-- `VERSION=dev`
-- The version contains pre-release identifiers:
-    - `-alpha`
-    - `-beta`
-    - `-rc`
-    - `-snapshot`
-
-This prevents unstable versions from being accidentally released as `latest`.
-
----
-
-##### Help and usage
-
-Running `make` without arguments shows a built-in help message describing all available commands:
-
-```bash
-make
-```
-
-If you are unsure which command to use:
-- **Testing or experimentation**: use `make dev`
-- **Publishing a stable version**: use `make release`
+See [docs/docker-release.md](docs/docker-release.md) for the image build and release workflow.
 
 ### Volumes
 
-The app requires storing chat files in the file system. For Docker usage, please refer to the Environment Variables section.
-
-- `chatvault.bucket.root`: This is the volume used to store your files. Do not delete this.
-- `chatvault.bucket.import`: This volume is used temporarily to store chat files that are to be parsed by the app and then moved to bucket.root.
-- `chatvault.bucket.export`: This volume is used temporarily to store a chat that is to be downloaded.
+See [docs/configuration.md](docs/configuration.md) for volume details.
 
 ### Environment variables
 
-For docker, the variables must be in upper case and where there is "." it must be "_":
-`some.environment.variable` is like `SOME_ENVIRONMENT_VARIABLE` in docker
-
-| Environment variables                     | obs                          | example                                            |
-|-------------------------------------------|------------------------------|----------------------------------------------------|
-| Database                                  | required                     |                                                    |
-| spring.datasource.url                     | required                     | jdbc:postgresql://database_host:5432/database_name |
-| spring.datasource.username                | required                     | user                                               |
-| spring.datasource.password                | required                     | secret                                             |
-| --------------------------                | --------------------------   | ---------                                          |
-| Email import                              | feat not required            |                                                    |
-| chatvault.email.enabled                   | not required                 | true                                               |
-| chatvault.email.host                      | required to feat             | imap.server.com                                    |
-| chatvault.email.password                  | required to feat             | secret                                             |
-| chatvault.email.port                      | required to feat             | 993                                                |
-| chatvault.email.username                  | required to feat             | someuser                                           |
-| chatvault.email.debug                     | not required                 | true                                               |
-| --------------------------                |                              | --------------------------                         |
-| File system                               | not required                 |                                                    |
-| chatvault.bucket.root                     | not required                 | /opt/chatvault/archive                             |
-| chatvault.bucket.import                   | not required                 | /opt/chatvault/import                              |
-| chatvault.bucket.export                   | not required                 | /opt/chatvault/export                              |
-| --------------------------                |                              | --------------------------                         |
-| chatvault.host                            | not required                 | https://somehost.com ,http://localhost:3000        |
-| spring.servlet.multipart.max-file-size    | not required                 | 500MB                                              |
-| spring.servlet.multipart.max-request-size | not required                 | 500MB                                              |
-| chatvault.msgparser.dateformat            | not required but recommended | dd/MM/yyyy HH:mm                                   |
-
-* If not defined chatvault.msgparser.dateformat, the application will not be able to resolve ambiguities in certain situations.
+See [docs/configuration.md](docs/configuration.md) for the full environment variable table and notes.
