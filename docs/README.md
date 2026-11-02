@@ -1,5 +1,6 @@
 # Documentation index
 
+- [Melhorias e pendências por ordem de relevância](improvements-priority.md)
 - [Layout history](layout-history.md)
 - [Configuration (volumes + env vars)](configuration.md)
 - [Docker image release workflow](docker-release.md)
