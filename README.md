@@ -11,6 +11,10 @@ This project is still in development, and some features may not be fully impleme
 * Automated Email Backup: Set up an email in ChatVault and export your messages as attachments to that email. Chat Vault identifies this email and archives the messages and attachments automatically.
 * Intuitive Frontend: To facilitate access to archived messages and their attachments, Chat Vault also includes a user-friendly frontend. Easily navigate conversations, search messages, and view attachments.
 
+## Export your saved archive as an offline HTML site
+
+Use **Export conversations → Exportar acervo como site HTML** to generate a ZIP with all saved messages, attachments, structured JSON and an integrity report. Extract the ZIP and open `index.html` without running ChatVault. See [the export guide](docs/static-export.md) for requirements and validation before retiring the service.
+
 ## How to export via the Whatsapp app
 
 See [docs/whatsapp-export.md](docs/whatsapp-export.md) for the official FAQ link and import options.

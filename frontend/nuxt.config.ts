@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
       public: {
           api: {
+              archiveExports: `${host}/archive-exports`,
               appVersion: `${host}/version`,
               listChats: `${host}/chats`,
               getMessagesByIdAndPage: `${host}/chats/:chatId?page=:page&size=:size&query=:query`,

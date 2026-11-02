@@ -30,7 +30,7 @@ function cancel() {
 </script>
 
 <template>
-  <div class="m-auto col-md-3">
+  <div class="m-auto col-12 col-md-8 col-lg-6">
     <div class="form-control">
       <div class="form-group d-flex justify-content-center mb-3">
         <a class="d-block text-center"
@@ -41,7 +41,9 @@ function cancel() {
         </a>
       </div>
 
-      <div class="btn-group" role="group">
+      <static-archive-exporter v-if="props.allowDownloadAll" />
+
+      <div class="btn-group mt-3" role="group">
         <button type="button" @click="cancel"
                 class="btn btn-outline-secondary ml-2">{{ t('cancel') }}
         </button>

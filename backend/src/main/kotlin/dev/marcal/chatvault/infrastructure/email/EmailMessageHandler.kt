@@ -1,6 +1,7 @@
 package dev.marcal.chatvault.infrastructure.email
 
 import dev.marcal.chatvault.api.dto.input.PendingChatFile
+import dev.marcal.chatvault.application.archive.ArchiveGate
 import dev.marcal.chatvault.application.chat.BucketDiskImportService
 import dev.marcal.chatvault.application.chat.ChatImportService
 import jakarta.mail.Folder
@@ -21,11 +22,17 @@ class EmailMessageHandler(
     @Value("\${chatvault.email.subject-starts-with}") private val subjectStartsWithList: List<String>,
     @Value("\${chatvault.email.debug}") private val emailDebug: Boolean,
     private val bucketDiskImporter: BucketDiskImportService,
+    private val archiveGate: ArchiveGate,
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @ServiceActivator(inputChannel = "imapChannel")
-    fun handleMessage(message: Message<MimeMessage>) {
+    fun handleMessage(message: Message<MimeMessage>) =
+        archiveGate.awaitMutation {
+            processMessage(message)
+        }
+
+    private fun processMessage(message: Message<MimeMessage>) {
         val mimeMessage =
             message.payload.also {
                 if (emailDebug) logger.info("Starting to process new email message ${it.subject}")
